@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es" th:fragment="layout(main)">
+<head th:replace="~{fragments/head :: head('Quizly')}"></head>
+<body>
+    <header class="border-b border-border bg-surface px-5 py-3">
+        <div class="mx-auto flex max-w-5xl items-center gap-2">
+            <span class="flex size-8 items-center justify-center rounded-lg bg-accent text-sm font-semibold text-text-inverse">Q</span>
+            <span class="text-sm font-semibold tracking-tight text-text">Quizly</span>
+            <span class="ms-auto text-sm text-text-muted">Plataforma educativa</span>
+            <span class="badge-admin">Estudiante</span>
+
+            <form th:action="@{/logout}" method="post" class="inline">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+            
+            <button type="submit" class="px-3 py-1 rounded bg-red-500 text-white hover:bg-red-600 transition">
+                Cerrar sesión
+            </button>
+            </form>
+        </div>
+    </header>
+
+    <main th:replace="${main}"></main>
+
+    <div id="toast-container" class="fixed top-5 right-5 z-9999 flex flex-col gap-3 pointer-events-none">
+        <template id="toast-template">
+            <div class="toast relative overflow-hidden pointer-events-auto flex items-center gap-3 rounded-lg border p-3 shadow-sm"
+                role="alert">
+    
+                <div class="flex gap-4 flex-1">
+                    <i class="toast-icon"></i>
+                    <!-- <p class="toast-title font-semibold"></p> -->
+                    <p class="toast-message"></p>
+                </div>
+    
+                <button class="btn-cerrar ml-4 text-lg leading-none hover:opacity-70" aria-label="Cerrar">
+                    &times;
+                </button>
+
+                <div class="toast-progress absolute bottom-0 left-0 h-1 w-full bg-black/10">
+                    <div class="toast-progress-bar h-full w-full origin-left scale-x-100"></div>
+                </div>           
+            </div>
+        </template>
+    </div>
+
+    <script th:inline="javascript">
+        const toasts = /*[[${toasts}]]*/ null;
+    
+        if (toasts) {
+            toasts.forEach(t => {
+                ToastSystem.mostrar(t.type, t.message);
+            });
+            // ToastSystem.mostrar(toasts.type, toasts.message);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es" th:replace="~{layout/base_layout :: layout(~{::main})}">
+<head th:replace="~{fragments/head :: head('Quizly')}"></head>
+<body>
+  <main th:fragment="main" class="mx-auto max-w-5xl px-6 py-8">
+    <h1 class="text-xl font-semibold tracking-tight text-text">
+      Bienvenido, 
+      <span th:if="${currentUser != null}" th:text="${currentUser.nombre}"></span>
+    </h1>
+    <p class="mt-1 text-sm text-text-muted">Vista previa de la paleta EduQuiz</p>
+
+    <div class="mt-6 grid gap-3 sm:grid-cols-4">
+      <article class="surface-card p-4">
+        <div class="icon-tint-blue mb-2 flex size-8 items-center justify-center rounded-lg text-base">📘</div>
+        <p class="font-mono text-2xl font-semibold text-accent">7</p>
+        <p class="text-[11px] text-text-muted">Cuestionarios completados</p>
+      </article>
+      <article class="surface-card p-4">
+        <div class="icon-tint-green mb-2 flex size-8 items-center justify-center rounded-lg text-base">📈</div>
+        <p class="font-mono text-2xl font-semibold text-accent-green">84%</p>
+        <p class="text-[11px] text-text-muted">Puntuación media</p>
+      </article>
+      <article class="surface-card p-4">
+        <div class="icon-tint-orange mb-2 flex size-8 items-center justify-center rounded-lg text-base">📚</div>
+        <p class="font-mono text-2xl font-semibold text-accent-orange">3</p>
+        <p class="text-[11px] text-text-muted">Asignaturas activas</p>
+      </article>
+      <article class="surface-card p-4">
+        <div class="icon-tint-purple mb-2 flex size-8 items-center justify-center rounded-lg text-base">⏱</div>
+        <p class="font-mono text-2xl font-semibold text-accent-purple">142</p>
+        <p class="text-[11px] text-text-muted">Minutos de estudio</p>
+      </article>
+    </div>
+
+    <h2 class="mt-8 text-[11px] font-medium uppercase tracking-wider text-text-muted">Cuestionarios recomendados</h2>
+    <ul class="mt-3 space-y-2">
+      <li class="surface-card surface-card-interactive flex items-center gap-3 p-3">
+        <span class="badge-difficulty badge-difficulty-easy">Básico</span>
+        <span class="flex-1 text-sm font-medium text-text">Integrales definidas</span>
+        <span class="text-[11px] text-text-muted">15 preguntas</span>
+        <button type="button" class="btn-primary">Empezar</button>
+      </li>
+      <li class="surface-card surface-card-interactive flex items-center gap-3 p-3">
+        <span class="badge-difficulty badge-difficulty-medium">Intermedio</span>
+        <span class="flex-1 text-sm font-medium text-text">Óptica geométrica</span>
+        <span class="text-[11px] text-text-muted">10 preguntas</span>
+        <button type="button" class="btn-primary">Empezar</button>
+      </li>
+      <li class="surface-card surface-card-interactive flex items-center gap-3 p-3">
+        <span class="badge-difficulty badge-difficulty-hard">Avanzado</span>
+        <span class="flex-1 text-sm font-medium text-text">Reacciones de oxidación</span>
+        <span class="text-[11px] text-text-muted">20 preguntas</span>
+        <button type="button" class="btn-primary">Empezar</button>
+      </li>
+    </ul>
+  </main>  
+</body>
+</html>

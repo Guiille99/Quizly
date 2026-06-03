@@ -1,0 +1,22 @@
+{
+  "name": "quizly",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev:css": "tailwindcss -i ./src/main/frontend/input.css -o ./src/main/resources/static/css/tailwind.css --watch",
+    "build:css": "tailwindcss -i ./src/main/frontend/input.css -o ./src/main/resources/static/css/tailwind.css --minify"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@tailwindcss/cli": "^4.3.0",
+    "bootstrap-icons": "^1.13.1",
+    "tailwindcss": "^4.3.0"
+  },
+  "devDependencies": {
+    "@iconify/tailwind": "^1.2.0"
+  }
+}

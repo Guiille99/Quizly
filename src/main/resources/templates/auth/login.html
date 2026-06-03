@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es"
+      th:replace="~{layout/auth_layout :: layout('Iniciar sesión · Quizly', 'compact', 'Bienvenido de nuevo', 'Accede a tu cuenta para continuar', ~{::content}, ~{::footer})}">
+<!-- <head>
+  <title th:fragment="title">Iniciar sesión · Quizly</title>
+</head> -->
+<body>
+
+<div th:fragment="content" class="mt-6">
+  <div th:if="${param.error}" class="alert alert-error mb-4" role="alert">
+    <span>Usuario o contraseña incorrectos. Inténtalo de nuevo.</span>
+  </div>
+  <div th:if="${param.logout}" class="alert alert-success mb-4" role="status">
+    <span>Has cerrado sesión correctamente.</span>
+  </div>
+  <div th:if="${param.registered}" class="alert alert-success mb-4º" role="status">
+    <span>Cuenta creada. Ya puedes iniciar sesión.</span>
+  </div>
+
+  <form th:action="@{/login}" method="post" class="form-stack">
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+
+    <div>
+      <label class="form-label" for="username">Nombre de usuario</label>
+      <input class="form-input" type="text" id="username" name="username"
+             autocomplete="username" placeholder="Nombre de usuario" required autofocus>
+    </div>
+
+    <div>
+      <label class="form-label" for="password">
+        Contraseña
+        <a href="#" tabindex="-1" aria-disabled="true" title="Próximamente">¿Olvidaste tu contraseña?</a>
+      </label>
+      <input class="form-input" type="password" id="password" name="password"
+             autocomplete="current-password" placeholder="Tu contraseña" required>
+    </div>
+
+    <button type="submit" class="btn-primary btn-block">Iniciar sesión</button>
+  </form>
+</div>
+
+<div th:fragment="footer" class="text-xs">
+  <span>¿No tienes cuenta?</span>
+  <a th:href="@{/register}" class="link-accent">Regístrate gratis</a>
+</div>
+
+</body>
+</html>

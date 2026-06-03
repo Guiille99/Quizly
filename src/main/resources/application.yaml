@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: quizly
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+  jpa:
+    show-sql: true
+  thymeleaf:
+    cache: false
+server:
+  port: 8080
+logging:
+  level:
+    '[org.springframework.security]': DEBUG
+
