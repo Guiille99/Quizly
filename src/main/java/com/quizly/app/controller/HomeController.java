@@ -17,7 +17,8 @@ public class HomeController {
     public String home(Model model) {
         // toastService.success(model,"Hello, worldssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss!");
         // toastService.error(model,"Hello, world!!");
-        // toastService.error(model,"Hello, world!!!");
+        // toastService.info(model,"Hello, world!!!");
+        // toastService.warning(model,"Hello, world!!!");
 
         return "index";
     }

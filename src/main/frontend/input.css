@@ -1,7 +1,7 @@
 @import "tailwindcss";
-/* @import "@iconify/tailwind"; */
 @import "bootstrap-icons/font/bootstrap-icons.css";
-@source "../../resources/templates/**/*.html";
+@plugin "daisyui";
+@source "../resources/templates/**/*.html";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -10,68 +10,72 @@
   --font-sans: "Sora", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "DM Mono", ui-monospace, monospace;
 
+  --btn-shadow: unset;
+
   /* Surfaces */
-  --color-bg: oklch(96.8% 0.007 264);
-  --color-surface: oklch(100% 0 0);
-  --color-card: oklch(100% 0 0);
-  --color-card-alt: oklch(98.4% 0.006 264);
-  --color-elevated: oklch(100% 0 0);
+  --color-bg: #f1f6fd;
+  --color-surface: #ffffff;
+  --color-card: #ffffff;
+  --color-card-alt: #f7faff;
+  --color-elevated: #ffffff;
 
   /* Text */
-  --color-text: oklch(21% 0.034 264.7);
-  --color-text-secondary: oklch(48.8% 0.042 264);
-  --color-text-muted: oklch(65.2% 0.038 264);
-  --color-text-inverse: oklch(100% 0 0);
+  --color-text: #121b29;
+  --color-text-secondary: #4e5969;
+  --color-text-muted: #8e96a2;
+  --color-text-inverse: #ffffff;
 
   /* Borders */
-  --color-border: oklch(91.6% 0.014 264);
-  --color-border-strong: oklch(87.4% 0.024 264);
-  --color-border-focus: oklch(54.6% 0.245 264.4);
-  --color-border-hover: oklch(77.7% 0.152 264.2);
+  --color-border: #d4dbe7;
+  --color-border-strong: #b9c5d8;
+  --color-border-focus: #235bfc;
+  --color-border-hover: #8bb4ff;
 
   /* Brand accents */
-  --color-accent: oklch(54.6% 0.245 264.4);
-  --color-accent-hover: oklch(48.8% 0.243 264.4);
-  --color-accent-green: oklch(58.8% 0.142 163);
-  --color-accent-orange: oklch(68.4% 0.158 55);
-  --color-accent-purple: oklch(54.1% 0.281 293);
-  --color-accent-red: oklch(57.7% 0.245 27.3);
+  --color-quizly-accent: #2071f3; /* Nueva variable para el acento principal */
+  --color-accent: var(--color-quizly-accent); /* La variable general de acento apunta a la nueva */
+  --color-accent-hover: #005bdb;
+  --color-accent-green: #00bc7d;
+  --color-accent-orange: #e87f25;
+  --color-accent-purple: #894ef0;
+  --color-accent-red: #fb2c36;
+  --color-accent-blue: #338fc7;
 
-  --color-accent-muted: oklch(97.2% 0.014 264);
-  --color-accent-muted-border: oklch(87.2% 0.088 264);
-  --color-accent-green-muted: oklch(97.8% 0.024 165);
-  --color-accent-orange-muted: oklch(98.2% 0.018 55);
-  --color-accent-purple-muted: oklch(97.4% 0.018 293);
-  --color-accent-red-muted: oklch(97.4% 0.014 12);
+  --color-accent-muted: #f1f6ff;
+  --color-accent-muted-border: #b9d5ff;
+  --color-accent-green-muted: #eafdf4;
+  --color-accent-orange-muted: #fff6ee;
+  --color-accent-purple-muted: #f7f4ff;
+  --color-accent-red-muted: #fff3f4;
 
   /* Difficulty */
-  --color-difficulty-easy-bg: oklch(97.8% 0.024 165);
-  --color-difficulty-easy-fg: oklch(41.2% 0.088 165);
-  --color-difficulty-easy-border: oklch(89.2% 0.072 165);
-  --color-difficulty-medium-bg: oklch(98.2% 0.018 55);
-  --color-difficulty-medium-fg: oklch(47.8% 0.108 55);
-  --color-difficulty-medium-border: oklch(90.2% 0.072 55);
-  --color-difficulty-hard-bg: oklch(97.4% 0.014 12);
-  --color-difficulty-hard-fg: oklch(42.4% 0.168 12);
-  --color-difficulty-hard-border: oklch(89.4% 0.058 12);
+  --color-difficulty-easy-bg: #eafdf4;
+  --color-difficulty-easy-fg: #00593f;
+  --color-difficulty-easy-border: #afebd0;
+  --color-difficulty-medium-bg: #fff6ee;
+  --color-difficulty-medium-fg: #8a4a14;
+  --color-difficulty-medium-border: #ffd3b2;
+  --color-difficulty-hard-bg: #fff3f4;
+  --color-difficulty-hard-fg: #930235;
+  --color-difficulty-hard-border: #ffcdd2;
 
   /* Status */
-  --color-status-active-bg: oklch(97.8% 0.024 165);
-  --color-status-active-fg: oklch(41.2% 0.088 165);
-  --color-status-active-border: oklch(89.2% 0.072 165);
-  --color-status-draft-bg: oklch(98.6% 0.022 95);
-  --color-status-draft-fg: oklch(47.8% 0.108 55);
-  --color-status-draft-border: oklch(91.8% 0.072 95);
-  --color-status-inactive-bg: oklch(96.8% 0.007 264);
-  --color-status-inactive-fg: oklch(51.2% 0.038 264);
-  --color-status-inactive-border: oklch(86.2% 0.024 264);
+  --color-status-active-bg: #eafdf4;
+  --color-status-active-fg: #00593f;
+  --color-status-active-border: #afebd0;
+  --color-status-draft-bg: #fffbea;
+  --color-status-draft-fg: #8a4a14;
+  --color-status-draft-border: #f3e4ae;
+  --color-status-inactive-bg: #f2f4f9;
+  --color-status-inactive-fg: #5c677d;
+  --color-status-inactive-border: #cad2e2;
 
   /* Admin badge */
-  --color-badge-admin-bg: oklch(95.4% 0.024 293);
-  --color-badge-admin-fg: oklch(42.8% 0.198 293);
-  --color-badge-admin-border: oklch(82.8% 0.088 293);
+  --color-badge-admin-bg: #f0edff;
+  --color-badge-admin-fg: #5926af;
+  --color-badge-admin-border: #c8bcfb;
 
-  --color-ring: oklch(54.6% 0.245 264.4 / 0.45);
+  --color-ring: #235bfc73;
 }
 
 /* Dark tokens only when .dark is on html (not @variant dark @theme — that overwrote :root) */
@@ -81,61 +85,61 @@
   }
 
   .dark {
-    --color-bg: oklch(18.5% 0.018 264);
-    --color-surface: oklch(22.2% 0.022 264);
-    --color-card: oklch(25.8% 0.028 264);
-    --color-card-alt: oklch(22.2% 0.022 264);
-    --color-elevated: oklch(25.8% 0.028 264);
+    --color-bg: #0f131b;
+    --color-surface: #161b25;
+    --color-card: #1d2331;
+    --color-card-alt: #161b25;
+    --color-elevated: #1d2331;
 
-    --color-text: oklch(93.2% 0.012 264);
-    --color-text-secondary: oklch(72% 0.032 264);
-    --color-text-muted: oklch(58.5% 0.038 264);
-    --color-text-inverse: oklch(100% 0 0);
+    --color-text: #e4e9f1;
+    --color-text-secondary: #9aa5b9;
+    --color-text-muted: #707c93;
+    --color-text-inverse: #ffffff;
 
-    --color-border: oklch(32.2% 0.034 264);
-    --color-border-strong: oklch(38% 0.038 264);
-    --color-border-focus: oklch(67.2% 0.168 264);
-    --color-border-hover: oklch(67.2% 0.168 264);
+    --color-border: #2a3345;
+    --color-border-strong: #384257;
+    --color-border-focus: #6091fc;
+    --color-border-hover: #6091fc;
 
-    --color-accent: oklch(67.2% 0.168 264);
-    --color-accent-hover: oklch(58% 0.168 264);
-    --color-accent-green: oklch(78.2% 0.128 165);
-    --color-accent-orange: oklch(75.4% 0.142 55);
-    --color-accent-purple: oklch(72.3% 0.178 293);
-    --color-accent-red: oklch(71.8% 0.168 12);
+    --color-accent: #6091fc;
+    --color-accent-hover: #4574dc;
+    --color-accent-green: #5ad2a4;
+    --color-accent-orange: #f3954f;
+    --color-accent-purple: #ac8cff;
+    --color-accent-red: #fa7188;
 
-    --color-accent-muted: oklch(67.2% 0.168 264 / 0.12);
-    --color-accent-muted-border: oklch(67.2% 0.168 264 / 0.2);
-    --color-accent-green-muted: oklch(78.2% 0.128 165 / 0.15);
-    --color-accent-orange-muted: oklch(75.4% 0.142 55 / 0.15);
-    --color-accent-purple-muted: oklch(72.3% 0.178 293 / 0.15);
-    --color-accent-red-muted: oklch(71.8% 0.168 12 / 0.15);
+    --color-accent-muted: #6091fc1f;
+    --color-accent-muted-border: rgba(96, 145, 252, 0.2);
+    --color-accent-green-muted: rgba(90, 210, 164, 0.15);
+    --color-accent-orange-muted: rgba(243, 149, 79, 0.15);
+    --color-accent-purple-muted: rgba(172, 140, 255, 0.15);
+    --color-accent-red-muted: rgba(250, 113, 136, 0.15);
 
-    --color-difficulty-easy-bg: oklch(79.2% 0.168 155 / 0.08);
-    --color-difficulty-easy-fg: oklch(79.2% 0.168 155);
-    --color-difficulty-easy-border: oklch(79.2% 0.168 155 / 0.3);
-    --color-difficulty-medium-bg: oklch(75.4% 0.142 55 / 0.08);
-    --color-difficulty-medium-fg: oklch(75.4% 0.142 55);
-    --color-difficulty-medium-border: oklch(75.4% 0.142 55 / 0.3);
-    --color-difficulty-hard-bg: oklch(71.8% 0.168 12 / 0.08);
-    --color-difficulty-hard-fg: oklch(71.8% 0.168 12);
-    --color-difficulty-hard-border: oklch(71.8% 0.168 12 / 0.3);
+    --color-difficulty-easy-bg: rgba(73, 218, 138, 0.08);
+    --color-difficulty-easy-fg: #49da8a;
+    --color-difficulty-easy-border: rgba(73, 218, 138, 0.3);
+    --color-difficulty-medium-bg: rgba(243, 149, 79, 0.08);
+    --color-difficulty-medium-fg: #f3954f;
+    --color-difficulty-medium-border: rgba(243, 149, 79, 0.3);
+    --color-difficulty-hard-bg: rgba(250, 113, 136, 0.08);
+    --color-difficulty-hard-fg: #fa7188;
+    --color-difficulty-hard-border: rgba(250, 113, 136, 0.3);
 
-    --color-status-active-bg: oklch(79.2% 0.168 155 / 0.1);
-    --color-status-active-fg: oklch(79.2% 0.168 155);
-    --color-status-active-border: oklch(79.2% 0.168 155 / 0.25);
-    --color-status-draft-bg: oklch(82.8% 0.168 95 / 0.1);
-    --color-status-draft-fg: oklch(82.8% 0.168 95);
-    --color-status-draft-border: oklch(82.8% 0.168 95 / 0.25);
-    --color-status-inactive-bg: oklch(51.2% 0.038 264 / 0.1);
-    --color-status-inactive-fg: oklch(51.2% 0.038 264);
-    --color-status-inactive-border: oklch(51.2% 0.038 264 / 0.25);
+    --color-status-active-bg: rgba(73, 218, 138, 0.1);
+    --color-status-active-fg: #49da8a;
+    --color-status-active-border: rgba(73, 218, 138, 0.25);
+    --color-status-draft-bg: rgba(233, 196, 15, 0.1);
+    --color-status-draft-fg: #e9c40f;
+    --color-status-draft-border: rgba(233, 196, 15, 0.25);
+    --color-status-inactive-bg: rgba(92, 103, 125, 0.1);
+    --color-status-inactive-fg: #5c677d;
+    --color-status-inactive-border: rgba(92, 103, 125, 0.25);
 
-    --color-badge-admin-bg: oklch(32.2% 0.034 264);
-    --color-badge-admin-fg: oklch(72.3% 0.178 293);
-    --color-badge-admin-border: oklch(38% 0.088 293);
+    --color-badge-admin-bg: #2a3345;
+    --color-badge-admin-fg: #ac8cff;
+    --color-badge-admin-border: #45386c;
 
-    --color-ring: oklch(67.2% 0.168 264 / 0.5);
+    --color-ring: rgba(96, 145, 252, 0.5);
   }
 }
 
@@ -167,4 +171,32 @@
 
 html.dark {
   color-scheme: dark;
+}
+
+@plugin "daisyui/theme" {
+  name: "quizly";
+  default: true; /* set as default */
+  /*prefersdark: false;*/ /* set as default dark mode (prefers-color-scheme:dark) */
+  color-scheme: light; /* color of browser-provided UI */
+
+  /* --color-base-100: var(--color-bg);
+  --color-base-200: var(--color-surface);
+  --color-base-300: var(--color-card); */
+  --color-base-content: var(--color-text);
+  --color-primary: var(--color-quizly-accent); 
+  --color-primary-content: var(--color-text-inverse);
+  --color-secondary: var(--color-accent-purple);
+  --color-secondary-content: var(--color-text-inverse);
+  --color-accent: var(--color-quizly-accent);
+  --color-accent-content: var(--color-text-inverse);
+  --color-neutral: var(--color-surface);
+  --color-neutral-content: var(--color-text);
+  --color-info: var(--color-accent-blue);
+  --color-info-content: var(--color-text-inverse);
+  --color-success: var(--color-accent-green);
+  --color-success-content: var(--color-text-inverse);
+  --color-warning: var(--color-accent-orange);
+  --color-warning-content: var(--color-text);
+  --color-error: var(--color-accent-red);
+  --color-error-content: var(--color-text-inverse);
 }

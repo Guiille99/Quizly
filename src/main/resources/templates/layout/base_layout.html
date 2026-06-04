@@ -21,24 +21,24 @@
 
     <main th:replace="${main}"></main>
 
-    <div id="toast-container" class="fixed top-5 right-5 z-9999 flex flex-col gap-3 pointer-events-none">
-        <template id="toast-template">
-            <div class="toast relative overflow-hidden pointer-events-auto flex items-center gap-3 rounded-lg border p-3 shadow-sm"
-                role="alert">
     
+
+    <div id="toast-container" class="toast toast-top toast-end sm:max-w-6/12 md:max-w-4/12">
+        <template id="toast-template">
+            <div class="alert self-end relative transition-all duration-300 ease-in-out" role="alert">
                 <div class="flex gap-4 flex-1">
                     <i class="toast-icon"></i>
                     <!-- <p class="toast-title font-semibold"></p> -->
-                    <p class="toast-message"></p>
+                    <p class="toast-message break-all"></p>
                 </div>
     
                 <button class="btn-cerrar ml-4 text-lg leading-none hover:opacity-70" aria-label="Cerrar">
                     &times;
                 </button>
-
-                <div class="toast-progress absolute bottom-0 left-0 h-1 w-full bg-black/10">
-                    <div class="toast-progress-bar h-full w-full origin-left scale-x-100"></div>
-                </div>           
+                
+                <div class="toast-progress absolute bottom-0 left-0 h-1 w-full">
+                    <div class="toast-progress-bar h-full w-full origin-left scale-x-100 bg-black/20"></div>
+                </div> 
             </div>
         </template>
     </div>

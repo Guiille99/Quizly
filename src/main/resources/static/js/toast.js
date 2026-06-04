@@ -2,24 +2,10 @@ const ToastSystem = (function() {
     const DURATION = 5000;
 
     const estilos = {
-        info:    'text-blue-800 bg-blue-50 border-blue-300',
-        error:   'text-red-800 bg-red-50 border-red-200',
-        success: 'text-emerald-900 bg-emerald-50 border-emerald-300',
-        warning: 'text-amber-800 bg-amber-50 border-amber-300',
-    };
-
-    const progressColors = {
-        success: "bg-emerald-500",
-        error: "bg-red-500",
-        warning: "bg-amber-500",
-        info: "bg-blue-500",
-    };
-    
-    const titulos = {
-        info:    'Información',
-        error:   'Error',
-        success: 'Éxito',
-        warning: 'Atención',
+        info:    'alert-info',
+        error:   'alert-error',
+        success: 'alert-success',
+        warning: 'alert-warning',
     };
 
     const icons = {
@@ -41,7 +27,7 @@ const ToastSystem = (function() {
     };
 
     const eliminar = (elemento) => {
-        elemento.classList.add('opacity-0', 'translate-x-full');
+        elemento.classList.add('opacity-0');
         setTimeout(() => elemento.remove(), 300);
     };
 
@@ -51,7 +37,7 @@ const ToastSystem = (function() {
         const contenedor = obtenerContenedor();
         const template = document.getElementById("toast-template");
         const fragment = template.content.cloneNode(true);
-        const toast = fragment.querySelector(".toast");
+        const toast = fragment.querySelector(".alert");
         const progressBar = fragment.querySelector(".toast-progress-bar");
 
         // Estilos y textos
@@ -59,7 +45,9 @@ const ToastSystem = (function() {
         // fragment.querySelector(".toast-title").textContent = `${titulos[tipo]}`;
         fragment.querySelector(".toast-message").textContent = `${mensaje}`;
         fragment.querySelector(".toast-icon").classList.add(...icons[tipo].split(' '));
-        progressBar.classList.add(progressColors[tipo]);
+
+        // Establecer el estado inicial para el fade-in: invisible
+        toast.classList.add('opacity-0');
 
     
         fragment.querySelector('.btn-cerrar')
@@ -70,7 +58,8 @@ const ToastSystem = (function() {
         // Animación de entrada
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
-                toast.classList.remove('translate-x-full', 'opacity-0');
+                // Eliminar opacity-0 para activar la transición de fade-in a opacity-100 (estado visible por defecto).
+                toast.classList.remove('opacity-0');
             });
         });
 
@@ -88,11 +77,11 @@ const ToastSystem = (function() {
             });
         });
     
-        // setTimeout(() => {
-        //     if (document.body.contains(toast)) {
-        //         eliminar(toast);
-        //     }
-        // }, DURATION);
+        setTimeout(() => {
+            if (document.body.contains(toast)) {
+                eliminar(toast);
+            }
+        }, DURATION);
     };
 
     return { mostrar };
