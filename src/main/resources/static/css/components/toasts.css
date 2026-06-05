@@ -1,0 +1,4 @@
+/* Toast */
+.toast .alert{
+    display: flex;
+}

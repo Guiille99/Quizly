@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.quizly.app.model.enums.Rol;
 
+import io.micrometer.common.util.StringUtils;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -14,6 +15,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -56,5 +58,23 @@ public class Usuario {
 
     @OneToMany(mappedBy = "usuario")
     private List<IntentoCuestionario> intentos;
+
+    /**
+     * Devuelve las iniciales del usuario basadas en su nombre y primer apellido.
+     */
+    @Transient
+    public String getIniciales() {
+        StringBuilder sb = new StringBuilder();
+        
+        if (StringUtils.isNotBlank(nombre)) {
+            sb.append(nombre.trim().charAt(0));
+        }
+        
+        if (StringUtils.isNotBlank(apellidos)) {
+            sb.append(apellidos.trim().charAt(0));
+        }
+        
+        return sb.toString().toUpperCase();
+    }
 
 }

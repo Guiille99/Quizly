@@ -1,0 +1,37 @@
+/* Stats */
+.stats__container{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2.5rem;
+}
+
+
+/* Cards */
+.stat-card {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    padding: 14px 16px;
+
+    .stat-number{
+        font-size: 1.5rem;
+        font-weight: bold;
+        &.blue{
+            color: var(--color-quizly-accent);
+        }
+
+        &.green{
+            color: var(--color-accent-green);
+        }
+        &.orange{
+            color: var(--color-accent-orange);
+        }
+        &.purple{
+            color: var(--color-accent-purple);
+        }
+    }
+
+    .stat-text{
+        font-size: 0.8rem;
+        color: var(--color-text-muted);
+    }
+}

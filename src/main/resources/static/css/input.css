@@ -71,9 +71,14 @@
   --color-status-inactive-border: #cad2e2;
 
   /* Admin badge */
-  --color-badge-admin-bg: #f0edff;
-  --color-badge-admin-fg: #5926af;
-  --color-badge-admin-border: #c8bcfb;
+  --color-badge-admin-bg: #faf5ff;
+  --color-badge-admin-fg: #8200db;
+  --color-badge-admin-border: #e9d4ff;
+
+  /* User badge */
+  --color-badge-user-bg: #5fb5ff;
+  --color-badge-user-fg: var(--color-text-inverse);
+  --color-badge-user-border: #317efa;
 
   --color-ring: #235bfc73;
 }
@@ -199,4 +204,30 @@ html.dark {
   --color-warning-content: var(--color-text);
   --color-error: var(--color-accent-red);
   --color-error-content: var(--color-text-inverse);
+}
+
+/* Sidebar */
+#sidebar{
+  @apply bg-base-100 border-r border-base-300/60 w-66 min-h-screen flex flex-col justify-between p-4 shadow-xs;
+}
+
+/* Buttons */
+.btn-link{
+  @apply hover:bg-base-200/80 rounded-xl py-2.5 px-3 outline-0 no-underline;
+
+  &.active{
+    @apply bg-primary/10 text-primary;
+  }
+}
+
+/* Dropdowns */
+.dropdown{
+  .dropdown-content{
+    @apply bg-base-100 rounded-xl z-10 mt-3 w-52 p-2 shadow-md border border-base-300/60;
+  }
+}
+
+/* Badges */
+.badge-default{
+  @apply w-9 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm
 }

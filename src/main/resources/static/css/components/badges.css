@@ -1,0 +1,72 @@
+/* Difficulty badges */
+.badge-difficulty {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 9999px;
+    border: 1px solid;
+    padding: 0.125rem 0.625rem;
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 0.625rem;
+    font-weight: 500;
+}
+
+.badge-difficulty-easy {
+    border-color: var(--color-difficulty-easy-border);
+    background-color: var(--color-difficulty-easy-bg);
+    color: var(--color-difficulty-easy-fg);
+}
+
+.badge-difficulty-medium {
+    border-color: var(--color-difficulty-medium-border);
+    background-color: var(--color-difficulty-medium-bg);
+    color: var(--color-difficulty-medium-fg);
+}
+
+.badge-difficulty-hard {
+    border-color: var(--color-difficulty-hard-border);
+    background-color: var(--color-difficulty-hard-bg);
+    color: var(--color-difficulty-hard-fg);
+}
+
+/* Status pills */
+.badge-status {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 9999px;
+    border: 1px solid;
+    padding: 0.125rem 0.625rem;
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 0.625rem;
+}
+
+.badge-status-active {
+    border-color: var(--color-status-active-border);
+    background-color: var(--color-status-active-bg);
+    color: var(--color-status-active-fg);
+}
+
+.badge-status-draft {
+    border-color: var(--color-status-draft-border);
+    background-color: var(--color-status-draft-bg);
+    color: var(--color-status-draft-fg);
+}
+
+.badge-status-inactive {
+    border-color: var(--color-status-inactive-border);
+    background-color: var(--color-status-inactive-bg);
+    color: var(--color-status-inactive-fg);
+}
+
+/* Admin / role badge */
+.badge-admin {
+    border: 1px solid var(--color-badge-admin-border);
+    background-color: var(--color-badge-admin-bg);
+    color: var(--color-badge-admin-fg);
+}
+
+/* User / role badge */
+.badge-user{
+    border: 1px solid var(--color-badge-user-border);
+    background-color: var(--color-badge-user-bg);
+    color: var(--color-badge-user-fg);
+}
