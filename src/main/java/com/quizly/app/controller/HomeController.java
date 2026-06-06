@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 @Controller
 @RequiredArgsConstructor
 public class HomeController {
-    private final ToastService toastService;
+    // private final ToastService toastService;
 
     @GetMapping("/")
     public String home(Model model) {

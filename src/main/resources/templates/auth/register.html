@@ -28,13 +28,25 @@
       </fieldset>
     </div>
 
-    <fieldset class="fieldset p-0">
-      <label class="label" for="username">Nombre de usuario</label>
-      <input class="input w-full" type="text" id="username" th:field="*{username}"
-             autocomplete="username" placeholder="Nombre de usuario"
-             th:classappend="${#fields.hasErrors('username')} ? 'input-error'">
-      <p th:if="${#fields.hasErrors('username')}" class="text-error" th:errors="*{username}"></p>
-    </fieldset>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <fieldset class="fieldset p-0">
+        <label class="label" for="username">Nombre de usuario</label>
+        <input class="input w-full" type="text" id="username" th:field="*{username}"
+               autocomplete="username" placeholder="Nombre de usuario"
+               th:classappend="${#fields.hasErrors('username')} ? 'input-error'">
+        <p th:if="${#fields.hasErrors('username')}" class="text-error" th:errors="*{username}"></p>
+      </fieldset>
+
+      <fieldset class="fieldset p-0">
+        <fieldset class="label">Género</fieldset>
+        <select id="genero" class="select" th:field="*{idGenero}"
+          th:classappend="${#fields.hasErrors('idGenero')} ? 'select-error'">
+            <option selected value="">Selecciona tu género</option>
+          <option th:each="genero : ${generos}" th:value="${genero.id}" th:text="${genero.nombre}"></option>
+        </select>
+        <p th:if="${#fields.hasErrors('idGenero')}" class="text-error" th:errors="*{idGenero}"></p>
+      </fieldset>
+    </div>
 
     <fieldset class="fieldset p-0">
       <label class="label" for="email">Correo electrónico</label>

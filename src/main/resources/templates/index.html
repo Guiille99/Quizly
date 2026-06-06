@@ -5,7 +5,7 @@
   <main th:fragment="main" class="w-full px-6 py-8">
     <div class="mb-5">
       <h1 class="text-xl font-semibold tracking-tight text-text">
-        Bienvenido, 
+        <span th:text="${currentUser != null and currentUser.genero.codigo == 'F' ? 'Bienvenida' : 'Bienvenido'} + ', '"></span>
         <span th:if="${currentUser != null}" th:text="${currentUser.nombre}"></span>
       </h1>
       <p class="mt-1 text-sm text-text-muted">Aquí tienes un resumen de tu actividad de hoy</p>

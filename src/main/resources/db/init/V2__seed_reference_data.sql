@@ -10,3 +10,9 @@ INSERT INTO intentos_cuestionario_estados (codigo, nombre) VALUES
     ('IN_PROGRESS', 'En progreso'),
     ('FINISHED',    'Finalizado'),
     ('ABANDONNED',  'Abandonado');
+
+-- Generos
+INSERT INTO generos (codigo, nombre) VALUES
+    ('M', 'Hombre'),
+    ('F', 'Mujer'),
+    ('PND', 'Prefiero no decirlo')
