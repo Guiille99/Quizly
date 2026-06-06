@@ -114,38 +114,9 @@
     </div>
 
 
-    
+    <div th:replace="~{fragments/toast :: toast}"></div>
 
 
-    <div id="toast-container" class="toast toast-top toast-end sm:max-w-6/12 md:max-w-4/12 z-999">
-        <template id="toast-template">
-            <div class="alert self-end relative transition-all duration-300 ease-in-out" role="alert">
-                <div class="flex gap-4 flex-1">
-                    <i class="toast-icon"></i>
-                    <!-- <p class="toast-title font-semibold"></p> -->
-                    <p class="toast-message break-all"></p>
-                </div>
-    
-                <button class="btn-cerrar ml-4 text-lg leading-none hover:opacity-70" aria-label="Cerrar">
-                    &times;
-                </button>
-                
-                <div class="toast-progress absolute bottom-0 left-0 h-1 w-full">
-                    <div class="toast-progress-bar h-full w-full origin-left scale-x-100 bg-black/20"></div>
-                </div> 
-            </div>
-        </template>
-    </div>
 
-    <script th:inline="javascript">
-        const toasts = /*[[${toasts}]]*/ null;
-    
-        if (toasts) {
-            toasts.forEach(t => {
-                ToastSystem.mostrar(t.type, t.message);
-            });
-            // ToastSystem.mostrar(toasts.type, toasts.message);
-        }
-    </script>
 </body>
 </html>
