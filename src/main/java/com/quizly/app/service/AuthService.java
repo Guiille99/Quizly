@@ -31,10 +31,13 @@ public class AuthService {
 
     @Transactional
     public Usuario register(RegisterFormDto registerDto) {
-        if (usuarioDao.existsByUsername(registerDto.getUsername())) {
+        String username = registerDto.getUsername().trim();
+        String email = registerDto.getEmail().trim().toLowerCase();
+
+        if (usuarioDao.existsByUsername(username)) {
             throw new DuplicateUsernameException();
         }
-        if (usuarioDao.existsByEmail(registerDto.getEmail())) {
+        if (usuarioDao.existsByEmail(email)) {
             throw new DuplicateEmailException();
         }
 
@@ -44,8 +47,8 @@ public class AuthService {
         Usuario usuario = new Usuario();
         usuario.setNombre(registerDto.getNombre());
         usuario.setApellidos(registerDto.getApellidos());
-        usuario.setUsername(registerDto.getUsername().trim());
-        usuario.setEmail(registerDto.getEmail().trim().toLowerCase());
+        usuario.setUsername(username);
+        usuario.setEmail(email);
         usuario.setPassword(passwordEncoder.encode(registerDto.getPassword()));
         usuario.setGenero(generoOpt.get());
         usuario.setRol(Rol.ESTUDIANTE);
