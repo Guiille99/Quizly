@@ -11,26 +11,36 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.quizly.app.dao.GeneroDao;
+import com.quizly.app.dao.UsuarioDao;
+import com.quizly.app.dto.ForgotPasswordDto;
 import com.quizly.app.dto.RegisterFormDto;
+import com.quizly.app.dto.ResetPasswordDto;
 import com.quizly.app.exception.DuplicateEmailException;
 import com.quizly.app.exception.DuplicateUsernameException;
 import com.quizly.app.model.entity.Genero;
 import com.quizly.app.service.AuthService;
+import com.quizly.app.service.EmailService;
 import com.quizly.app.web.notification.ToastService;
 
 import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @Controller
 public class AuthController {
 
     private final AuthService authService;
     private final GeneroDao generoDao;
+    private final UsuarioDao usuarioDao;
     private final ToastService toastService;
+    private final EmailService emailService;
 
-    public AuthController(AuthService authService, GeneroDao generoDao, ToastService toastService) {
+    public AuthController(AuthService authService, GeneroDao generoDao, ToastService toastService, UsuarioDao usuarioDao, EmailService emailService) {
         this.authService = authService;
         this.generoDao = generoDao;
+        this.usuarioDao = usuarioDao;
         this.toastService = toastService;
+        this.emailService = emailService;
     }
 
     @ModelAttribute("generos")
@@ -74,4 +84,61 @@ public class AuthController {
 
         return "redirect:/login";
     }
+
+    @GetMapping("/forgot-password")
+    public String forgotPasswordForm(Model model) {
+        if (!model.containsAttribute("forgotPasswordForm")) {
+            model.addAttribute("forgotPasswordForm", new ForgotPasswordDto());
+        }
+        return "auth/forgot-password";
+    }
+    
+    @PostMapping("/forgot-password")
+    public String processForgotPassword(@Valid @ModelAttribute("forgotPasswordForm") ForgotPasswordDto form, 
+                     BindingResult bindingResult, RedirectAttributes ra) {
+
+        if (bindingResult.hasErrors()) {
+            return "auth/forgot-password";
+        }
+        
+        usuarioDao.findByEmail(form.getEmail()).ifPresent(usuario -> {
+            String token = authService.createPasswordResetToken(usuario);
+
+            emailService.sendPasswordResetEmail(usuario.getEmail(), token);
+
+            System.out.println("Token generado para " + form.getEmail() + ": " + token);
+        });
+
+        toastService.info(ra, "Si el email está registrado, recibirás un enlace de recuperación pronto.");
+        return "redirect:/login";
+    }
+
+    @GetMapping("/reset-password")
+    public String resetPasswordForm(@RequestParam("token") String token, Model model){
+        ResetPasswordDto resetPasswdDto = new ResetPasswordDto();
+        resetPasswdDto.setToken(token);
+        model.addAttribute("resetForm", resetPasswdDto);
+        return "auth/reset-password";
+    }
+
+    @PostMapping("/reset-password")
+    public String processResetPassword(@RequestParam("token") String token,
+        @Valid @ModelAttribute("resetForm") ResetPasswordDto form, 
+        BindingResult bindingResult, RedirectAttributes ra){
+
+        if (bindingResult.hasErrors()) {
+            form.setToken(token);
+            return "auth/reset-password";
+        }
+
+            try {
+                authService.resetPassword(token, form.getPassword());
+                toastService.success(ra, "Tu contraseña ha sido actualizada con éxito.");
+                return "redirect:/login";
+            } catch (Exception e) {
+                toastService.error(ra, "Se ha producido un error al actualizar la contraseña");
+                return "redirect:/forgot-password";
+            }
+    }
+    
 }

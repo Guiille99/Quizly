@@ -1,5 +1,7 @@
 package com.quizly.app.dto;
 
+import org.apache.commons.lang3.StringUtils;
+
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -26,8 +28,8 @@ public class RegisterFormDto {
     @Pattern(regexp = "^\\S+$", message = "El nombre de usuario no puede contener espacios")
     private String username;
 
-    @NotBlank(message = "El email es obligatorio")
-    @Email(message = "El email no es válido")
+    @NotBlank(message = "El correo electrónico es obligatorio")
+    @Email(message = "El formato del correo electrónico no es válido")
     @Size(max = 100)
     private String email;
 
@@ -43,7 +45,7 @@ public class RegisterFormDto {
 
     @AssertTrue(message = "Las contraseñas no coinciden")
     public boolean isPasswordConfirmValid() {
-        if (password == null || passwordConfirm == null) {
+        if (StringUtils.isEmpty(password) || StringUtils.isEmpty(passwordConfirm)) {
             return true;
         }
         return password.equals(passwordConfirm);

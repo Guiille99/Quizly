@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="layout(content)">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        /* Estilos base centralizados que la mayoría de clientes soportan en el <head> */
+        body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+        table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+        img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+        
+        @media only screen and (max-width: 600px) {
+            .email-container { width: 100% !important; }
+            .content-cell { padding: 20px !important; }
+        }
+    </style>
+</head>
+<body style="margin: 0; padding: 0; -webkit-font-smoothing: antialiased; background-color: #f1f6fd; font-family: 'Sora', ui-sans-serif, system-ui, sans-serif;">
+
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f1f6fd; width: 100%;">
+        <tr>
+            <td align="center" style="padding: 32px 16px;">
+                <!-- Contenedor Principal (Card) -->
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" class="email-container" style="max-width: 600px; background-color: #ffffff; border-radius: 16px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); overflow: hidden;">
+                    <tr>
+                        <td style="padding: 40px; color: #121b29;">
+                            
+                            <!-- Cabecera Común: Logo -->
+                            <div style="text-align: center; margin-bottom: 32px;">
+                                <a href="#" style="font-size: 28px; font-weight: 800; color: #2071f3; text-decoration: none; letter-spacing: -0.5px;">Quizly</a>
+                            </div>
+
+                            <!-- Bloque de Contenido Dinámico -->
+                            <div th:replace="${content}"></div>
+
+                            <!-- Saludo Final Común -->
+                            <p style="margin-top: 32px; margin-bottom: 0;">
+                                Saludos,<br>
+                                <strong>El equipo de Quizly</strong>
+                            </p>
+
+                        </td>
+                    </tr>
+                </table>
+
+                <!-- Footer Común -->
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width: 600px; margin-top: 24px;">
+                    <tr>
+                        <td align="center" style="padding: 16px; font-size: 12px; color: #8e96a2;">
+                            <p style="margin: 0;">© <span th:text="${#dates.format(#dates.createNow(), 'yyyy')}">2024</span> Quizly. Todos los derechos reservados.</p>
+                            <p style="margin-top: 8px;">Este es un mensaje automático, por favor no respondas a este correo.</p>
+                        </td>
+                    </tr>
+                </table>
+
+            </td>
+        </tr>
+    </table>
+
+</body>
+</html>

@@ -9,8 +9,21 @@ spring:
     show-sql: true
   thymeleaf:
     cache: false
+  mail:
+    host: sandbox.smtp.mailtrap.io
+    port: 2525
+    username: ${EMAIL_USERNAME}
+    password: ${EMAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 server:
   port: 8080
+app:
+  url: http://localhost:8080
 logging:
   level:
     '[org.springframework.security]': DEBUG

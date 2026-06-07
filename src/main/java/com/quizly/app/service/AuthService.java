@@ -1,18 +1,23 @@
 package com.quizly.app.service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import com.quizly.app.dao.GeneroDao;
+import com.quizly.app.dao.PasswordResetTokenDao;
 import com.quizly.app.dao.UsuarioDao;
 import com.quizly.app.dto.RegisterFormDto;
 import com.quizly.app.exception.DuplicateEmailException;
 import com.quizly.app.exception.DuplicateUsernameException;
 import com.quizly.app.model.entity.Genero;
+import com.quizly.app.model.entity.PasswordResetToken;
 import com.quizly.app.model.entity.Usuario;
 import com.quizly.app.model.enums.Rol;
 
@@ -21,11 +26,13 @@ public class AuthService {
 
     private final UsuarioDao usuarioDao;
     private final GeneroDao generoDao;
+    private final PasswordResetTokenDao passwordResetTokenDao;
     private final PasswordEncoder passwordEncoder;
 
-    public AuthService(UsuarioDao usuarioDao, PasswordEncoder passwordEncoder, GeneroDao generoDao) {
+    public AuthService(UsuarioDao usuarioDao, PasswordEncoder passwordEncoder, GeneroDao generoDao, PasswordResetTokenDao passwordResetTokenDao) {
         this.usuarioDao = usuarioDao;
         this.generoDao = generoDao;
+        this.passwordResetTokenDao = passwordResetTokenDao;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -56,5 +63,45 @@ public class AuthService {
         usuario.setUpdatedAt(now);
 
         return usuarioDao.save(usuario);
+    }
+
+    @Transactional
+    public String createPasswordResetToken(Usuario usuario){
+       List<PasswordResetToken> usuarioPrt = passwordResetTokenDao.findAllByUserId(usuario.getId());
+       
+       // Si el usuario tiene tokens previos guardados en base de datos los eliminamos
+       if (!CollectionUtils.isEmpty(usuarioPrt)) {
+        List<Long> tokensIdList = usuarioPrt.stream()
+            .map(PasswordResetToken::getId)
+            .toList();
+
+        passwordResetTokenDao.deleteTokensById(tokensIdList);
+       }
+
+        String token = UUID.randomUUID().toString();
+
+        PasswordResetToken prt = new PasswordResetToken();
+        prt.setToken(token);
+        prt.setUsuario(usuario);
+        prt.setFechaExpiracion(LocalDateTime.now().plusMinutes(50));
+
+        passwordResetTokenDao.save(prt);
+        return token;
+    }
+
+    @Transactional
+    public void resetPassword(String token, String newPassword){
+        PasswordResetToken prt = passwordResetTokenDao.findByToken(token)
+            .orElseThrow(() -> new RuntimeException("Token de recuperación inválido"));
+
+        if (prt.isExpired()) {
+            passwordResetTokenDao.delete(prt);
+            throw new RuntimeException("El token ha expirado. Por favor, solicita uno nuevo");
+        }
+
+        Usuario usuario = prt.getUsuario();
+        usuario.setPassword(passwordEncoder.encode(newPassword));
+        usuarioDao.update(usuario);
+        passwordResetTokenDao.delete(prt);
     }
 }
