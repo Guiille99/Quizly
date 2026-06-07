@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 
+import com.quizly.app.exception.QuizlyException;
+
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +25,7 @@ public class EmailService {
     @Value("${app.url}")
     private String appUrl;
 
-    public void sendPasswordResetEmail(String userEmail, String token){
+    public void sendPasswordResetEmail(String userEmail, String token) throws QuizlyException{
         String resetUrl = appUrl + "/reset-password?token=" + token;
 
         Context context = new Context();
@@ -34,7 +36,7 @@ public class EmailService {
         sendHtmlEmail(userEmail, "Recuperación de contraseña - Quizly", htmlContent);
     }
 
-    private void sendHtmlEmail(String userEmail, String subject, String html){
+    private void sendHtmlEmail(String userEmail, String subject, String html) throws QuizlyException{
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
@@ -45,8 +47,9 @@ public class EmailService {
             helper.setText(html, true);
 
             mailSender.send(message);
-        } catch (MessagingException e) {
-            throw new RuntimeException("Error enviando email", e);
+        } catch (Exception e) {
+            System.out.println("Se ha producido un error al enviar el email: " + e);
+            throw new QuizlyException("Se ha producido un error al enviar el email.");
         }
     }
 }

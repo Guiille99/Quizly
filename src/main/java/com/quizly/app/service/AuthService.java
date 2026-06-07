@@ -16,6 +16,7 @@ import com.quizly.app.dao.UsuarioDao;
 import com.quizly.app.dto.RegisterFormDto;
 import com.quizly.app.exception.DuplicateEmailException;
 import com.quizly.app.exception.DuplicateUsernameException;
+import com.quizly.app.exception.QuizlyException;
 import com.quizly.app.model.entity.Genero;
 import com.quizly.app.model.entity.PasswordResetToken;
 import com.quizly.app.model.entity.Usuario;
@@ -90,13 +91,13 @@ public class AuthService {
     }
 
     @Transactional
-    public void resetPassword(String token, String newPassword){
+    public void resetPassword(String token, String newPassword) throws QuizlyException{
         PasswordResetToken prt = passwordResetTokenDao.findByToken(token)
-            .orElseThrow(() -> new RuntimeException("Token de recuperación inválido"));
+            .orElseThrow(() -> new QuizlyException("El token de recuperación es inválido."));
 
         if (prt.isExpired()) {
             passwordResetTokenDao.delete(prt);
-            throw new RuntimeException("El token ha expirado. Por favor, solicita uno nuevo");
+            throw new QuizlyException("El token ha expirado. Por favor, solicita uno nuevo.");
         }
 
         Usuario usuario = prt.getUsuario();

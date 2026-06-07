@@ -1,6 +1,7 @@
 package com.quizly.app.controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,7 +18,9 @@ import com.quizly.app.dto.RegisterFormDto;
 import com.quizly.app.dto.ResetPasswordDto;
 import com.quizly.app.exception.DuplicateEmailException;
 import com.quizly.app.exception.DuplicateUsernameException;
+import com.quizly.app.exception.QuizlyException;
 import com.quizly.app.model.entity.Genero;
+import com.quizly.app.model.entity.Usuario;
 import com.quizly.app.service.AuthService;
 import com.quizly.app.service.EmailService;
 import com.quizly.app.web.notification.ToastService;
@@ -95,19 +98,27 @@ public class AuthController {
     
     @PostMapping("/forgot-password")
     public String processForgotPassword(@Valid @ModelAttribute("forgotPasswordForm") ForgotPasswordDto form, 
-                     BindingResult bindingResult, RedirectAttributes ra) {
+                     BindingResult bindingResult, RedirectAttributes ra, Model model) {
 
         if (bindingResult.hasErrors()) {
             return "auth/forgot-password";
         }
         
-        usuarioDao.findByEmail(form.getEmail()).ifPresent(usuario -> {
+        Optional<Usuario> usuarioOpt = usuarioDao.findByEmail(form.getEmail());
+
+        if (usuarioOpt.isPresent()) {
+            Usuario usuario = usuarioOpt.get();
             String token = authService.createPasswordResetToken(usuario);
 
-            emailService.sendPasswordResetEmail(usuario.getEmail(), token);
+            try {
+                emailService.sendPasswordResetEmail(usuario.getEmail(), token);
+            } catch (QuizlyException e) {
+                toastService.error(model, e.getMessage());
+                return "auth/forgot-password";
+            }
 
             System.out.println("Token generado para " + form.getEmail() + ": " + token);
-        });
+        }
 
         toastService.info(ra, "Si el email está registrado, recibirás un enlace de recuperación pronto.");
         return "redirect:/login";
@@ -124,21 +135,26 @@ public class AuthController {
     @PostMapping("/reset-password")
     public String processResetPassword(@RequestParam("token") String token,
         @Valid @ModelAttribute("resetForm") ResetPasswordDto form, 
-        BindingResult bindingResult, RedirectAttributes ra){
+        BindingResult bindingResult, RedirectAttributes ra, Model model){
 
         if (bindingResult.hasErrors()) {
             form.setToken(token);
             return "auth/reset-password";
         }
 
-            try {
-                authService.resetPassword(token, form.getPassword());
-                toastService.success(ra, "Tu contraseña ha sido actualizada con éxito.");
-                return "redirect:/login";
-            } catch (Exception e) {
-                toastService.error(ra, "Se ha producido un error al actualizar la contraseña");
-                return "redirect:/forgot-password";
-            }
+        try {
+            authService.resetPassword(token, form.getPassword());
+            toastService.success(ra, "Tu contraseña ha sido actualizada con éxito.");
+            return "redirect:/login";
+        } catch(QuizlyException e){
+            toastService.error(model, e.getMessage());
+            form.setToken(token);
+            return "auth/reset-password";
+        } catch (Exception e) {
+            toastService.error(model, "Se ha producido un error al actualizar la contraseña");
+            form.setToken(token);
+            return "auth/reset-password";
+        }
     }
     
 }
