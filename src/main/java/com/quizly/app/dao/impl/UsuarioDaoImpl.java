@@ -16,46 +16,31 @@ public class UsuarioDaoImpl extends AbstractDaoImpl<Usuario, Long> implements Us
 
     @Override
     public Optional<Usuario> findByUsername(String username) {
-        return findSingleResult(
-                "SELECT u FROM Usuario u WHERE u.username = :username",
-                "username",
-                username);
-    }
-
-    @Override
-    public Optional<Usuario> findByEmail(String email) {
-        return findSingleResult(
-                "SELECT u FROM Usuario u WHERE u.email = :email",
-                "email",
-                email);
-    }
-
-    @Override
-    public boolean existsByUsername(String username) {
-        return countByQuery(
-                "SELECT COUNT(u) FROM Usuario u WHERE u.username = :username",
-                "username",
-                username) > 0;
-    }
-
-    @Override
-    public boolean existsByEmail(String email) {
-        return countByQuery(
-                "SELECT COUNT(u) FROM Usuario u WHERE u.email = :email",
-                "email",
-                email) > 0;
-    }
-
-    private Optional<Usuario> findSingleResult(String jpql, String paramName, Object paramValue) {
-        return entityManager.createQuery(jpql, Usuario.class)
-                .setParameter(paramName, paramValue)
+        return entityManager.createQuery("SELECT u FROM Usuario u WHERE u.username = :username", Usuario.class)
+                .setParameter("username", username)
                 .getResultStream()
                 .findFirst();
     }
 
-    private long countByQuery(String jpql, String paramName, Object paramValue) {
-        return entityManager.createQuery(jpql, Long.class)
-                .setParameter(paramName, paramValue)
-                .getSingleResult();
+    @Override
+    public Optional<Usuario> findByEmail(String email) {
+        return entityManager.createQuery("SELECT u FROM Usuario u WHERE u.email = :email", Usuario.class)
+                .setParameter("email", email)
+                .getResultStream()
+                .findFirst();
+    }
+
+    @Override
+    public boolean existsByUsername(String username) {
+        return entityManager.createQuery("SELECT COUNT(u) FROM Usuario u WHERE u.username = :username", Long.class)
+                    .setParameter("username", username)
+                    .getSingleResult() > 0;
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return entityManager.createQuery("SELECT COUNT(u) FROM Usuario u WHERE u.email = :email", Long.class)
+                    .setParameter("email", email)
+                    .getSingleResult() > 0;
     }
 }
