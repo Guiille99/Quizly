@@ -97,11 +97,12 @@ CREATE TABLE cuestionarios (
     descripcion    VARCHAR(255),
     tiempo_limite  INTEGER,
     slug           VARCHAR(255) NOT NULL,
+    version        NUMBER       NOT NULL,
     created_at     TIMESTAMP    NOT NULL,
     updated_at     TIMESTAMP    NOT NULL,
     tema_id        BIGINT       NOT NULL,
     dificultad_id  BIGINT       NOT NULL,
-    CONSTRAINT uk_cuestionarios_slug UNIQUE (slug),
+    CONSTRAINT uk_cuestionarios_slug_version UNIQUE (slug, version),
     CONSTRAINT fk_cuestionarios_tema
         FOREIGN KEY (tema_id) REFERENCES temas (id),
     CONSTRAINT fk_cuestionarios_dificultad

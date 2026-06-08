@@ -1,6 +1,5 @@
 package com.quizly.app.model.entity;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import jakarta.persistence.Column;
@@ -12,13 +11,14 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "cuestionarios")
+@Table(name = "cuestionarios", uniqueConstraints = {@UniqueConstraint(columnNames = {"slug", "version"})})
 @Getter
 @Setter
 @NoArgsConstructor
@@ -37,8 +37,11 @@ public class Cuestionario extends AuditableEntity {
     @Column(name = "tiempo_limite")
     private Integer tiempoLimite;
 
-    @Column(name = "slug", nullable = false, unique = true)
+    @Column(name = "slug", nullable = false)
     private String slug;
+
+    @Column(name = "version", nullable = false)
+    private Integer version;
 
     @ManyToOne
     @JoinColumn(name = "tema_id")
