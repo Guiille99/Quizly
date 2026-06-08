@@ -29,6 +29,9 @@ public class OpcionRespuesta {
 
     @Column(name = "correcta", nullable = false)
     private Boolean correcta;
+
+    @Column(name = "retroalimentacion", length = 500)
+    private String retroalimentacion;
     
     @ManyToOne
     @JoinColumn(name = "pregunta_id")
