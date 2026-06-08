@@ -15,9 +15,9 @@
                     </label>
                 </div>
     
-                <div class="flex-1 px-2">
+                <!-- <div class="flex-1 px-2">
                     <h2 class="text-md font-semibold tracking-tight md:text-lg text-base-content">Panel principal</h2>
-                </div>
+                </div> -->
                 <div class="flex-none gap-3">
                     <div class="dropdown dropdown-end">
                         <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar size-9 min-h-0">
@@ -63,13 +63,13 @@
                     <nav>
                         <ul class="menu w-full p-0 gap-1 text-base-content/75 font-medium text-[14px]">
                             <li>
-                                <a class="btn-link active">
+                                <a th:href="@{/}" class="btn-link" th:classappend="${currentUri == '/'} ? 'active'">
                                     <i class="bi bi-house-door"></i>
                                     Inicio
                                 </a>
                             </li>
                             <li>
-                                <a class="btn-link">
+                                <a th:href="@{/asignaturas}" class="btn-link" th:classappend="${currentUri == '/asignaturas'} ? 'active'">
                                     <i class="bi bi-journal-bookmark-fill"></i>
                                     Asignaturas
                                 </a>

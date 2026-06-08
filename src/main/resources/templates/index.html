@@ -13,19 +13,19 @@
 
     <div class="stats__container w-full">
       <div class="card stat-card flex-1">
-        <span class="stat-number blue">7</span>
+        <span class="stat-number blue" th:text="${nCuestionariosCompletados}"></span>
         <p class="stat-text">Cuestionarios completados</p>
       </div>
       <div class="card stat-card flex-1">
-        <span class="stat-number green">84%</span>
+        <span class="stat-number green" th:text="${puntuacionMedia} + '%'"></span>
         <p class="stat-text">Puntuación media</p>
       </div>
       <div class="card stat-card flex-1">
-        <span class="stat-number orange">3</span>
+        <span class="stat-number orange" th:text="${nAsignaturasActivas}">0</span>
         <p class="stat-text">Asignaturas activas</p>
       </div>
       <div class="card stat-card flex-1">
-        <span class="stat-number purple">142</span>
+        <span class="stat-number purple" th:text="${minutosEstudio}">10</span>
         <p class="stat-text">Minutos de estudio</p>
       </div>
     </div>

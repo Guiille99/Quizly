@@ -1,5 +1,5 @@
 package com.quizly.app.model.enums;
 
-public enum IntentoPreguntaEstadoEnum {
+public enum IntentoCuestionarioEstadoEnum {
     IN_PROGRESS, FINISHED, ABANDONNED
 }

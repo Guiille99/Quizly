@@ -1,0 +1,23 @@
+package com.quizly.app.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
+
+import com.quizly.app.util.Constantes;
+
+import jakarta.servlet.http.HttpServletRequest;
+
+@Controller
+@RequiredArgsConstructor
+public class AsignaturasController {
+
+    @GetMapping("/asignaturas")
+    public String showAsignaturas(Model model, HttpServletRequest request) {
+        model.addAttribute(Constantes.ATTR_CURRENT_URI, request.getRequestURI());
+        return "asignaturas/asignaturas";
+    }
+    
+}

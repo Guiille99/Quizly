@@ -45,4 +45,17 @@ public class IntentoCuestionarioDaoImpl extends AbstractDaoImpl<IntentoCuestiona
                 .setParameter("cuestionarioId", cuestionarioId)
                 .getResultList();
     }
+
+    @Override
+    public List<IntentoCuestionario> getIntentosCuestionariosByEstadoYUsuario(Long usuarioId, String codigoEstado) {
+        return entityManager.createQuery(
+                """
+                SELECT i FROM IntentoCuestionario i WHERE i.estado.codigo = :codigoEstado
+                AND i.usuario.id = :usuarioId
+                """, IntentoCuestionario.class)
+                .setParameter("codigoEstado", codigoEstado)
+                .setParameter("usuarioId", usuarioId)
+                .getResultList();
+        
+    }
 }
