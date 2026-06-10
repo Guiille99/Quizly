@@ -78,7 +78,10 @@
                                 <details open>
                                     <summary class="bi bi-card-checklist btn-link">Cuestionarios</summary>
                                     <ul>
-                                        <li><a href="" class="btn-link">Todos</a></li>
+                                        <li>
+                                            <a th:href="@{/cuestionarios}" class="btn-link" 
+                                                th:classappend="${currentUri == '/cuestionarios'} ? 'active'">Todos</a>
+                                        </li>
                                         <li><a href="" class="btn-link">Favoritos</a></li>
                                         <li><a href="" class="btn-link">Recientes</a></li>
                                     </ul>
