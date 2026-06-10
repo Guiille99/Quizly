@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.quizly.app.dao.GeneroDao;
-import com.quizly.app.dao.UsuarioDao;
+import com.quizly.app.repository.GeneroRepository;
+import com.quizly.app.repository.UsuarioRepository;
 import com.quizly.app.dto.ForgotPasswordDto;
 import com.quizly.app.dto.RegisterFormDto;
 import com.quizly.app.dto.ResetPasswordDto;
@@ -33,22 +33,22 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class AuthController {
 
     private final AuthService authService;
-    private final GeneroDao generoDao;
-    private final UsuarioDao usuarioDao;
+    private final GeneroRepository generoRepository;
+    private final UsuarioRepository usuarioRepository; // Inyección del nuevo repositorio
     private final ToastService toastService;
     private final EmailService emailService;
 
-    public AuthController(AuthService authService, GeneroDao generoDao, ToastService toastService, UsuarioDao usuarioDao, EmailService emailService) {
+    public AuthController(AuthService authService, GeneroRepository generoRepository, ToastService toastService, UsuarioRepository usuarioRepository, EmailService emailService) {
         this.authService = authService;
-        this.generoDao = generoDao;
-        this.usuarioDao = usuarioDao;
+        this.generoRepository = generoRepository;
+        this.usuarioRepository = usuarioRepository;
         this.toastService = toastService;
         this.emailService = emailService;
     }
 
     @ModelAttribute("generos")
     public List<Genero> getGeneros() {
-        return generoDao.findAll();
+        return generoRepository.findAll();
     }
 
     @GetMapping("/login")
@@ -104,7 +104,7 @@ public class AuthController {
             return "auth/forgot-password";
         }
         
-        Optional<Usuario> usuarioOpt = usuarioDao.findByEmail(form.getEmail());
+        Optional<Usuario> usuarioOpt = usuarioRepository.findByEmail(form.getEmail()); // Usando el nuevo repositorio
 
         if (usuarioOpt.isPresent()) {
             Usuario usuario = usuarioOpt.get();

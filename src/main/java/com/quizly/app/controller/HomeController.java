@@ -6,8 +6,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-
-import com.quizly.app.dao.IntentoCuestionarioDao;
+import com.quizly.app.repository.IntentoCuestionarioRepository;
 import com.quizly.app.model.entity.IntentoCuestionario;
 import com.quizly.app.model.enums.IntentoCuestionarioEstadoEnum;
 import com.quizly.app.security.QuizlyUserDetails;
@@ -22,13 +21,13 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class HomeController {
     // private final ToastService toastService;
-    private final IntentoCuestionarioDao intentoCuestionarioDao;
+    private final IntentoCuestionarioRepository intentoCuestionarioRepository; // Inyección del nuevo repositorio
 
     @GetMapping("/")
     public String home(Model model, @AuthenticationPrincipal QuizlyUserDetails userDetails, 
             HttpServletRequest request) {
         if (userDetails != null) {
-            List<IntentoCuestionario> intentosCuestionarioUsuario = intentoCuestionarioDao.findByUsuarioId(userDetails.getId());
+            List<IntentoCuestionario> intentosCuestionarioUsuario = intentoCuestionarioRepository.findByUsuarioId(userDetails.getId()); // Usando el nuevo repositorio
 
             List<IntentoCuestionario> cuestionariosCompletados = intentosCuestionarioUsuario.stream()
                 .filter(i -> IntentoCuestionarioEstadoEnum.FINISHED.toString().equals(i.getEstado().getCodigo()))
