@@ -1,0 +1,13 @@
+<div th:fragment="base(tableId, page, thead, tbody, filterFormId, targetUrl, pageParamName, sizeOptions)"
+    th:id="${tableId}" class="w-full flex flex-col gap-4">
+
+    <div class="table__container">
+        <table class="table table-zebra w-full">
+            <thead th:insert="${thead}"></thead>
+            <tbody th:insert="${tbody}"></tbody>
+        </table>
+    </div>
+
+    <div th:if="${page.totalPages > 0}" th:replace="~{components/table/pagination :: controls(${page}, ${filterFormId}, ${targetUrl}, 
+        ${tableId}, ${pageParamName}, ${sizeOptions})}"></div>
+</div>

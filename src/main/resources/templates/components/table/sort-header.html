@@ -1,0 +1,26 @@
+<th th:fragment="cell(field, fieldLabel, page, filterFormId, targetUrl, tableId, pageParamName)"
+    class="sort-header cursor-pointer hover:bg-base-200 transition-colors"
+    th:with="prefix=${pageParamName.contains('_') ? pageParamName.substring(0, pageParamName.lastIndexOf('_') + 1) : ''},
+        sortParam=${prefix + 'sort'},
+        sizeParam=${prefix + 'size'},
+        currentSort=${page.sort.getOrderFor(field)},
+        isSorted=${currentSort != null},
+        isAsc=${isSorted and currentSort.ascending},
+        nextDir=${isAsc ? 'desc' : 'asc'}"
+    th:hx-get="@{${targetUrl}(__${sortParam}__=${field + ',' + nextDir}, __${sizeParam}__=${page.size}, __${prefix + 'page'}__=0)}"
+    th:hx-include="${filterFormId != null and filterFormId != '' ? filterFormId : null}"
+    th:hx-target="'#' + ${tableId}"
+    th:hx-swap="'outerHTML'">
+
+    
+    <div class="flex items-center gap-2">
+        <span th:text="${fieldLabel}">Título Columna</span>
+
+        <div class="sort-icons__container" th:classappend="${isSorted ? 'opacity-100 text-primary' : ''}">
+            <i th:if="${!isSorted or isAsc}" class="bi bi-chevron-up" th:classappend="${isAsc ? '' : 'opacity-50'}"></i>
+            <i th:if="${!isSorted or !isAsc}" class="bi bi-chevron-down" th:classappend="${!isSorted ? 'opacity-50' : ''}"></i>
+        </div>
+    </div>
+
+    
+</th>

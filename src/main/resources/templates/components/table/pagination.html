@@ -1,0 +1,78 @@
+<div th:fragment="controls(page, filterFormId, targetUrl, tableId, pageParamName, sizeOptions)"
+    class="pagination__container flex flex-col sm:flex-row items-center justify-between gap-4"
+    th:with="prefix=${pageParamName.contains('_') ? pageParamName.substring(0, pageParamName.lastIndexOf('_') + 1) : ''},
+             sortParam=${prefix + 'sort'},
+             sizeParam=${prefix + 'size'},
+             currentSort=${page.sort.sorted ? page.sort.![property + ',' + direction.name().toLowerCase()] : null}">
+
+    <div class="flex flex-wrap items-center gap-3 text-sm text-base-content/70">
+        <!-- Selector de Tamaño Dinámico -->
+        <div class="flex items-center gap-2" th:if="${sizeOptions != null}">
+            <span>Mostrar</span>
+            <select class="select select-bordered select-xs w-16"
+                    th:name="${sizeParam}"
+                    th:hx-get="@{${targetUrl}(__${pageParamName}__=0, __${sortParam}__=${currentSort})}"
+                    th:hx-target="'#' + ${tableId}"
+                    th:hx-swap="'outerHTML'"
+                    th:hx-include="${filterFormId != null and filterFormId != '' ? filterFormId : null}">
+                <option th:each="opt : ${sizeOptions}" 
+                        th:value="${opt}" 
+                        th:text="${opt}"
+                        th:selected="${page.size == opt}"></option>
+            </select>
+        </div>
+
+        <span>
+            Mostrando <span th:text="${page.totalElements > 0 ? page.number * page.size + 1 : 0}" class="font-bold">1</span>
+            a <span th:text="${(page.number * page.size + page.size) < page.totalElements ? (page.number * page.size + page.size) : page.totalElements}" class="font-bold">10</span>
+            de <span th:text="${page.totalElements}" class="font-bold">50</span> resultados
+        </span>
+    </div>
+
+    <div class="join">
+        <button class="join-item btn btn-sm"
+            th:disabled="${page.first}"
+            th:hx-get="@{${targetUrl}(__${pageParamName}__=0, __${sizeParam}__=${page.size}, __${sortParam}__=${currentSort})}"
+            th:hx-include="${filterFormId != null and filterFormId != '' ? filterFormId : null}"
+            th:hx-target="'#' + ${tableId}"
+            th:hx-swap="'outerHTML'">
+
+            <i class="bi bi-chevron-double-left"></i>
+        </button>
+
+        <button class="join-item btn btn-sm"
+            th:disabled="${page.first}"
+            th:hx-get="@{${targetUrl}(__${pageParamName}__=${page.number - 1}, __${sizeParam}__=${page.size}, __${sortParam}__=${currentSort})}"
+            th:hx-include="${filterFormId != null and filterFormId != '' ? filterFormId : null}"
+            th:hx-target="'#' + ${tableId}"
+            th:hx-swap="'outerHTML'">
+
+            <i class="bi bi-chevron-left"></i>
+        </button>
+
+        <button class="join-item btn btn-sm no-animation pointer-events-none bg-base-200">
+            Página <span th:text="${page.number + 1}">1</span> de <span th:text="${page.totalPages}">5</span>
+        </button>
+
+        <button class="join-item btn btn-sm"
+            th:disabled="${page.last}"
+            th:hx-get="@{${targetUrl}(__${pageParamName}__=${page.number + 1}, __${sizeParam}__=${page.size}, __${sortParam}__=${currentSort})}"
+            th:hx-include="${filterFormId != null and filterFormId != '' ? filterFormId : null}"
+            th:hx-target="'#' + ${tableId}"
+            th:hx-swap="'outerHTML'">
+                    
+            <i class="bi bi-chevron-right"></i>
+        </button>
+
+        <button class="join-item btn btn-sm"
+            th:disabled="${page.last}"
+            th:hx-get="@{${targetUrl}(__${pageParamName}__=${page.totalPages - 1}, __${sizeParam}__=${page.size}, __${sortParam}__=${currentSort})}"
+            th:hx-include="${filterFormId != null and filterFormId != '' ? filterFormId : null}"
+            th:hx-target="'#' + ${tableId}"
+            th:hx-swap="'outerHTML'">
+                
+            <i class="bi bi-chevron-double-right"></i>
+        </button>
+    </div>
+
+</div>
