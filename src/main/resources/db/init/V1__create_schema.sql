@@ -145,7 +145,7 @@ CREATE TABLE cuestionarios (
     descripcion    VARCHAR(255),
     tiempo_limite  INTEGER,
     slug           VARCHAR(255) NOT NULL,
-    version        NUMBER       NOT NULL,
+    version        INT       NOT NULL,
     created_at     TIMESTAMP    NOT NULL,
     updated_at     TIMESTAMP    NOT NULL,
     tema_id        BIGINT       NOT NULL,
