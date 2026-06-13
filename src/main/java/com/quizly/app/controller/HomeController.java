@@ -10,6 +10,7 @@ import com.quizly.app.repository.IntentoCuestionarioRepository;
 import com.quizly.app.model.entity.IntentoCuestionario;
 import com.quizly.app.model.enums.IntentoCuestionarioEstadoEnum;
 import com.quizly.app.security.QuizlyUserDetails;
+import com.quizly.app.service.ActividadService;
 import com.quizly.app.util.Constantes;
 import com.quizly.app.web.notification.ToastService;
 
@@ -21,13 +22,14 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class HomeController {
     // private final ToastService toastService;
-    private final IntentoCuestionarioRepository intentoCuestionarioRepository; // Inyección del nuevo repositorio
+    private final ActividadService actividadService;
+    private final IntentoCuestionarioRepository intentoCuestionarioRepository;
 
     @GetMapping("/")
     public String home(Model model, @AuthenticationPrincipal QuizlyUserDetails userDetails, 
             HttpServletRequest request) {
         if (userDetails != null) {
-            List<IntentoCuestionario> intentosCuestionarioUsuario = intentoCuestionarioRepository.findByUsuarioId(userDetails.getId()); // Usando el nuevo repositorio
+            List<IntentoCuestionario> intentosCuestionarioUsuario = intentoCuestionarioRepository.findByUsuarioId(userDetails.getId());
 
             List<IntentoCuestionario> cuestionariosCompletados = intentosCuestionarioUsuario.stream()
                 .filter(i -> IntentoCuestionarioEstadoEnum.FINISHED.toString().equals(i.getEstado().getCodigo()))
@@ -52,6 +54,7 @@ public class HomeController {
             model.addAttribute("puntuacionMedia", Math.round(puntuacionMedia));
             model.addAttribute("nAsignaturasActivas", nAsignaturasActivas);
             model.addAttribute("minutosEstudio", minutosEstudio);
+            model.addAttribute("actividades", actividadService.getActividadesRecientes(userDetails.getUsuario(), 5));
         }
         
         model.addAttribute(Constantes.ATTR_CURRENT_URI, request.getRequestURI());

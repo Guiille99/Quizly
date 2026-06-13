@@ -53,4 +53,27 @@ public class IntentoCuestionarioRepositoryImpl implements IntentoCuestionarioRep
         query.setParameter("codigoEstado", codigoEstado);
         return query.getResultList();
     }
+
+    @Override
+    public List<IntentoCuestionario> findLatestByUsuarioId(Long usuarioId, int limit) {
+        TypedQuery<IntentoCuestionario> query = entityManager.createQuery(
+            "SELECT i FROM IntentoCuestionario i WHERE i.usuario.id = :usuarioId ORDER BY i.fechaFin DESC", 
+            IntentoCuestionario.class);
+        query.setParameter("usuarioId", usuarioId);
+        query.setMaxResults(limit);
+        return query.getResultList();
+    }
+
+    @Override
+    public Double findMaxPorcentajeAntesDe(Long usuarioId, Long cuestionarioId, Long intentoIdActual) {
+        TypedQuery<Double> query = entityManager.createQuery(
+            "SELECT MAX((CAST(i.aciertos AS double) / (i.aciertos + i.fallos)) * 100) " +
+            "FROM IntentoCuestionario i WHERE i.usuario.id = :usuarioId " +
+            "AND i.cuestionario.id = :cuestionarioId AND i.id != :intentoId", Double.class);
+        query.setParameter("usuarioId", usuarioId);
+        query.setParameter("cuestionarioId", cuestionarioId);
+        query.setParameter("intentoId", intentoIdActual);
+        Double result = query.getSingleResult();
+        return result != null ? result : -1.0;
+    }
 }
