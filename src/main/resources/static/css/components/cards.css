@@ -7,11 +7,30 @@
 
 
 /* Cards */
-.stat-card {
-    background-color: var(--color-surface);
+.card{
     border: 1px solid var(--color-border);
+    background-color: var(--color-surface);
     padding: 14px 16px;
 
+    .icon__container{
+        width: 36px;
+        height: 36px;
+        border-radius: 9px;
+    }
+}
+
+.selectable-card{
+    transition: all;
+    &:hover{
+        border-color: var(--color-primary);
+        @apply shadow-primary;
+        transform: translateY(-1px);
+    }
+    
+}
+
+/* Stat card */
+.stat-card {
     .stat-number{
         font-size: 1.5rem;
         font-weight: bold;
@@ -33,5 +52,38 @@
     .stat-text{
         font-size: 0.8rem;
         color: var(--color-text-muted);
+    }
+}
+
+
+/* Asignatura card */
+.asignaturas__container{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+}
+
+.asignatura-card{
+    .asignatura-card__header{
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        margin-bottom: 12px;
+    }
+    .asignatura-card__icon__container{
+        width: 36px;
+        height: 36px;
+        border-radius: 9px;
+    }
+
+    progress{
+        height: 0.3rem;
+        margin-bottom: 5px;
+        width: 100%;
+    }
+
+    .asignatura-card__info, .asigantura-card__footer{
+        font-size: 0.7rem;
+        color: var(--color-neutral-400);
     }
 }

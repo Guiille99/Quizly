@@ -11,7 +11,7 @@
       <p class="mt-1 text-sm text-text-muted">Aquí tienes un resumen de tu actividad de hoy</p>
     </div>
 
-    <div class="stats__container w-full">
+    <div class="stats__container w-full mb-5">
       <div class="card stat-card flex-1">
         <span class="stat-number blue" th:text="${nCuestionariosCompletados}"></span>
         <p class="stat-text">Cuestionarios completados</p>
@@ -29,6 +29,34 @@
         <p class="stat-text">Minutos de estudio</p>
       </div>
     </div>
+
+    <!-- <div th:replace="~{components/table/skeleton :: base(
+        tableId='table-usuarios', 
+        page=${usuariosPage}, 
+        thead=~{::thead}, 
+        tbody=~{::tbody}, 
+        filterFormId=null, 
+        targetUrl='/usuarios',
+        pageParamName='page',
+        sizeOptions=${ {5, 10, 20, 50} })}"
+        th:fragment="table-usuarios_fragment">
+        
+            <thead>
+                <tr>
+                    <th th:replace="~{components/table/sort-header :: cell('nombre', 'Nombre', ${usuariosPage}, null, '/usuarios', 'table-usuarios', 'page')}"></th>
+                    <th th:replace="~{components/table/sort-header :: cell('apellidos', 'Apellidos', ${usuariosPage}, null, '/usuarios', 'table-usuarios', 'page')}"></th>
+                    <th>Rol</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr th:each="usuario : ${usuariosPage.content}">
+                    <td th:text="${usuario.nombre}"></td>
+                    <td th:text="${usuario.apellidos}"></td>
+                    <td th:text="${usuario.rol}"></td>
+                </tr>
+            </tbody>
+    </div> -->
   </main>  
 </body>
 </html>

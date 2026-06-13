@@ -10,8 +10,54 @@
             <p class="mt-1 text-sm text-text-muted">Explora las asignaturas disponibles y sus temas</p>
         </div>
 
-        <div class="asignaturas__container">
-            
+        <form id="form-filtros-asignaturas" class="flex justify-between gap-4 mb-4">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+        
+            <fieldset class="fieldset p-0 flex-1">
+                <input class="input w-full" type="search" id="nameFilter" name="nameFilter"
+                    placeholder="Nombre de la asignatura"
+                    hx-get="/asignaturas/elementos"
+                    hx-trigger="input changed delay:400ms, search"
+                    hx-target="#lista-asignaturas"
+                    hx-include="#form-filtros-asignaturas" />
+            </fieldset>
+
+            <button class="btn btn-neutral" type="button" onclick="document.getElementById('form-filtros-asignaturas').reset()"
+                hx-get="/asignaturas/elementos"
+                hx-target="#lista-asignaturas"
+                hx-swap="outeHTML">
+                Limpiar
+            </button>
+        </form>
+
+        <!-- Contenedor de asignaturas -->
+        <div id="lista-asignaturas" th:fragment="lista-asignaturas_fragment">
+            <div class="asignaturas__container mb-4">
+                <div th:each="item : ${asignaturas}" class="card selectable-card asignatura-card">
+                    <div class="asignatura-card__header">
+                        <div class="flex flex-col">
+                            <span class="asignatura-card__name" th:text="${item.asignatura.nombre}">Matemáticas</span>
+                            <span class="asignatura-card__info" th:text="|${item.nTemas} temas - Clic para ver|">8 temas - Clic para ver</span>
+                        </div>
+                    </div>
+    
+                    <progress class="progress auto-range" th:value="${item.porcentaje}" max="100"></progress>
+                    <span class="asigantura-card__footer" th:text="|${item.porcentaje}% completado|">60% completado</span>
+                </div>
+            </div>
+
+            <div th:if="${asignaturas.totalPages > 0}">
+                <div th:replace="~{components/table/pagination :: controls(
+                    page=${asignaturas},
+                    filterFormId='',
+                    targetUrl='/asignaturas/elementos',
+                    tableId='lista-asignaturas',
+                    pageParamName='page',
+                    sizeOptions=${ {5, 10, 15, 20} }
+                )}">
+
+                </div>
+            </div>
         </div>
     </main>
 </body>

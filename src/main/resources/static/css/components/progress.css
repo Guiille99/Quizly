@@ -1,0 +1,20 @@
+/* Mecanismo de rangos automáticos */
+.range-low { --range-color: var(--color-accent-red); }
+.range-medium { --range-color: var(--color-accent-orange); }
+.range-high { --range-color: var(--color-accent-green); }
+
+/* Aplicación para Radial Progress */
+.radial-progress.range-low, 
+.radial-progress.range-medium, 
+.radial-progress.range-high {
+    color: var(--range-color);
+}
+
+/* Aplicación para Progress Bar (DaisyUI) */
+progress[class*="range-"]::-webkit-progress-value {
+    background-color: var(--range-color);
+}
+
+progress[class*="range-"]::-moz-progress-bar {
+    background-color: var(--range-color);
+}

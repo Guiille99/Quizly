@@ -1,0 +1,6 @@
+/* Forms */
+.form-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+}
