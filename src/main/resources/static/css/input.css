@@ -7,7 +7,7 @@
 @plugin "daisyui";
 @source "../resources/templates/**/*.html";
 
-@custom-variant dark (&:where(.dark, .dark *));
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 @theme {
   /* Typography */
@@ -93,7 +93,7 @@
     color-scheme: light;
   }
 
-  .dark {
+  [data-theme="dark"] {
     --color-bg: #0f131b;
     --color-surface: #161b25;
     --color-card: #1d2331;
@@ -110,6 +110,8 @@
     --color-border-focus: #6091fc;
     --color-border-hover: #6091fc;
 
+    --color-primary: var(--color-accent); 
+    --color-primary-content: var(--color-text-inverse);
     --color-accent: #6091fc;
     --color-accent-hover: #4574dc;
     --color-accent-green: #5ad2a4;
@@ -178,12 +180,12 @@
   }
 }
 
-html.dark {
+html[data-theme="dark"] {
   color-scheme: dark;
 }
 
 @plugin "daisyui/theme" {
-  name: "quizly";
+  name: "light";
   default: true; /* set as default */
   /*prefersdark: false;*/ /* set as default dark mode (prefers-color-scheme:dark) */
   color-scheme: light; /* color of browser-provided UI */
@@ -208,6 +210,23 @@ html.dark {
   --color-warning-content: var(--color-text);
   --color-error: var(--color-accent-red);
   --color-error-content: var(--color-text-inverse);
+}
+
+@plugin "daisyui/theme" {
+  name: "dark";
+  color-scheme: dark;
+  --color-base-100: #0f131b;
+  --color-base-200: #161b25;
+  --color-base-300: #1d2331;
+  --color-base-content: #e4e9f1;
+  --color-primary: #6091fc;
+  --color-primary-content: #ffffff;
+  --color-secondary: #ac8cff;
+  --color-accent: #6091fc;
+  --color-info: #6091fc;
+  --color-success: #5ad2a4;
+  --color-warning: #f3954f;
+  --color-error: #fa7188;
 }
 
 /* Sidebar */
