@@ -49,7 +49,7 @@ public class ActividadService {
         String fechaRelativa = "";
 
         if (IntentoCuestionarioEstadoEnum.FINISHED.toString().equals(estado)) {
-            fechaRelativa = utils.formatFechaRelativa(intento.getFechaFin());
+            fechaRelativa = utils.formatFechaRelativa(intento.getUpdatedAt());
 
             // Si el cuestionario ha sido completado, comprobamos si se trata de un nuevo récord
             Double mejorPrevio = intentoCuestionarioRepository.findMaxPorcentajeAntesDe(

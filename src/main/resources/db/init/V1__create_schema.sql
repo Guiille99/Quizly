@@ -205,11 +205,13 @@ CREATE TABLE intentos_cuestionario (
     cuestionario_id BIGINT    NOT NULL,
     usuario_id      BIGINT    NOT NULL,
     fecha_inicio    TIMESTAMP NOT NULL,
-    fecha_fin       TIMESTAMP NOT NULL,
+    fecha_fin       TIMESTAMP,
     aciertos        INTEGER   NOT NULL,
     fallos          INTEGER   NOT NULL,
     tiempo_empleado BIGINT    NOT NULL,
     estado_id       BIGINT    NOT NULL,
+    created_at      TIMESTAMP NOT NULL,
+    updated_at      TIMESTAMP NOT NULL
     CONSTRAINT fk_intentos_cuestionario_cuestionario
         FOREIGN KEY (cuestionario_id) REFERENCES cuestionarios (id),
     CONSTRAINT fk_intentos_cuestionario_usuario

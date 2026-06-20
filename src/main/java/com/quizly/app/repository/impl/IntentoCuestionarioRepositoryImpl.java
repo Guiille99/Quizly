@@ -57,7 +57,7 @@ public class IntentoCuestionarioRepositoryImpl implements IntentoCuestionarioRep
     @Override
     public List<IntentoCuestionario> findLatestByUsuarioId(Long usuarioId, int limit) {
         TypedQuery<IntentoCuestionario> query = entityManager.createQuery(
-            "SELECT i FROM IntentoCuestionario i WHERE i.usuario.id = :usuarioId ORDER BY i.fechaFin DESC", 
+            "SELECT i FROM IntentoCuestionario i WHERE i.usuario.id = :usuarioId ORDER BY i.updatedAt DESC", 
             IntentoCuestionario.class);
         query.setParameter("usuarioId", usuarioId);
         query.setMaxResults(limit);
