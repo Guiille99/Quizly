@@ -90,3 +90,19 @@
         color: var(--color-neutral-400);
     }
 }
+
+.quiz-card{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+
+    .quiz-meta{
+        font-size: 0.7rem;
+        color: var(--color-neutral-400);
+    }
+
+    button{
+        margin-left: auto;
+    }
+}
