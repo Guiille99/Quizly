@@ -2,6 +2,8 @@ package com.quizly.app.repository;
 
 import java.util.List;
 import java.util.Optional;
+
+import com.quizly.app.dto.TemaEstadisticaDto;
 import com.quizly.app.model.entity.Tema;
 
 public interface TemaRepositoryCustom {
@@ -11,4 +13,12 @@ public interface TemaRepositoryCustom {
     List<Tema> findByAsignaturaId(Long asignaturaId);
 
     boolean existsBySlug(String slug);
+
+    /**
+     * Obtiene la lista de estadística de los temas
+     * asociados a un usuario
+     * @param usuarioId
+     * @return Lista de {@link TemaEstadisticaDto}
+     */
+    List<TemaEstadisticaDto> getEstadisticasTemasPorUsuario(Long usuarioId);
 }

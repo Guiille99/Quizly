@@ -11,6 +11,7 @@
       <p class="mt-1 text-sm text-text-muted">Aquí tienes un resumen de tu actividad de hoy</p>
     </div>
 
+    <!-- Estadísticas principales -->
     <div class="stats__container w-full mb-5">
       <div class="card stat-card flex-1">
         <span class="stat-number blue" th:text="${nCuestionariosCompletados}"></span>
@@ -31,8 +32,71 @@
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-      <div class="lg:col-span-2 card p-6 flex flex-col justify-center border-dashed border-2 border-border/50">
-          <p class="text-text-muted italic text-center">Gráfica (Próximamente)</p>
+      <!-- Rendimiento por temas -->
+      <div class="card lg:col-span-2">
+        <h3 class="card-title">Análisis del rendimiento de los temas</h3>
+
+        <div class="flex flex-col sm:flex-row gap-4 mt-4">
+           <!-- Fortalezas -->
+           <div class="card flex-1">
+              <h3 class="card-title text-accent-green mb-4">Fortalezas</h3>
+
+              <div th:if="${not #lists.isEmpty(temasMayorRendimiento)}" th:each="temaStat : ${temasMayorRendimiento}" class="flex gap-4">
+                <div class="icon__container bg-accent-green-muted">
+                  <i class="bi bi-check-circle-fill text-accent-green"></i>
+                </div>
+
+                <div class="flex-1">
+                  <div class="flex justify-between text-sm">
+                    <span th:text="${temaStat.nombreTema}"></span>
+                    <span th:text="|${temaStat.promedioRedondeado} %|"></span>
+                  </div>
+                  <progress class="progress auto-range" th:value="${temaStat.promedioRedondeado}" max="100"></progress>
+                </div>
+              </div>
+
+              <div th:if="${#lists.isEmpty(temasMayorRendimiento)}" class="flex flex-col items-center gap-4">
+                <div class="icon-blur-container icon-blur-success glow">
+                  <i class="bi bi-trophy"></i>
+                </div>
+                <div class="text-sm text-center">
+                  <p class="font-bold">Aún no hay temas en Fortalezas.</p>
+                  <p>¡Sigue completando cuestionarios y tus temas más fuertes aparecerán aquí pronto!</p>
+                </div>
+              </div>
+           </div>
+           
+           <!-- Necesita mejorar -->
+           <div class="card flex-1">
+            <h3 class="card-title text-accent-orange mb-4">Necesita mejorar</h3>
+
+            <div th:if="${not #lists.isEmpty(temasPeorRendimiento)}" th:each="temaStat : ${temasPeorRendimiento}" class="flex gap-4 mt-4">
+              <div class="icon__container bg-accent-orange-muted">
+                <i class="bi bi-exclamation-triangle-fill text-accent-orange"></i>
+              </div>
+
+              <div class="flex-1">
+                <div class="flex justify-between text-sm">
+                  <span th:text="${temaStat.nombreTema}"></span>
+                  <span th:text="|${temaStat.promedioRedondeado} %|"></span>
+                </div>
+                <progress class="progress auto-range" th:value="${temaStat.promedioRedondeado}" max="100"></progress>
+              </div>
+            </div>
+
+            <div th:if="${#lists.isEmpty(temasPeorRendimiento)}" class="flex flex-col items-center gap-4">
+              <div class="icon-blur-container icon-blur-warning glow">
+                <i class="bi bi-graph-up-arrow"></i>
+              </div>
+              <div class="text-sm text-center">
+                <p class="font-bold">No hay temas para mejorar todavía.</p>
+                <p>¡Sigue practicando o intenta desafiarte más!</p>
+              </div>
+            </div>
+         </div>
+
+         </div>
+
       </div>
 
       <!-- Actividad reciente -->

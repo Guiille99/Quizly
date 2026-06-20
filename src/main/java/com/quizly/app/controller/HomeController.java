@@ -1,5 +1,6 @@
 package com.quizly.app.controller;
 
+import com.quizly.app.service.TemaService;
 import java.util.List;
 
 import org.springframework.stereotype.Controller;
@@ -12,8 +13,6 @@ import com.quizly.app.model.enums.IntentoCuestionarioEstadoEnum;
 import com.quizly.app.security.QuizlyUserDetails;
 import com.quizly.app.service.ActividadService;
 import com.quizly.app.util.Constantes;
-import com.quizly.app.web.notification.ToastService;
-
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
@@ -21,15 +20,16 @@ import lombok.RequiredArgsConstructor;
 @Controller
 @RequiredArgsConstructor
 public class HomeController {
+    private final TemaService temaService;
     // private final ToastService toastService;
     private final ActividadService actividadService;
     private final IntentoCuestionarioRepository intentoCuestionarioRepository;
 
     @GetMapping("/")
-    public String home(Model model, @AuthenticationPrincipal QuizlyUserDetails userDetails, 
+    public String home(Model model, @AuthenticationPrincipal QuizlyUserDetails authUser, 
             HttpServletRequest request) {
-        if (userDetails != null) {
-            List<IntentoCuestionario> intentosCuestionarioUsuario = intentoCuestionarioRepository.findByUsuarioId(userDetails.getId());
+        if (authUser != null) {
+            List<IntentoCuestionario> intentosCuestionarioUsuario = intentoCuestionarioRepository.findByUsuarioId(authUser.getId());
 
             List<IntentoCuestionario> cuestionariosCompletados = intentosCuestionarioUsuario.stream()
                 .filter(i -> IntentoCuestionarioEstadoEnum.FINISHED.toString().equals(i.getEstado().getCodigo()))
@@ -54,7 +54,9 @@ public class HomeController {
             model.addAttribute("puntuacionMedia", Math.round(puntuacionMedia));
             model.addAttribute("nAsignaturasActivas", nAsignaturasActivas);
             model.addAttribute("minutosEstudio", minutosEstudio);
-            model.addAttribute("actividades", actividadService.getActividadesRecientes(userDetails.getUsuario(), 5));
+            model.addAttribute("actividades", actividadService.getActividadesRecientes(authUser.getUsuario(), 5));
+            model.addAttribute("temasMayorRendimiento", temaService.getTemasMayorRendimientoUsuario(authUser.getId()));
+            model.addAttribute("temasPeorRendimiento", temaService.getTemasPeorRendimientoUsuario(authUser.getId()));
         }
         
         model.addAttribute(Constantes.ATTR_CURRENT_URI, request.getRequestURI());

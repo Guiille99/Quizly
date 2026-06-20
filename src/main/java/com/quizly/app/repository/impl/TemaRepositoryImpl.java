@@ -3,6 +3,7 @@ package com.quizly.app.repository.impl;
 import java.util.List;
 import java.util.Optional;
 
+import com.quizly.app.dto.TemaEstadisticaDto;
 import com.quizly.app.model.entity.Tema;
 import com.quizly.app.repository.TemaRepositoryCustom;
 
@@ -40,5 +41,23 @@ public class TemaRepositoryImpl implements TemaRepositoryCustom {
             .getSingleResult();
         
         return count > 0;
+    }
+
+    @Override
+    public List<TemaEstadisticaDto> getEstadisticasTemasPorUsuario(Long usuarioId) {
+       return entityManager.createQuery("""
+                SELECT new com.quizly.app.dto.TemaEstadisticaDto(
+                    t.id,
+                    t.nombre, 
+                    AVG(CAST(ic.aciertos AS double) * 100 / NULLIF(ic.aciertos + ic.fallos, 0))
+                )
+                FROM IntentoCuestionario ic
+                JOIN ic.cuestionario c
+                JOIN  c.tema t
+                WHERE ic.usuario.id = :usuarioId
+                GROUP BY t
+               """, TemaEstadisticaDto.class)
+               .setParameter("usuarioId", usuarioId)
+               .getResultList();
     }
 }

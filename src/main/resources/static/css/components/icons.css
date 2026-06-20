@@ -1,0 +1,25 @@
+.icon-blur-container{
+    @apply flex items-center justify-center rounded-full text-2xl transition-all duration-300;
+    height: 80px;
+    width: 80px;
+
+    .bi{
+        font-size: 2rem
+    }
+}
+
+.icon-blur-success{
+    @apply bg-success/20 text-success;
+
+    &.glow{
+        @apply shadow-lg shadow-success/40;
+    }
+}
+
+.icon-blur-warning{
+    @apply bg-warning/20 text-warning;
+
+    &.glow{
+        @apply shadow-lg shadow-warning/40;
+    }
+}
