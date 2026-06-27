@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es" th:replace="~{layout/base_layout :: layout(~{::main})}">
+<head th:replace="~{fragments/head :: head('Quizly - Cuestionarios recientes')}"></head>
+<body>
+    <main th:fragment="main" class="w-full px-6 py-8">
+        <div class="mb-5">
+            <h1 class="text-xl font-semibold tracking-tight text-text">Vistos recientemente</h1>
+            <p class="mt-1 text-sm text-text-muted">Últimos cuestionarios abiertos</p>
+        </div>
+
+        <!-- Contenedor de cuestionarios -->
+        <div id="lista-cuestionarios" th:fragment="lista-cuestionarios_fragment">
+            <div class="quiz__container flex flex-col gap-2 mb-4">
+                <div th:each="cuestionario : ${cuestionariosRecientesPage}" class="card selectable-card quiz-card">
+                    <div class="flex flex-col gap-1">
+                        <span class="quiz-title" th:text="${cuestionario.titulo}"></span>
+                        <span class="quiz-meta" th:text="|${cuestionario.tema.asignatura.nombre} - ${cuestionario.preguntas.size()} preguntas|"></span>
+                    </div>
+                    <div class="badge-difficulty" th:classappend="${cuestionario.dificultad.codigo == 'EASY' ? 'badge-difficulty-easy' : cuestionario.dificultad.codigo == 'MEDIUM' ? 'badge-difficulty-medium' : cuestionario.dificultad.codigo == 'HARD' ? 'badge-difficulty-hard' : ''}">
+                        <span th:text="${cuestionario.dificultad.nombre}"></span>
+                    </div>
+
+                    <button class="btn btn-primary">Empezar</button>
+                </div>
+            </div>
+
+            <div th:if="${cuestionariosRecientesPage.totalPages > 0}">
+                <div th:replace="~{components/commons/pagination :: controls(
+                    page=${cuestionariosRecientesPage},
+                    filterFormId='',
+                    targetUrl='/cuestionarios/table-data',
+                    tableId='lista-cuestionarios',
+                    pageParamName='page',
+                    sizeOptions=${ {5, 10} }
+                )}">
+
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
