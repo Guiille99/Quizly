@@ -16,6 +16,7 @@ import com.quizly.app.model.enums.IntentoCuestionarioEstadoEnum;
 import com.quizly.app.repository.IntentoCuestionarioRepository;
 import com.quizly.app.security.QuizlyUserDetails;
 import com.quizly.app.util.Constantes;
+import com.quizly.app.util.Utils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -54,12 +55,12 @@ public class MiProgresoController {
             long totalSegundos = intentosCuestionarioUsuario.stream()
                 .mapToLong(i -> i.getTiempoEmpleado() != null ? i.getTiempoEmpleado() : 0L)
                 .sum();
-            long minutosEstudio = totalSegundos / 60;
+            
 
             model.addAttribute("nCuestionariosCompletados", cuestionariosCompletados.size());
             model.addAttribute("puntuacionMedia", Math.round(puntuacionMedia));
             model.addAttribute("nAsignaturasActivas", nAsignaturasActivas);
-            model.addAttribute("minutosEstudio", minutosEstudio);
+            model.addAttribute("tiempoEstudio", Utils.formatDuration(totalSegundos));
             model.addAttribute("historialCuestionariosPage", 
             intentoCuestionarioService.getIntentosCuestionariosByUsuarioYEstadoPaginated(authUser.getId(), 
                 IntentoCuestionarioEstadoEnum.FINISHED.toString(), pageable));

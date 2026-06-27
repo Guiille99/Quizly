@@ -13,6 +13,8 @@ import com.quizly.app.model.enums.IntentoCuestionarioEstadoEnum;
 import com.quizly.app.security.QuizlyUserDetails;
 import com.quizly.app.service.ActividadService;
 import com.quizly.app.util.Constantes;
+import com.quizly.app.util.Utils;
+
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
@@ -48,12 +50,11 @@ public class HomeController {
             long totalSegundos = intentosCuestionarioUsuario.stream()
                 .mapToLong(i -> i.getTiempoEmpleado() != null ? i.getTiempoEmpleado() : 0L)
                 .sum();
-            long minutosEstudio = totalSegundos / 60;
 
             model.addAttribute("nCuestionariosCompletados", cuestionariosCompletados.size());
             model.addAttribute("puntuacionMedia", Math.round(puntuacionMedia));
             model.addAttribute("nAsignaturasActivas", nAsignaturasActivas);
-            model.addAttribute("minutosEstudio", minutosEstudio);
+            model.addAttribute("tiempoEstudio", Utils.formatDuration(totalSegundos));
             model.addAttribute("actividades", actividadService.getActividadesRecientes(authUser.getUsuario(), 5));
             model.addAttribute("temasMayorRendimiento", temaService.getTemasMayorRendimientoUsuario(authUser.getId()));
             model.addAttribute("temasPeorRendimiento", temaService.getTemasPeorRendimientoUsuario(authUser.getId()));

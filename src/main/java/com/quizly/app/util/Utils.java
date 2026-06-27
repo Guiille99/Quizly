@@ -1,5 +1,6 @@
 package com.quizly.app.util;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
@@ -38,5 +39,36 @@ public class Utils {
         }
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(patron);
         return fecha.format(formatter);
+    }
+
+    /**
+     * Formatea la duración en segundos usando la unidad más adecuada.
+     * <br>
+     * Ejemplos:
+     * <ul>
+     * <li> 45s    -> 0 min </li>
+     * <li> 1800s  -> 30 min </li>
+     * <li> 5400s  -> 1 h 30 min </li>
+     * <li> 9000s  -> 6 d 6 h </li>
+     * </ul>
+     * 
+     * @param totalSeconds
+     * @return
+     */
+    public static String formatDuration(long totalSeconds){
+        Duration duration = Duration.ofSeconds(totalSeconds);
+        long days = duration.toDays();
+
+        if (days > 0) {
+            return String.format("%d d %d h", days, duration.toHoursPart());
+        }
+
+        long hours = duration.toHours();
+
+        if (hours > 0) {
+            return String.format("%d h %d min", hours, duration.toMinutesPart());
+        }
+
+        return duration.toMinutes() + " min";
     }
 }
