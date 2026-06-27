@@ -1,6 +1,9 @@
 package com.quizly.app.repository;
 
 import java.util.List;
+
+import org.springframework.data.jpa.repository.Query;
+
 import com.quizly.app.model.entity.IntentoCuestionario;
 
 public interface IntentoCuestionarioRepositoryCustom {

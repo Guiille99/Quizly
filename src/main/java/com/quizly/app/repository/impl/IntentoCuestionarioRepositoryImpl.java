@@ -3,6 +3,7 @@ package com.quizly.app.repository.impl;
 import java.util.List;
 
 import com.quizly.app.model.entity.IntentoCuestionario;
+import com.quizly.app.model.enums.IntentoCuestionarioEstadoEnum;
 import com.quizly.app.repository.IntentoCuestionarioRepositoryCustom;
 
 import jakarta.persistence.EntityManager;

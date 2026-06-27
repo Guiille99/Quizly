@@ -3,6 +3,8 @@
 .range-medium { --range-color: var(--color-accent-orange); }
 .range-high { --range-color: var(--color-accent-green); }
 
+
+
 /* Aplicación para Radial Progress */
 .radial-progress.range-low, 
 .radial-progress.range-medium, 
@@ -17,4 +19,9 @@ progress[class*="range-"]::-webkit-progress-value {
 
 progress[class*="range-"]::-moz-progress-bar {
     background-color: var(--range-color);
+}
+
+/* Aplicación para texto plano */
+span.auto-range{
+    color: var(--range-color);
 }

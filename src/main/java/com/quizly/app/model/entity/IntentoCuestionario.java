@@ -3,6 +3,8 @@ package com.quizly.app.model.entity;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.quizly.app.util.Utils;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -65,6 +67,14 @@ public class IntentoCuestionario extends AuditableEntity {
         int total = (aciertos != null ? aciertos : 0) + (fallos != null ? fallos : 0);
         if (total == 0) return 0.0;
         return (aciertos * 100.0) / total;
+    }
+
+    public int getPorcentajeAciertosRedondeado(){
+        return (int) Math.round(getPorcentajeAciertos());
+    }
+
+    public String getFechaFinFormateadaDDMMYYY(){
+        return Utils.formatFecha(fechaFin, "dd/MM/yyyy");
     }
     
 }

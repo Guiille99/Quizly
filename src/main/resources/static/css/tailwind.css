@@ -9097,6 +9097,9 @@ progress[class*="range-"]::-webkit-progress-value {
 progress[class*="range-"]::-moz-progress-bar {
   background-color: var(--range-color);
 }
+span.auto-range {
+  color: var(--range-color);
+}
 .icon-blur-container {
   display: flex;
   align-items: center;
@@ -9144,6 +9147,14 @@ progress[class*="range-"]::-moz-progress-bar {
       --tw-shadow-color: color-mix(in oklab, color-mix(in oklab, var(--color-warning) 40%, transparent) var(--tw-shadow-alpha), transparent);
     }
   }
+}
+.section-title {
+  margin-bottom: calc(var(--spacing) * 3);
+  font-size: var(--text-sm);
+  line-height: var(--tw-leading, var(--text-sm--line-height));
+  --tw-font-weight: var(--font-weight-bold);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-muted);
 }
 @layer theme {
   :root {

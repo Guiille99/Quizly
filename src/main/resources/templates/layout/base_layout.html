@@ -95,7 +95,8 @@
                                 </details>
                             </li>
                             <li>
-                                <a class="btn-link">
+                                <a th:href="@{/miProgreso}" class="btn-link"
+                                    th:classappend="${currentUri == '/miProgreso'} ? 'active'">
                                     <i class="bi bi-graph-up-arrow"></i>
                                     Mi progreso
                                 </a>

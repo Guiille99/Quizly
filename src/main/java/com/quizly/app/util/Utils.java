@@ -31,4 +31,12 @@ public class Utils {
         
         return fecha.format(DateTimeFormatter.ofPattern("dd MMM", new Locale("es", "ES")));
     }
+
+    public static String formatFecha(LocalDateTime fecha, String patron){
+        if (fecha == null) {
+            return null;
+        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(patron);
+        return fecha.format(formatter);
+    }
 }
