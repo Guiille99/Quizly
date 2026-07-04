@@ -9,10 +9,10 @@ const ToastSystem = (function() {
     };
 
     const icons = {
-        info:    'bi bi-info-circle',
-        error:   'bi bi-x-circle',
-        success: 'bi bi-check-circle',
-        warning: 'bi bi-exclamation-circle',
+        info:    'fa-solid fa-circle-info',
+        error:   'fa-solid fa-circle-xmark',
+        success: 'fa-solid fa-circle-check',
+        warning: 'fa-solid fa-circle-exclamation',
     }
 
     const obtenerContenedor = () => {
@@ -77,11 +77,11 @@ const ToastSystem = (function() {
             });
         });
     
-        setTimeout(() => {
-            if (document.body.contains(toast)) {
-                eliminar(toast);
-            }
-        }, DURATION);
+        // setTimeout(() => {
+        //     if (document.body.contains(toast)) {
+        //         eliminar(toast);
+        //     }
+        // }, DURATION);
     };
 
     return { mostrar };

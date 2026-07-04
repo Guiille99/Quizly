@@ -91,6 +91,7 @@
     }
 }
 
+/* Quiz card */
 .quiz-card{
     display: flex;
     flex-direction: row;
@@ -104,5 +105,28 @@
 
     button{
         margin-left: auto;
+    }
+}
+
+#quiz-start__card{
+    #quiz-start__info{
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 10px;
+
+        .quiz-start__info__item{
+            @apply card bg-accent-muted;
+            padding: 10px;
+            
+            .quiz-start__info__item__header{
+                display: flex;
+                align-items: center;
+                gap: 5px;
+            }
+
+            .quiz-start__info__item__text{
+                font-weight: bold;
+            }
+        }
     }
 }

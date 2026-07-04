@@ -43,7 +43,7 @@
 
               <div th:if="${not #lists.isEmpty(temasMayorRendimiento)}" th:each="temaStat : ${temasMayorRendimiento}" class="flex gap-4">
                 <div class="icon__container bg-accent-green-muted">
-                  <i class="bi bi-check-circle-fill text-accent-green"></i>
+                  <i class="fa-solid fa-circle-check text-accent-green"></i>
                 </div>
 
                 <div class="flex-1">
@@ -57,7 +57,7 @@
 
               <div th:if="${#lists.isEmpty(temasMayorRendimiento)}" class="flex flex-col items-center gap-4">
                 <div class="icon-blur-container icon-blur-success glow">
-                  <i class="bi bi-trophy"></i>
+                  <i class="fa fa-solid fa-trophy"></i>
                 </div>
                 <div class="text-sm text-center">
                   <p class="font-bold">Aún no hay temas en Fortalezas.</p>
@@ -72,7 +72,7 @@
 
             <div th:if="${not #lists.isEmpty(temasPeorRendimiento)}" th:each="temaStat : ${temasPeorRendimiento}" class="flex gap-4 mt-4">
               <div class="icon__container bg-accent-orange-muted">
-                <i class="bi bi-exclamation-triangle-fill text-accent-orange"></i>
+                <i class="fa-solid fa-triangle-exclamation text-accent-orange"></i>
               </div>
 
               <div class="flex-1">
@@ -86,7 +86,7 @@
 
             <div th:if="${#lists.isEmpty(temasPeorRendimiento)}" class="flex flex-col items-center gap-4">
               <div class="icon-blur-container icon-blur-warning glow">
-                <i class="bi bi-graph-up-arrow"></i>
+                <i class="fa fa-solid fa-arrow-trend-up"></i>
               </div>
               <div class="text-sm text-center">
                 <p class="font-bold">No hay temas para mejorar todavía.</p>
@@ -108,9 +108,9 @@
             <div th:if="${not #lists.isEmpty(actividades)}" th:each="actividad : ${actividades}" class="flex items-start gap-3">
               <div th:classappend="${actividad.bgColorClass} + ' ' + ${actividad.textColorClass}" 
                    class="icon__container w-8 h-8">
-                <i th:if="${actividad.tipo == 'COMPLETADO'}" class="bi bi-check-lg"></i>
-                <i th:if="${actividad.tipo == 'RECORD'}" class="bi bi-trophy"></i>
-                <i th:if="${actividad.tipo == 'INICIADO'}" class="bi bi-play-fill"></i>
+                <i th:if="${actividad.tipo == 'COMPLETADO'}" class="fa-solid fa-check"></i>
+                <i th:if="${actividad.tipo == 'RECORD'}" class="fa-solid fa-trophy"></i>
+                <i th:if="${actividad.tipo == 'INICIADO'}" class="fa-solid fa-play"></i>
               </div>
               <div class="flex-1 min-w-0">
                 <p class="text-sm font-medium text-text truncate" th:text="${actividad.titulo}"></p>

@@ -17,8 +17,8 @@
         <span th:text="${fieldLabel}">Título Columna</span>
 
         <div class="sort-icons__container" th:classappend="${isSorted ? 'opacity-100 text-primary' : ''}">
-            <i th:if="${!isSorted or isAsc}" class="bi bi-chevron-up" th:classappend="${isAsc ? '' : 'opacity-50'}"></i>
-            <i th:if="${!isSorted or !isAsc}" class="bi bi-chevron-down" th:classappend="${!isSorted ? 'opacity-50' : ''}"></i>
+            <i th:if="${!isSorted or isAsc}" class="fa-solid fa-chevron-up" th:classappend="${isAsc ? '' : 'opacity-50'}"></i>
+            <i th:if="${!isSorted or !isAsc}" class="fa-solid fa-chevron-down" th:classappend="${!isSorted ? 'opacity-50' : ''}"></i>
         </div>
     </div>
 

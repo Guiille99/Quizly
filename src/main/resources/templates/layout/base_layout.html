@@ -11,7 +11,7 @@
                 <div class="flex-one">
                     <label for="sidebar-drawer" class="btn btn-square btn-ghost md:hidden animate-none"
                         aria-label="Abrir menú">
-                        <i class="bi bi-list text-3xl"></i>
+                        <i class="fa-solid fa-bars text-3xl"></i>
                     </label>
                 </div>
     
@@ -67,19 +67,22 @@
                         <ul class="menu w-full p-0 gap-1 text-base-content/75 font-medium text-[14px]">
                             <li>
                                 <a th:href="@{/}" class="btn-link" th:classappend="${currentUri == '/'} ? 'active'">
-                                    <i class="bi bi-house-door"></i>
+                                    <i class="fa-solid fa-house"></i>
                                     Inicio
                                 </a>
                             </li>
                             <li>
                                 <a th:href="@{/asignaturas}" class="btn-link" th:classappend="${currentUri == '/asignaturas'} ? 'active'">
-                                    <i class="bi bi-journal-bookmark-fill"></i>
+                                    <i class="fa-solid fa-book-bookmark"></i>
                                     Asignaturas
                                 </a>
                             </li>
                             <li>
                                 <details open>
-                                    <summary class="bi bi-card-checklist btn-link">Cuestionarios</summary>
+                                    <summary class="btn-link">
+                                        <i class="fa-solid fa-list-check"></i>
+                                        Cuestionarios
+                                    </summary>
                                     <ul>
                                         <li>
                                             <a th:href="@{/cuestionarios}" class="btn-link" 
@@ -96,7 +99,7 @@
                             <li>
                                 <a th:href="@{/miProgreso}" class="btn-link"
                                     th:classappend="${currentUri == '/miProgreso'} ? 'active'">
-                                    <i class="bi bi-graph-up-arrow"></i>
+                                    <i class="fa-solid fa-arrow-trend-up"></i>
                                     Mi progreso
                                 </a>
                             </li>
