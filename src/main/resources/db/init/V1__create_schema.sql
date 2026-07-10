@@ -227,7 +227,7 @@ COMMENT ON COLUMN intentos_cuestionario.fecha_inicio IS 'Fecha y hora de comienz
 COMMENT ON COLUMN intentos_cuestionario.fecha_fin IS 'Fecha y hora de finalización o abandono';
 COMMENT ON COLUMN intentos_cuestionario.aciertos IS 'Número de preguntas respondidas correctamente';
 COMMENT ON COLUMN intentos_cuestionario.fallos IS 'Número de preguntas respondidas incorrectamente';
-COMMENT ON COLUMN intentos_cuestionario.tiempo_empleado IS 'Duración total del intento en milisegundos';
+COMMENT ON COLUMN intentos_cuestionario.tiempo_empleado IS 'Duración total del intento en segundos';
 COMMENT ON COLUMN intentos_cuestionario.estado_id IS 'Estado actual de la realización del cuestionario';
 
 CREATE TABLE respuesta_usuario (

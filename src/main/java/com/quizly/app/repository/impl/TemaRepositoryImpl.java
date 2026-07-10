@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import com.quizly.app.dto.TemaEstadisticaDto;
 import com.quizly.app.model.entity.Tema;
+import com.quizly.app.model.enums.IntentoCuestionarioEstadoEnum;
 import com.quizly.app.repository.TemaRepositoryCustom;
 
 import jakarta.persistence.EntityManager;
@@ -55,9 +56,11 @@ public class TemaRepositoryImpl implements TemaRepositoryCustom {
                 JOIN ic.cuestionario c
                 JOIN  c.tema t
                 WHERE ic.usuario.id = :usuarioId
+                AND ic.estado.codigo = :estadoIntento
                 GROUP BY t
                """, TemaEstadisticaDto.class)
                .setParameter("usuarioId", usuarioId)
+               .setParameter("estadoIntento", IntentoCuestionarioEstadoEnum.FINISHED.toString())
                .getResultList();
     }
 }

@@ -76,5 +76,22 @@ public class IntentoCuestionario extends AuditableEntity {
     public String getFechaFinFormateadaDDMMYYY(){
         return Utils.formatFecha(fechaFin, "dd/MM/yyyy");
     }
+
+    public String getTiempoEmpleadoFormateado() {
+
+        if (tiempoEmpleado == null) {
+            return "--:--";
+        }
+    
+        long horas = tiempoEmpleado / 3600;
+        long minutos = (tiempoEmpleado % 3600) / 60;
+        long segundos = tiempoEmpleado % 60;
+    
+        if (horas > 0) {
+            return String.format("%02d:%02d:%02d", horas, minutos, segundos);
+        }
+    
+        return String.format("%02d:%02d", minutos, segundos);
+    }
     
 }

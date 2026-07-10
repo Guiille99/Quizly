@@ -71,4 +71,39 @@ public class Utils {
 
         return duration.toMinutes() + " min";
     }
+
+    /**
+     * Formatea una duración en segundos a un formato natural en español.
+     * Ejemplos: "1 hora y 20 minutos", "10 minutos", "1 minuto", "2 horas"
+     * 
+     * @param totalSeconds segundos a formatear
+     * @return cadena formateada
+     */
+    public static String formatNaturalDuration(long totalSeconds) {
+        if (totalSeconds == 0) return "0 minutos";
+        
+        Duration duration = Duration.ofSeconds(totalSeconds);
+        long hours = duration.toHours();
+        int minutes = duration.toMinutesPart();
+
+        StringBuilder sb = new StringBuilder();
+
+        if (hours > 0) {
+            sb.append(hours).append(hours == 1 ? " hora" : " horas");
+        }
+
+        if (minutes > 0) {
+            if (sb.length() > 0) {
+                sb.append(" y ");
+            }
+            sb.append(minutes).append(minutes == 1 ? " minuto" : " minutos");
+        }
+        
+        // En caso de que haya segundos pero no lleguen a un minuto completo
+        if (sb.length() == 0 && totalSeconds > 0) {
+            return "menos de un minuto";
+        }
+
+        return sb.toString();
+    }
 }

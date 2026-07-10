@@ -77,11 +77,11 @@ const ToastSystem = (function() {
             });
         });
     
-        // setTimeout(() => {
-        //     if (document.body.contains(toast)) {
-        //         eliminar(toast);
-        //     }
-        // }, DURATION);
+        setTimeout(() => {
+            if (document.body.contains(toast)) {
+                eliminar(toast);
+            }
+        }, DURATION);
     };
 
     return { mostrar };

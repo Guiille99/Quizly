@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es" th:replace="~{layout/quiz_layout :: layout(~{::main})}">
+<head th:replace="~{fragments/head :: head('Quizly')}"></head>
+<body>
+    <main th:fragment="main" class="w-full px-6 py-8">
+        <!-- Cabecera -->
+        <section class="grid gap-6 lg:grid-cols-3">
+            <!-- Resultado -->
+             <div class="card bg-base-100 shadow-lg boder boder-base-300">
+                <div class="card-body items-center text-center">
+                    <h1 class="text-3xl font-bold auto-range" th:style="|--value: ${summary.scorePercentage}|">¡Cuestionario completado!</h1>
+                    <p class="opacity-70 mt-2" th:text="${summary.resultMessage}"></p>
+
+                    <div id="summary-score" class="radial-progress auto-range mt-6 animate-on-load"
+                        th:attr="data-value=${summary.scorePercentage}"
+                        style="--value:0; --size:12rem"
+                        role="progressbar">
+
+                        <span class="text-4xl font-bold" th:text="|${summary.scorePercentage} %|"></span>
+                    </div>
+
+                    <span class="mt-4 text-lg font-medium">Puntuación final</span>
+                </div>
+             </div>
+
+             <!-- Estadísticas -->
+              <div id="summary-stats-container" class="card justify-center bg-base-100 shadow-lg boder boder-base-300 lg:col-span-2">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <!-- Aciertos -->
+                     <div class="card summary-stat-card bg-accent-green-muted! animate-on-load">
+                        <div class="summary-stat-figure text-success">
+                            <i class="fa-solid fa-circle-check"></i>
+                        </div>
+
+                        <p class="summary-stat-value" th:text="${summary.correctAnswers}"></p>
+                        <p>Aciertos</p>
+                     </div>
+                    
+                    <!-- Fallos -->
+                    <div class="card summary-stat-card bg-accent-red-muted! animate-on-load">
+                        <div class="summary-stat-figure text-error">
+                            <i class="fa-solid fa-circle-xmark"></i>
+                            </div>
+                    
+                        <p class="summary-stat-value" th:text="${summary.incorrectAnswers}"></p>
+                        <p>Fallos</p>
+                    </div>
+                    
+                    <!-- Tiempo -->
+                    <div class="card summary-stat-card bg-accent-blue-muted! animate-on-load">
+                        <div class="summary-stat-figure text-info">
+                            <i class="fa-solid fa-clock"></i>
+                        </div>
+                    
+                        <p class="summary-stat-value" th:text="${summary.tiempoEmpleado}"></p>
+                        <p>Tiempo empleado</p>
+                    </div>
+  
+                </div>
+              </div>
+        </section>
+
+        <!-- Desglose de preguntas -->
+         <section class="mt-10">
+            <h2 class="text-2xl font-bold mb-5">Desglose de preguntas</h2>
+
+            <div class="space-y-4">
+                <div th:each="question,iter : ${summary.questions}" class="collapse collapse-arrow animate-on-load shadow-sm"
+                    th:classappend="${question.correct ? 'bg-accent-green-muted' : 'bg-accent-red-muted'}">
+                    <input type="checkbox" />
+
+                    <!-- Cabecera -->
+                     <div class="collapse-title">
+                        <div class="grid md:grid-cols-12 gap-4 items-center">
+                            <!-- Número -->
+                            <div class="md:col-span-1">
+                                <div class="badge badge-lg rounded-full h-8 w-8" th:classappend="${question.correct ? 'badge-success' : 'badge-error'}"
+                                    th:text="${iter.count}"></div>
+                            
+                            </div>
+
+                            <!-- Enunciado -->
+                            <div class="md:col-span-5">
+                                <p class="font-medium" th:text="${question.statement}"></p>
+                            </div>
+
+                            <!-- Respuesta -->
+                             <div class="md:col-span-4">
+                                <span class="text-sm opacity-60">Tu respuesta</span>
+                                <p class="font-medium" th:text="${question.selectedOption}"></p>
+                             </div>
+
+                             <!-- Estado -->
+                              <div class="md:col-span-2 text-right">
+                                <span class="badge badge-outline" th:classappend="${question.correct ? 'badge-success' : 'badge-error'}"
+                                    th:text="${question.correct} ? 'Correcta' : 'Incorrecta'"></span>
+                              </div>
+
+                        </div>
+                     </div>
+
+                     <!-- Contenido -->
+                      <div class="collapse-content pt-4">
+                        <div class="space-y-4">
+                            <div th:if="${!question.correct}">
+                                <span class="font-semibold">Respuesta correcta</span>
+                                <p class="text-success mt-1" th:text="${question.correctOption}"></p>
+                            </div>
+
+                            <div>
+                                <span class="font-semibold">Explicación</span>
+                                <p class="mt-2 leading-relaxed" th:text="${question.explanation}"></p>
+                            </div>
+                        </div>
+                      </div>
+                </div>
+            </div>
+         </section>
+
+         <!-- Acciones -->
+          <section class="mt-10 flex justify-center gap-4">
+            <a th:href="@{/}" class="btn btn-primary btn-wide">
+                <i class="fa-regular fa-house"></i>
+                Volver al inicio
+            </a>
+          </section>
+    </main>
+</body>
+</html>

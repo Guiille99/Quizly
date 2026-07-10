@@ -13,4 +13,6 @@ public interface CuestionarioRepositoryCustom {
     List<Cuestionario> findByTemaIdAndDificultadId(Long temaId, Long dificultadId);
 
     boolean existsBySlug(String slug);
+
+    Optional<Cuestionario> getUltimaVersionCuestionarioBySlug(String slug);
 }

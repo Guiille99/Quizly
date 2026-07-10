@@ -2,6 +2,8 @@ package com.quizly.app.model.entity;
 
 import java.util.List;
 
+import com.quizly.app.util.Utils;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -11,6 +13,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -53,5 +56,11 @@ public class Cuestionario extends AuditableEntity {
 
     @OneToMany(mappedBy = "cuestionario")
     private List<Pregunta> preguntas;
+
+
+    @Transient
+    public String getTiempoLimiteNatural() {
+        return Utils.formatNaturalDuration(tiempoLimite * 60);
+    }
 
 }

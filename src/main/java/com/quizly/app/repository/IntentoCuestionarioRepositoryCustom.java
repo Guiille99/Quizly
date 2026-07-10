@@ -1,10 +1,8 @@
 package com.quizly.app.repository;
 
 import java.util.List;
-
-import org.springframework.data.jpa.repository.Query;
-
 import com.quizly.app.model.entity.IntentoCuestionario;
+import com.quizly.app.model.entity.IntentoCuestionarioEstado;
 
 public interface IntentoCuestionarioRepositoryCustom {
     
@@ -18,6 +16,8 @@ public interface IntentoCuestionarioRepositoryCustom {
 
     List<IntentoCuestionario> findLatestByUsuarioId(Long usuarioId, int limit);
 
+    List<IntentoCuestionario> findIntentosAbiertoByUsuarioYCuestionario(Long usuarioId, Long cuestionarioId);
+
     /**
      * Obtiene el mayor porcentaje registrado por el usuario
      * pasado por parámetro en el cuestionario pasado por parámetro,
@@ -28,4 +28,8 @@ public interface IntentoCuestionarioRepositoryCustom {
      * @return
      */
     Double findMaxPorcentajeAntesDe(Long usuarioId, Long cuestionarioId, Long intentoIdActual);
+
+
+    int marcarIntentosAbandonados(Long usuarioId, List<Long> cuestionariosId, IntentoCuestionarioEstado intentoEstado);
+   
 }

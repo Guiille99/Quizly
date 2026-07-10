@@ -1,13 +1,15 @@
 package com.quizly.app.repository.impl;
 
+import java.time.LocalDateTime;
 import java.util.List;
-
 import com.quizly.app.model.entity.IntentoCuestionario;
+import com.quizly.app.model.entity.IntentoCuestionarioEstado;
 import com.quizly.app.model.enums.IntentoCuestionarioEstadoEnum;
 import com.quizly.app.repository.IntentoCuestionarioRepositoryCustom;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 
 public class IntentoCuestionarioRepositoryImpl implements IntentoCuestionarioRepositoryCustom {
@@ -70,11 +72,49 @@ public class IntentoCuestionarioRepositoryImpl implements IntentoCuestionarioRep
         TypedQuery<Double> query = entityManager.createQuery(
             "SELECT MAX((CAST(i.aciertos AS double) / (i.aciertos + i.fallos)) * 100) " +
             "FROM IntentoCuestionario i WHERE i.usuario.id = :usuarioId " +
-            "AND i.cuestionario.id = :cuestionarioId AND i.id != :intentoId", Double.class);
+            "AND i.cuestionario.id = :cuestionarioId AND i.id != :intentoId " + 
+            "AND i.estado.codigo = :estadoIntentoCodigo", Double.class);
         query.setParameter("usuarioId", usuarioId);
         query.setParameter("cuestionarioId", cuestionarioId);
         query.setParameter("intentoId", intentoIdActual);
+        query.setParameter("estadoIntentoCodigo", IntentoCuestionarioEstadoEnum.FINISHED.toString());
         Double result = query.getSingleResult();
         return result != null ? result : -1.0;
+    }
+
+    @Override
+    public List<IntentoCuestionario> findIntentosAbiertoByUsuarioYCuestionario(Long usuarioId, Long cuestionarioId) {
+        TypedQuery<IntentoCuestionario> query = entityManager.createQuery("""
+            SELECT i FROM IntentoCuestionario i WHERE i.usuario.id = :usuarioId
+            AND i.cuestionario.id = :cuestionarioId AND i.estado.codigo = :estadoIntento
+        """, IntentoCuestionario.class);
+
+        query.setParameter("usuarioId", usuarioId);
+        query.setParameter("cuestionarioId", cuestionarioId);
+        query.setParameter("estadoIntento", IntentoCuestionarioEstadoEnum.IN_PROGRESS.toString());
+
+        return query.getResultList();
+    }
+
+    @Override
+    public int marcarIntentosAbandonados(Long usuarioId, List<Long> cuestionariosId, IntentoCuestionarioEstado intentoEstado) {
+        Query query = entityManager.createQuery("""
+            UPDATE IntentoCuestionario i
+            SET     i.estado = :intentoEstado,
+                    i.fechaFin = :fechaFin,
+                    i.tiempoEmpleado = :tiempoEmpleado
+            WHERE   i.usuario.id = :usuarioId
+                AND i.cuestionario.id IN :cuestionariosId
+                AND i.estado.codigo = :estadoAbiertoCodigo
+        """);
+
+        query.setParameter("intentoEstado", intentoEstado);
+        query.setParameter("fechaFin", LocalDateTime.now());
+        query.setParameter("tiempoEmpleado", 0L);
+        query.setParameter("usuarioId", usuarioId);
+        query.setParameter("cuestionariosId", cuestionariosId);
+        query.setParameter("estadoAbiertoCodigo", IntentoCuestionarioEstadoEnum.IN_PROGRESS.toString());
+
+        return query.executeUpdate();
     }
 }

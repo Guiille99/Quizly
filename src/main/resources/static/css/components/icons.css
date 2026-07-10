@@ -23,3 +23,11 @@
         @apply shadow-lg shadow-warning/40;
     }
 }
+
+.icon-blur-blue{
+    @apply bg-accent-blue/20 text-accent-blue;
+
+    &.glow{
+        @apply shadow-lg shadow-accent-blue/40;
+    }
+}

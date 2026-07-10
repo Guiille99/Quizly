@@ -32,7 +32,7 @@
     
 }
 
-/* Stat card */
+/* Stats card */
 .stat-card {
     .stat-number{
         font-size: 1.5rem;
@@ -58,6 +58,22 @@
     }
 }
 
+.summary-stat-card{
+    padding: 5px;
+    display: flex;
+    gap: 3px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    .summary-stat-figure{
+        font-size: 2.5rem;
+    }
+    .summary-stat-value{
+        font-size: 2rem;
+        font-weight: bold;
+    }
+}
 
 /* Asignatura card */
 .asignaturas__container{

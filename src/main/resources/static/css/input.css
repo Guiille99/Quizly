@@ -51,6 +51,8 @@
   --color-accent-orange-muted: #fff6ee;
   --color-accent-purple-muted: #f7f4ff;
   --color-accent-red-muted: #fff3f4;
+  --color-accent-blue-muted: oklch(95% 0.03 250);
+  --color-accent-red-muted: oklch(94% 0.04 16.53);
 
   /* Difficulty */
   --color-difficulty-easy-bg: #eafdf4;
@@ -125,6 +127,7 @@
     --color-accent-orange-muted: rgba(243, 149, 79, 0.15);
     --color-accent-purple-muted: rgba(172, 140, 255, 0.15);
     --color-accent-red-muted: rgba(250, 113, 136, 0.15);
+    --color-accent-blue-muted: #172554;
 
     --color-difficulty-easy-bg: rgba(73, 218, 138, 0.08);
     --color-difficulty-easy-fg: #49da8a;

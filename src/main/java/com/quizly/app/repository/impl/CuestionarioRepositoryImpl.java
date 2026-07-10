@@ -49,4 +49,14 @@ public class CuestionarioRepositoryImpl implements CuestionarioRepositoryCustom 
             .getSingleResult();
         return count > 0;
     }
+
+    @Override
+    public Optional<Cuestionario> getUltimaVersionCuestionarioBySlug(String slug) {
+        TypedQuery<Cuestionario> query = entityManager.createQuery("""
+            SELECT c FROM Cuestionario c WHERE c.slug = :slug ORDER BY c.version DESC
+        """, Cuestionario.class);
+
+        query.setParameter("slug", slug);
+        return query.getResultStream().findFirst();
+    }
 }
