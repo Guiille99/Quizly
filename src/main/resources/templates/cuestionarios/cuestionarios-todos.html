@@ -20,7 +20,7 @@
                         <span th:text="${cuestionario.dificultad.nombre}"></span>
                     </div>
 
-                    <button class="btn btn-primary">Empezar</button>
+                    <a class="btn btn-primary" th:href="@{/cuestionarios/{slug}(slug=${cuestionario.slug})}" role="button">Empezar</a>
                 </div>
             </div>
 

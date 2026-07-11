@@ -119,7 +119,7 @@
         color: var(--color-neutral-400);
     }
 
-    button{
+    .btn{
         margin-left: auto;
     }
 }
