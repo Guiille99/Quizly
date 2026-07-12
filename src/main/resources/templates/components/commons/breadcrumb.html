@@ -1,0 +1,16 @@
+<div th:fragment="breadcrumb" th:if="${not #lists.isEmpty(breadcrumbs)}" class="breadcrumbs text-sm ms-3 pb-0" aria-label="breadcrumb">
+   <ul>
+    <li th:each="item, stat : ${breadcrumbs}">
+        <a th:if="${!stat.last}" th:href="${item.url}" class="hover:text-primary transition" th:text="${item.label}"></a>
+        <span th:if="${stat.last}" class="font-bold" th:text="${item.label}"></span>
+    </li>
+   </ul> 
+</div>
+
+
+<!-- <div th:fragment="breadcrumb" class="breadcrumbs text-sm ms-3 pb-0" aria-label="breadcrumb">
+    <ul>
+     <li>Hola</li>
+     <li>Hola 2</li>
+    </ul> 
+ </div> -->

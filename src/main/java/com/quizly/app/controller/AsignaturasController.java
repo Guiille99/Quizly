@@ -15,6 +15,7 @@ import com.quizly.app.model.entity.Cuestionario;
 import com.quizly.app.model.entity.Tema;
 import com.quizly.app.security.QuizlyUserDetails;
 import com.quizly.app.service.AsignaturaService;
+import com.quizly.app.service.BreadcrumbService;
 import com.quizly.app.service.CuestionarioService;
 import com.quizly.app.service.TemaService;
 
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.quizly.app.util.Constantes;
+import com.quizly.app.web.model.BreadcrumbContext;
 import com.quizly.app.web.notification.ToastService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -41,6 +43,8 @@ public class AsignaturasController {
     private final TemaService temaService;
     private final CuestionarioService cuestionarioService;
     private final ToastService toastService;
+    private final BreadcrumbContext breadcrumbContext;
+    private final BreadcrumbService breadcrumbService;
 
     @GetMapping
     public String showAsignaturas(Model model, HttpServletRequest request,
@@ -51,6 +55,7 @@ public class AsignaturasController {
 
         model.addAttribute("asignaturas", asignaturasProgreso);
         model.addAttribute(Constantes.ATTR_CURRENT_URI, request.getRequestURI());
+        breadcrumbContext.set(breadcrumbService.asignaturas());
         return "asignaturas/asignaturas";
     }
     
@@ -84,6 +89,7 @@ public class AsignaturasController {
         model.addAttribute("asignatura", asignatura);
         model.addAttribute("temasAsignatura", temasAsignatura);
         model.addAttribute(Constantes.ATTR_CURRENT_URI, request.getRequestURI());
+        breadcrumbContext.set(breadcrumbService.asignatura(asignatura));
 
         return "asignaturas/temas_asignatura";
     }
@@ -123,6 +129,7 @@ public class AsignaturasController {
         model.addAttribute("tema", tema);
         model.addAttribute("cuestionariosTemaPage", cuestionariosTemaPage);
         model.addAttribute(Constantes.ATTR_CURRENT_URI, request.getRequestURI());
+        breadcrumbContext.set(breadcrumbService.temaAsignatura(tema));
 
         return "asignaturas/cuestionarios_tema_asignatura";
     }
