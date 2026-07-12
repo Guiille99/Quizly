@@ -15,10 +15,12 @@ import org.springframework.stereotype.Service;
 import com.quizly.app.dto.AsignaturaProgresoDto;
 import com.quizly.app.model.entity.Asignatura;
 import com.quizly.app.model.entity.Cuestionario;
+import com.quizly.app.model.entity.Tema;
 import com.quizly.app.model.entity.Usuario;
 import com.quizly.app.model.enums.IntentoCuestionarioEstadoEnum;
 import com.quizly.app.repository.AsignaturaRepository;
 import com.quizly.app.repository.IntentoCuestionarioRepository;
+import com.quizly.app.repository.TemaRepository;
 
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
@@ -75,5 +77,15 @@ public class AsignaturaService {
         }).toList();
 
         return new PageImpl<>(asignaturasProgreso, sortedPageable, paginaAsignaturas.getTotalElements());
+    }
+
+    /**
+     * Obtiene la asignatura a través de su slug.
+     * En caso de no existir devolverá null.
+     * @param slug
+     * @return {@link Asignatura}
+     */
+    public Asignatura getAsignatruaBySlug(String slug){
+        return asignaturaRepository.findBySlug(slug).orElse(null);
     }
 }

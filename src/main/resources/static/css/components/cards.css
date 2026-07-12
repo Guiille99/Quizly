@@ -75,21 +75,21 @@
     }
 }
 
-/* Asignatura card */
-.asignaturas__container{
+/* Progress card */
+.grid-cards-container{
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 10px;
 }
 
-.asignatura-card{
-    .asignatura-card__header{
+.progress-card{
+    .progress-card__header{
         display: flex;
         align-items: flex-start;
         gap: 10px;
         margin-bottom: 12px;
     }
-    .asignatura-card__icon__container{
+    .progress-card__icon__container{
         width: 36px;
         height: 36px;
         border-radius: 9px;
@@ -101,7 +101,7 @@
         width: 100%;
     }
 
-    .asignatura-card__info, .asigantura-card__footer{
+    .progress-card__info, .progress-card__footer{
         font-size: 0.7rem;
         color: var(--color-neutral-400);
     }

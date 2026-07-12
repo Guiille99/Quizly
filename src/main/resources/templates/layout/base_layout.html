@@ -72,7 +72,7 @@
                                 </a>
                             </li>
                             <li>
-                                <a th:href="@{/asignaturas}" class="btn-link" th:classappend="${currentUri == '/asignaturas'} ? 'active'">
+                                <a th:href="@{/asignaturas}" class="btn-link" th:classappend="${currentUri.startsWith('/asignaturas')} ? 'active'">
                                     <i class="fa-solid fa-book-bookmark"></i>
                                     Asignaturas
                                 </a>

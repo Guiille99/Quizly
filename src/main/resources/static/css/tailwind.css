@@ -7,7 +7,6 @@
     --font-mono: "DM Mono", ui-monospace, monospace;
     --color-amber-600: oklch(66.6% 0.179 58.318);
     --color-blue-500: oklch(62.3% 0.214 259.815);
-    --color-blue-950: oklch(28.2% 0.091 267.935);
     --color-rose-500: oklch(64.5% 0.246 16.439);
     --color-neutral-400: oklch(70.8% 0 0);
     --color-black: #000;
@@ -35,7 +34,6 @@
     --leading-relaxed: 1.625;
     --radius-xl: 0.75rem;
     --radius-2xl: 1rem;
-    --ease-out: cubic-bezier(0, 0, 0.2, 1);
     --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
     --default-transition-duration: 150ms;
     --default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
@@ -2617,6 +2615,12 @@
   }
   .py-8 {
     padding-block: calc(var(--spacing) * 8);
+  }
+  .py-12 {
+    padding-block: calc(var(--spacing) * 12);
+  }
+  .py-16 {
+    padding-block: calc(var(--spacing) * 16);
   }
   .pt-1 {
     padding-top: calc(var(--spacing) * 1);
@@ -10184,19 +10188,19 @@
     font-weight: bold;
   }
 }
-.asignaturas__container {
+.grid-cards-container {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 10px;
 }
-.asignatura-card {
-  .asignatura-card__header {
+.progress-card {
+  .progress-card__header {
     display: flex;
     align-items: flex-start;
     gap: 10px;
     margin-bottom: 12px;
   }
-  .asignatura-card__icon__container {
+  .progress-card__icon__container {
     width: 36px;
     height: 36px;
     border-radius: 9px;
@@ -10206,7 +10210,7 @@
     margin-bottom: 5px;
     width: 100%;
   }
-  .asignatura-card__info, .asigantura-card__footer {
+  .progress-card__info, .progress-card__footer {
     font-size: 0.7rem;
     color: var(--color-neutral-400);
   }

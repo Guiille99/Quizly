@@ -2,7 +2,6 @@ package com.quizly.app.service;
 
 
 import com.quizly.app.repository.IntentoCuestionarioEstadoRepository;
-import com.quizly.app.repository.RespuestaUsuarioRepository;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -12,14 +11,19 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import com.quizly.app.model.entity.Cuestionario;
 import com.quizly.app.model.entity.IntentoCuestionario;
 import com.quizly.app.model.entity.IntentoCuestionarioEstado;
+import com.quizly.app.model.entity.Tema;
 import com.quizly.app.model.entity.Usuario;
 import com.quizly.app.model.enums.IntentoCuestionarioEstadoEnum;
 import com.quizly.app.model.session.OptionQuizRecord;
@@ -207,5 +211,26 @@ public class CuestionarioService {
         IntentoCuestionario intentoCuestionario = intentoCuestionarioRepository.findById(session.getIntentoCuestionarioId()).get();
 
         return buildSummary(session, intentoCuestionario);
+    }
+
+    public Page<Cuestionario> getCuestionariosPaginatedByTema(Tema tema, String titleFilter, Pageable pageable){
+        
+        if (tema == null) {
+            return Page.empty();
+        }
+
+        // Gestionar la ordenación
+        Sort sort = pageable.getSort().isSorted() ? pageable.getSort() : Sort.by("titulo").ascending();
+        Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
+
+        Page<Cuestionario> cuestionariosPage;
+
+        if (StringUtils.isNotBlank(titleFilter)) {
+            cuestionariosPage = cuestionarioRepository.findByTituloContainingIgnoreCaseAndTemaId(titleFilter, tema.getId(), pageable);
+        } else{
+            cuestionariosPage = cuestionarioRepository.findByTemaId(tema.getId(), pageable);
+        }
+
+        return new PageImpl<>(cuestionariosPage.getContent(), sortedPageable, cuestionariosPage.getTotalElements());
     }
 }

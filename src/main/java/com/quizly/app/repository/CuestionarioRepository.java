@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.quizly.app.model.entity.Cuestionario;
+import com.quizly.app.model.entity.Tema;
 
 @Repository
 public interface CuestionarioRepository extends JpaRepository<Cuestionario, Long>, CuestionarioRepositoryCustom {
@@ -32,4 +33,14 @@ public interface CuestionarioRepository extends JpaRepository<Cuestionario, Long
             ORDER BY MAX(ic.fechaFin) DESC
             """)
     Page<Cuestionario> getCuestionariosRecientesByUsuarioYEstado(Long usuarioId, List<String> listIntentosCuestionarioEstado, Pageable pageable);
+
+    /**
+     * Obtiene los cuestionarios de un tema paginados
+     * @param temaId
+     * @param pageable
+     * @return Page<{@link Cuestionario}>
+     */
+    Page<Cuestionario> findByTemaId(Long temaId, Pageable pageable);
+
+    Page<Cuestionario> findByTituloContainingIgnoreCaseAndTemaId(String titulo, Long temaId, Pageable pageable);
 }

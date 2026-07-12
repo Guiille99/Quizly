@@ -25,38 +25,45 @@
             <button class="btn btn-neutral" type="button" onclick="document.getElementById('form-filtros-asignaturas').reset()"
                 hx-get="/asignaturas/elementos"
                 hx-target="#lista-asignaturas"
-                hx-swap="outeHTML">
+                hx-swap="outerHTML">
                 Limpiar
             </button>
         </form>
 
         <!-- Contenedor de asignaturas -->
         <div id="lista-asignaturas" th:fragment="lista-asignaturas_fragment">
-            <div class="asignaturas__container mb-4">
-                <div th:each="item : ${asignaturas}" class="card selectable-card asignatura-card">
-                    <div class="asignatura-card__header">
-                        <div class="flex flex-col">
-                            <span class="asignatura-card__name" th:text="${item.asignatura.nombre}">Matemáticas</span>
-                            <span class="asignatura-card__info" th:text="|${item.nTemas} temas - Clic para ver|">8 temas - Clic para ver</span>
+            <th:block th:if="${asignaturas.totalElements > 0}">
+                <div class="grid-cards-container mb-4">
+                    <div th:each="item : ${asignaturas}" class="card selectable-card progress-card">
+                        <a th:href="@{/asignaturas/{slug}(slug=${item.asignatura.slug})}" class="absolute top-0 left-0 z-999 h-full w-full"></a>
+                        <div class="progress-card__header">
+                            <div class="flex flex-col">
+                                <span class="progress-card__name" th:text="${item.asignatura.nombre}">Matemáticas</span>
+                                <span class="progress-card__info" th:text="|${item.nTemas} temas - Clic para ver|">8 temas - Clic para ver</span>
+                            </div>
                         </div>
+        
+                        <progress class="progress auto-range" th:value="${item.porcentaje}" max="100"></progress>
+                        <span class="progress-card__footer" th:text="|${item.porcentaje}% completado|">60% completado</span>
                     </div>
+                </div>
     
-                    <progress class="progress auto-range" th:value="${item.porcentaje}" max="100"></progress>
-                    <span class="asigantura-card__footer" th:text="|${item.porcentaje}% completado|">60% completado</span>
+                <div th:if="${asignaturas.totalPages > 0}">
+                    <div th:replace="~{components/commons/pagination :: controls(
+                        page=${asignaturas},
+                        filterFormId='form-filtros-asignaturas',
+                        targetUrl='/asignaturas/elementos',
+                        tableId='lista-asignaturas',
+                        pageParamName='page',
+                        sizeOptions=${ {5, 10, 15, 20} }
+                    )}">
+    
+                    </div>
                 </div>
-            </div>
+            </th:block>
 
-            <div th:if="${asignaturas.totalPages > 0}">
-                <div th:replace="~{components/commons/pagination :: controls(
-                    page=${asignaturas},
-                    filterFormId='',
-                    targetUrl='/asignaturas/elementos',
-                    tableId='lista-asignaturas',
-                    pageParamName='page',
-                    sizeOptions=${ {5, 10, 15, 20} }
-                )}">
-
-                </div>
+            <div th:unless="${asignaturas.totalElements > 0}" class="w-full flex flex-col items-center justify-center py-16 px-4">
+                <p>No se encontraron resultados</p>
             </div>
         </div>
     </main>
