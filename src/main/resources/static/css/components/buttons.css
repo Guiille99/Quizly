@@ -6,3 +6,28 @@
 .btn-primary:hover {
     background-color: var(--color-accent-hover);
 }
+
+.btn-purple{
+    background-color: var(--color-purple-500);
+    color: var(--color-white);
+
+    &:hover{
+        background-color: color-mix(in srgb, var(--color-purple-500), black 20%);
+    }
+}
+
+.btn-orange{
+    background-color: var(--color-orange-500);
+    color: var(--color-white);
+    &:hover{
+        background-color: color-mix(in srgb, var(--color-orange-500), black 20%);
+    }
+}
+
+.btn-red{
+    background-color: var(--color-red-500);
+    color: var(--color-white);
+    &:hover{
+        background-color: color-mix(in srgb, var(--color-red-500), black 20%);
+    }
+}

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+    <th:block th:fragment="errorPage(
+            status,
+            title,
+            description,
+            hint,
+            icon,
+            color,
+            bgColor,
+            alertClass,
+            btnClass,
+            showErrorId)">
+    
+        <div>
+            <div class="grid lg:grid-cols-2">
+                <!-- Icono -->
+                 <div class="relative flex items-center justify-center p-12">
+                    <div class="absolute w-72 h-72 rounded-full blur-3xl opacity-15"
+                        th:classappend="${bgColor}">
+                    </div>
+
+                    <div class="icon-blur-container glow h-48! w-48!" th:classappend="${color}">
+                        <i style="font-size: 12rem;" th:classappend="${icon}"></i>
+                    </div>
+                 </div>
+
+                 <!-- Zona derecha -->
+                  <div class="flex flex-col justify-center p-12 gap-6">
+                    <div class="text-center lg:text-left">
+                        <h1 class="text-7xl font-black" th:classappend="${color}" 
+                            th:text="${status}"></h1>
+                        
+                        <h2 class="text-3xl font-bold mt-2" th:text="${title}"></h2>
+
+                        <p class="text-text-muted mt-4" th:text="${description}"></p>
+                    </div>
+
+                    <div class="alert" th:classappend="${alertClass}">
+                        <i class="fa-solid fa-circle-info"></i>
+                        <span th:text="${hint}"></span>
+                    </div>
+
+                    <div class="flex gap-3 flex-wrap justify-center lg:justify-start">
+                        <a th:href="@{/}" class="btn" th:classappend="${btnClass}">
+                            <i class="fa-regular fa-house"></i>
+                            Ir al inicio
+                        </a>
+
+                        <button onclick="history.back()" class="btn btn-outline">
+                            <i class="fa-solid fa-arrow-left"></i>
+                            Volver atrás
+                        </button>
+                    </div>
+
+                    <div th:if="${showErrorId}" class="text-sm">
+                        <span class="font-semibold">ID del error:</span>
+                        <code th:text="${errorId}"></code>
+                    </div>
+                  </div>
+            </div>
+        </div>
+    </th:block>
+</html>

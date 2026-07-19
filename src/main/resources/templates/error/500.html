@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:replace="~{fragments/head :: head('Error interno del servidor')}"></head>
+<body>
+    <main class="flex items-center justify-center min-h-[calc(100vh-5rem)] p-8">
+        <div class="w-full max-w-6xl" th:replace="~{fragments/error-page :: errorPage(
+            500,
+            'Error interno del servidor',
+            'Se ha producido un error inesperado en nuestro servidor. Nuestro equipo ya ha sido notificado y está trabajando para resolverlo.',
+            'Si el problema persiste, por favor, inténtalo más tarde.',
+            'fa-solid fa-triangle-exclamation',
+            'text-red-500',
+            'bg-red-500',
+            'border-red-500',
+            'btn-red',
+            false
+            )}">
+        </div>
+    
+    </main>
+</body>
+</html>
