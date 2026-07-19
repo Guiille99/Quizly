@@ -61,10 +61,10 @@ public class IntentoCuestionario extends AuditableEntity {
     private IntentoCuestionarioEstado estado;
 
     /**
-     * Calcula el porcentaje de aciertos sobre el total de preguntas respondidas.
+     * Calcula el porcentaje de aciertos sobre el total de preguntas del cuestionario.
      */
     public double getPorcentajeAciertos() {
-        int total = (aciertos != null ? aciertos : 0) + (fallos != null ? fallos : 0);
+        int total = cuestionario.getPreguntas().size();
         if (total == 0) return 0.0;
         return (aciertos * 100.0) / total;
     }
