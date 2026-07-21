@@ -27,7 +27,10 @@ public class ActividadService {
     private final Utils utils;
 
     public List<ActividadRecienteDto> getActividadesRecientes(Usuario usuario, int limite) {
-        List<IntentoCuestionario> intentos = intentoCuestionarioRepository.findLatestByUsuarioId(usuario.getId(), limite);
+        List<String> codigosEstadoIntento = List.of(IntentoCuestionarioEstadoEnum.IN_PROGRESS.name(), IntentoCuestionarioEstadoEnum.FINISHED.name());
+
+        List<IntentoCuestionario> intentos = intentoCuestionarioRepository.findLatestByUsuarioIdAndEstado(usuario.getId(), 
+            codigosEstadoIntento, limite);
 
         return intentos.stream().map(this::toActividadRecienteDto).toList();
     }

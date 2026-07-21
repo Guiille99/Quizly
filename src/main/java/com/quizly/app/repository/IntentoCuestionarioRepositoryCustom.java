@@ -16,6 +16,16 @@ public interface IntentoCuestionarioRepositoryCustom {
 
     List<IntentoCuestionario> findLatestByUsuarioId(Long usuarioId, int limit);
 
+    /**
+     * Obtiene los N últimos intentos del usuario cuyo código de estado del intento
+     * se encuentre en la lista pasada por parámetro
+     * @param usuarioId
+     * @param intentosEstadoCodigos
+     * @param limit
+     * @return
+     */
+    List<IntentoCuestionario> findLatestByUsuarioIdAndEstado(Long usuarioId, List<String> intentosEstadoCodigos, int limit);
+
     List<IntentoCuestionario> findIntentosAbiertoByUsuarioYCuestionario(Long usuarioId, Long cuestionarioId);
 
     /**
