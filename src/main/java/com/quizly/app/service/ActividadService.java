@@ -58,7 +58,7 @@ public class ActividadService {
             Double mejorPrevio = intentoCuestionarioRepository.findMaxPorcentajeAntesDe(
                 intento.getUsuario().getId(), intento.getCuestionario().getId(), intento.getId());
 
-            if (intento.getPorcentajeAciertos() > mejorPrevio) {
+            if (mejorPrevio != -1 && intento.getPorcentajeAciertos() > mejorPrevio) {
                 titulo = "Nuevo récord en " + intento.getCuestionario().getTitulo();
                 subtitulo = Math.round(intento.getPorcentajeAciertos()) + "%";
                 tipo = "RECORD";
