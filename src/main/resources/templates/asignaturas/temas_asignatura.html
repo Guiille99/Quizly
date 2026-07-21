@@ -52,8 +52,8 @@
                 <div th:if="${temasAsignatura.totalPages > 0}">
                     <div th:replace="~{components/commons/pagination :: controls(
                         page=${temasAsignatura},
-                        filterFormId='form-filtros-temas',
-                        targetUrl='/asignaturas/{slug}/tableData(slug=${asignatura.slug})',
+                        filterFormId='#form-filtros-temas',
+                        targetUrl=@{/asignaturas/{slug}/tableData(slug=${asignatura.slug})},
                         tableId='lista-temas',
                         pageParamName='page',
                         sizeOptions=${ {5, 10, 15, 20} }
