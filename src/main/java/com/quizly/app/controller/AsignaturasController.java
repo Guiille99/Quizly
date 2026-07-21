@@ -20,6 +20,8 @@ import com.quizly.app.service.CuestionarioService;
 import com.quizly.app.service.TemaService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,7 +35,7 @@ import com.quizly.app.web.notification.ToastService;
 import jakarta.servlet.http.HttpServletRequest;
 
 
-
+@Slf4j
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/asignaturas")
@@ -79,6 +81,7 @@ public class AsignaturasController {
 
         // Si no existe ninguna asignatura con el slug recibido
         if (asignatura == null) {
+            log.warn("El usuario '{}' intentó acceder a una asignatura inexistente con slug '{}'", authUser.getUsername(), slug);
             toastService.error(ra, "No se ha encontrado la asignatura solicitada.");
             return "redirect:/asignaturas";
         }
@@ -119,6 +122,8 @@ public class AsignaturasController {
         Tema tema = temaService.getTemaBySlug(slugTema);
 
         if (asignatura == null || tema == null) {
+            log.warn("El usuario '{}' intentó acceder a un tema inexistente. Slug de la asignatura: '{}', slug del tema: '{}'",
+                authUser.getUsername(), slugAsig, slugTema);
             toastService.error(ra, "No se ha encontrado la asignatura o tema solicitado.");
             return "redirect:/asignaturas";
         }

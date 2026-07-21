@@ -13,15 +13,20 @@ import org.springframework.util.CollectionUtils;
 import com.quizly.app.repository.GeneroRepository;
 import com.quizly.app.repository.PasswordResetTokenRepository;
 import com.quizly.app.repository.UsuarioRepository;
+
+import lombok.extern.slf4j.Slf4j;
+
 import com.quizly.app.dto.RegisterFormDto;
 import com.quizly.app.exception.DuplicateEmailException;
 import com.quizly.app.exception.DuplicateUsernameException;
 import com.quizly.app.exception.QuizlyException;
+import com.quizly.app.logging.LogExecution;
 import com.quizly.app.model.entity.Genero;
 import com.quizly.app.model.entity.PasswordResetToken;
 import com.quizly.app.model.entity.Usuario;
 import com.quizly.app.model.enums.Rol;
 
+@Slf4j
 @Service
 public class AuthService {
 
@@ -37,6 +42,7 @@ public class AuthService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    @LogExecution
     @Transactional
     public Usuario register(RegisterFormDto registerDto) {
         String username = registerDto.getUsername().trim();
@@ -63,9 +69,13 @@ public class AuthService {
         usuario.setCreatedAt(now);
         usuario.setUpdatedAt(now);
 
-        return usuarioRepository.save(usuario);
+        Usuario userPersist = usuarioRepository.save(usuario);
+
+        log.info("Nuevo usuario registrado. username='{}', id='{}'", userPersist.getUsername(), userPersist.getId());
+        return userPersist;
     }
 
+    @LogExecution
     @Transactional
     public String createPasswordResetToken(Usuario usuario){
        List<PasswordResetToken> usuarioPrt = passwordResetTokenRepository.findAllByUserId(usuario.getId()); // Usando el nuevo repositorio
@@ -87,9 +97,11 @@ public class AuthService {
         prt.setFechaExpiracion(LocalDateTime.now().plusMinutes(50)); // Considera hacer este valor configurable
 
         passwordResetTokenRepository.save(prt); // Usando el nuevo repositorio
+        log.info("Se generó un token de reseteo de contraseña para el usuario '{}'", usuario.getUsername());
         return token;
     }
 
+    @LogExecution
     @Transactional
     public void resetPassword(String token, String newPassword) throws QuizlyException{
         PasswordResetToken prt = passwordResetTokenRepository.findByToken(token) // Usando el nuevo repositorio
@@ -104,5 +116,6 @@ public class AuthService {
         usuario.setPassword(passwordEncoder.encode(newPassword));
         usuarioRepository.save(usuario); // Ya usa el nuevo repositorio
         passwordResetTokenRepository.delete(prt); // Usando el nuevo repositorio
+        log.info("Contraseña actualizada para el usuario '{}'", usuario.getUsername());
     }
 }

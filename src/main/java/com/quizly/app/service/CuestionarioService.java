@@ -20,6 +20,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import com.quizly.app.logging.LogExecution;
 import com.quizly.app.model.entity.Cuestionario;
 import com.quizly.app.model.entity.IntentoCuestionario;
 import com.quizly.app.model.entity.IntentoCuestionarioEstado;
@@ -41,7 +42,10 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CuestionarioService {
@@ -70,6 +74,7 @@ public class CuestionarioService {
         return cuestionarioRepository.getUltimaVersionCuestionarioBySlug(slug);
     }
 
+    @LogExecution
     @Transactional
     public void startQuiz(String slug, Long userId, HttpSession session){
         
@@ -114,8 +119,10 @@ public class CuestionarioService {
         IntentoCuestionario intentoCuestionario = intentoCuestionarioService.crearIntentoCuestionario(cuestionario, usuario);
         quizSessionService.create(session, intentoCuestionario);
         
+        log.info("El usuario '{}' inició el cuestionario '{}' (id={})", usuario.getUsername(), cuestionario.getTitulo(), cuestionario.getId());
     }
 
+    @LogExecution
     @Transactional
     public IntentoCuestionario finishQuiz(HttpSession httpSession){
         UserQuizSession session = quizSessionService.getRequired(httpSession);
@@ -139,6 +146,14 @@ public class CuestionarioService {
         IntentoCuestionario intentoCuestionarioPersist = intentoCuestionarioRepository.save(intentoCuestionario);
         respuestaUsuarioService.saveAll(session.getResponses(), intentoCuestionario);
 
+        log.info("El usuario '{}' finalizó el cuestionario '{}' con un {}% ({} aciertos, {} fallos, {} s)",
+            intentoCuestionarioPersist.getUsuario().getUsername(),
+            intentoCuestionarioPersist.getCuestionario().getTitulo(),
+            intentoCuestionarioPersist.getPorcentajeAciertosRedondeado(),
+            intentoCuestionarioPersist.getAciertos(),
+            intentoCuestionarioPersist.getFallos(),
+            intentoCuestionarioPersist.getTiempoEmpleado()
+        );
         return intentoCuestionarioPersist;
     }
 

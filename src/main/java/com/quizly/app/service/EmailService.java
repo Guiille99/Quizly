@@ -8,11 +8,14 @@ import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 
 import com.quizly.app.exception.QuizlyException;
+import com.quizly.app.logging.LogExecution;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class EmailService {
@@ -25,6 +28,7 @@ public class EmailService {
     @Value("${app.url}")
     private String appUrl;
 
+    @LogExecution
     public void sendPasswordResetEmail(String userEmail, String token) throws QuizlyException{
         String resetUrl = appUrl + "/reset-password?token=" + token;
 
@@ -47,8 +51,10 @@ public class EmailService {
             helper.setText(html, true);
 
             mailSender.send(message);
+
+            log.info("Correo '{}' enviado correctamente", subject);
         } catch (Exception e) {
-            System.out.println("Se ha producido un error al enviar el email: " + e);
+            log.error("Se ha producido un error al enviar el email", e);
             throw new QuizlyException("Se ha producido un error al enviar el email.");
         }
     }

@@ -26,5 +26,9 @@ app:
   url: http://localhost:8080
 logging:
   level:
-    '[org.springframework.security]': DEBUG
+    root: INFO
+    '[com.quizly]': INFO
+    '[org.springframework]': INFO
+    '[org.springframework.security]': INFO
+    '[org.hibernate]': WARN
 

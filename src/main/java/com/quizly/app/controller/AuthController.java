@@ -26,9 +26,11 @@ import com.quizly.app.service.EmailService;
 import com.quizly.app.web.notification.ToastService;
 
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.web.bind.annotation.RequestParam;
 
-
+@Slf4j
 @Controller
 public class AuthController {
 
@@ -81,6 +83,7 @@ public class AuthController {
             bindingResult.rejectValue("email", "email.duplicate", e.getMessage());
             return "auth/register";
         } catch(Exception e){
+            log.error("Se ha producido un error inesperado durante el registro", e);
             toastService.error(model, "Se ha producido un error durante el registro.");
             return "auth/register";
         }
@@ -111,13 +114,13 @@ public class AuthController {
             String token = authService.createPasswordResetToken(usuario);
 
             try {
+                log.info("Solicitud de recuperación de contraseña enviada por el usuario '{}'", usuario.getUsername());
                 emailService.sendPasswordResetEmail(usuario.getEmail(), token);
             } catch (QuizlyException e) {
+                log.error("Se ha producido un error al enviar el email de recuperación de contraseña", e);
                 toastService.error(model, e.getMessage());
                 return "auth/forgot-password";
             }
-
-            System.out.println("Token generado para " + form.getEmail() + ": " + token);
         }
 
         toastService.info(ra, "Si el email está registrado, recibirás un enlace de recuperación pronto.");
@@ -151,6 +154,7 @@ public class AuthController {
             form.setToken(token);
             return "auth/reset-password";
         } catch (Exception e) {
+            log.error("Error inesperado al actualizar la contraseña", e);
             toastService.error(model, "Se ha producido un error al actualizar la contraseña");
             form.setToken(token);
             return "auth/reset-password";
