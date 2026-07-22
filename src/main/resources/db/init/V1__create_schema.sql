@@ -160,7 +160,7 @@ CREATE TABLE cuestionarios (
 COMMENT ON COLUMN cuestionarios.id IS 'Identificador único del cuestionario';
 COMMENT ON COLUMN cuestionarios.titulo IS 'Título descriptivo del cuestionario';
 COMMENT ON COLUMN cuestionarios.descripcion IS 'Explicación del propósito del cuestionario';
-COMMENT ON COLUMN cuestionarios.tiempo_limite IS 'Tiempo máximo en minutos para completar el cuestionario';
+COMMENT ON COLUMN cuestionarios.tiempo_limite IS 'Tiempo máximo en segundos para completar el cuestionario';
 COMMENT ON COLUMN cuestionarios.slug IS 'Identificador amigable para URLs';
 COMMENT ON COLUMN cuestionarios.version IS 'Número de versión para control de cambios';
 COMMENT ON COLUMN cuestionarios.created_at IS 'Fecha de creación del cuestionario';

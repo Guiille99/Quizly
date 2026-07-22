@@ -37,6 +37,9 @@ public class Cuestionario extends AuditableEntity {
     @Column(name = "descripcion", length = 255)
     private String descripcion;
 
+    /**
+     * Tiempo límite del cuestionario en segundos.
+     */
     @Column(name = "tiempo_limite")
     private Integer tiempoLimite;
 
@@ -60,7 +63,7 @@ public class Cuestionario extends AuditableEntity {
 
     @Transient
     public String getTiempoLimiteNatural() {
-        return Utils.formatNaturalDuration(tiempoLimite * 60);
+        return Utils.formatNaturalDuration(tiempoLimite);
     }
 
 }
