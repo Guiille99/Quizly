@@ -101,7 +101,7 @@ public class Utils {
         
         // En caso de que haya segundos pero no lleguen a un minuto completo
         if (sb.length() == 0 && totalSeconds > 0) {
-            return "menos de un minuto";
+            return totalSeconds + (totalSeconds == 1 ? " segundo " : " segundos ");
         }
 
         return sb.toString();

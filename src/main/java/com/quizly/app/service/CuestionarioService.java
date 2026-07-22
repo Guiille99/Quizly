@@ -129,6 +129,12 @@ public class CuestionarioService {
 
         IntentoCuestionario intentoCuestionario = intentoCuestionarioRepository.findById(session.getIntentoCuestionarioId()).get();
 
+        // Si el intento ya cuenta con una fecha de finalización
+        // noo hacemos nada
+        if (intentoCuestionario.getFechaFin() != null) {
+            return null;
+        }
+
         int aciertos = session.getScore();
         int fallos = session.getPreguntas().size() - aciertos;
 
@@ -145,6 +151,10 @@ public class CuestionarioService {
         // Persistimos el intento del cuestionario y las respuestas del usuario
         IntentoCuestionario intentoCuestionarioPersist = intentoCuestionarioRepository.save(intentoCuestionario);
         respuestaUsuarioService.saveAll(session.getResponses(), intentoCuestionario);
+
+        // Actualizamos el index de la pregunta actual a la última pregunta 
+        // para que se entienda que ha llegado al final
+        session.setCurrentQuestionIndex(session.getPreguntas().size());
 
         log.info("El usuario '{}' finalizó el cuestionario '{}' con un {}% ({} aciertos, {} fallos, {} s)",
             intentoCuestionarioPersist.getUsuario().getUsername(),
@@ -219,7 +229,7 @@ public class CuestionarioService {
 
         return new QuizSummary(session.getTitulo(), session.getTema(), session.getDificultad(), session.getSlug(), 
             total, intentoCuestionario.getAciertos(), intentoCuestionario.getFallos(), intentoCuestionario.getPorcentajeAciertosRedondeado(), 
-            intentoCuestionario.getTiempoEmpleadoFormateado(), questions);
+            intentoCuestionario.getTiempoEmpleadoFormateado(), session.isTiempoAgotado(), questions);
     }
 
     public QuizSummary getSummary (UserQuizSession session){

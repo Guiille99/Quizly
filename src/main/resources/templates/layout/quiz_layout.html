@@ -14,6 +14,17 @@
             <svg aria-label="moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g stroke-linejoin="round" stroke-linecap="round" stroke-width="2" fill="none" stroke="currentColor"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></g></svg>  
         </label>
 
+        <!-- CONTADOR -->
+        <div th:if="${quizSession != null and quizSession.hasTiempoLimite()}" id="quiz-timer" class="md:flex items-center gap-2 px-4 py-2 rounded-xl"
+            th:attr="data-seconds=${quizSession.segundosRestantes}, 
+            data-timeout-url=@{/cuestionarios/{slug}/timeout(slug=${quizSession.slug})}">
+
+            <i class="fa-regular fa-clock"></i>
+
+            <span id="quiz-timer-text" class="font-mono font-semibold"></span>
+
+        </div>
+
         <div class="flex-none gap-3">
             <div class="avatar size-9 min-h-0">
                 <div class="badge-default">
@@ -26,4 +37,5 @@
     <!-- MAIN -->
     <main th:replace="${main}"></main>
 </body>
+<script src="/js/quiz-timer.js"></script>
 </html>

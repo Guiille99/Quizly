@@ -48,7 +48,10 @@
                             <i class="fa-solid fa-clock text-accent-blue"></i>
                             <span>Tiempo límite: </span>
                         </div>
-                        <span class="quiz-start__info__item__text" th:text="${quiz.getTiempoLimiteNatural}"></span>
+                        <span th:if="${quiz.tiempoLimite != null}" class="quiz-start__info__item__text" 
+                            th:text="${quiz.getTiempoLimiteNatural}"></span>
+                        
+                        <span th:unless="${quiz.tiempoLimite != null}">No tiene</span>
                     </div>
                 </div>
 

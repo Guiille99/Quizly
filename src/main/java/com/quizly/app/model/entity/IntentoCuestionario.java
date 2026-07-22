@@ -1,5 +1,6 @@
 package com.quizly.app.model.entity;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -92,6 +93,46 @@ public class IntentoCuestionario extends AuditableEntity {
         }
     
         return String.format("%02d:%02d", minutos, segundos);
+    }
+
+    /**
+     * Devuelve la fecha y hora en la que expira el intento.
+     * Si el cuestionario no tiene límite de tiempo devuelve null.
+     * @return
+     */
+    public LocalDateTime getFechaExpiracion(){
+        if (cuestionario == null || cuestionario.getTiempoLimite() == null) {
+            return null;
+        }
+
+        return fechaInicio.plusSeconds(cuestionario.getTiempoLimite());
+    }
+
+    /**
+     * Indica si el tiempo del cuestionario ha expirado
+     * @return
+     */
+    public boolean isTiempoAgotado(){
+        LocalDateTime fechaExpiracion = getFechaExpiracion();
+
+        return fechaExpiracion != null && LocalDateTime.now().isAfter(fechaExpiracion);
+    }
+
+    /**
+     * Devuelve los segundos restantes.
+     * Si no hay límite de tiempo devuelve -1.
+     * @return
+     */
+    public long getSegundosRestantes(){
+        LocalDateTime fechaExpiracion = getFechaExpiracion();
+
+        if (fechaExpiracion == null) {
+            return -1;
+        }
+
+        long segundos = Duration.between(LocalDateTime.now(), fechaExpiracion).getSeconds();
+
+        return Math.max(segundos, 0);
     }
     
 }

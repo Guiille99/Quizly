@@ -4,7 +4,15 @@
 <body>
     <main th:fragment="main" class="w-full px-6 py-8">
         <!-- Cabecera -->
+        <div th:if="${summary.timeExpired}" class="alert alert-warning mb-6">
+            <i class="fa-regular fa-clock"></i>
+            <span>
+                El tiempo límite ha finalizado y el cuestionario se ha entregado automáticamente.
+                Las preguntas sin responder se han consideraro como no contestadas.
+            </span>
+        </div>
         <section class="grid gap-6 lg:grid-cols-3">
+
             <!-- Resultado -->
              <div class="card bg-base-100 shadow-lg boder boder-base-300">
                 <div class="card-body items-center text-center">

@@ -48,6 +48,7 @@ public class QuizSessionService {
         session.setScore(0);
         session.setStartedAt(Instant.now());
         session.setResponses(new ArrayList<>());
+        session.setFechaExpiracion(intentoCuestionario.getFechaExpiracion());
 
         httpSession.setAttribute(SESSION_KEY, session);
 

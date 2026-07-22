@@ -13,6 +13,7 @@ public record QuizSummary(
     int incorrectAnswers,
     int scorePercentage,
     String tiempoEmpleado,
+    boolean timeExpired,
     List<QuestionSummary> questions
 ) {
 

@@ -13,6 +13,7 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -33,10 +34,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import org.springframework.web.bind.annotation.PostMapping;
-
-
-
-
+import org.springframework.web.bind.annotation.RequestBody;
 
 
 @Slf4j
@@ -126,7 +124,12 @@ public class CuestionariosController {
             return "redirect:/cuestionarios/" + slug + "/summary";
         }
 
-        model.addAttribute("quiz", quizSession);
+        if (quizSession.isTiempoAgotado()) {
+            cuestionarioService.finishQuiz(session);
+            return "redirect:/cuestionarios/" + slug + "/summary";
+        }
+
+        model.addAttribute("quizSession", quizSession);
         model.addAttribute("question", quizSession.getCurrentQuestion());
 
        return "cuestionarios/questionQuiz";
@@ -148,8 +151,29 @@ public class CuestionariosController {
         model.addAttribute("quiz", quiz);
         model.addAttribute("question", quiz.getCurrentQuestion());
 
-        return "cuestionarios/questionQuiz :: question-card";
+        // Dispara el evento para sincronizar el contador con HTMX
+        response.setHeader("HX-Trigger",
+            "{\"quizTimerSync\":{\"seconds\":"
+            + quiz.getSegundosRestantes()
+            + "}}");
+
+        return "cuestionarios/questionQuiz :: quiz-content";
     }
+
+    @PostMapping("/{slug}/timeout")
+    public ResponseEntity<Void> timeoutQuiz(@PathVariable String slug, HttpSession session, HttpServletResponse response) {
+        UserQuizSession quizSession = quizSessionService.getRequired(session);
+
+        if (!quizSession.isFinished()) {
+            cuestionarioService.finishQuiz(session);
+        }
+
+        return ResponseEntity
+                .noContent()
+                .header("HX-Redirect", "/cuestionarios/" + slug + "/summary")
+                .build();
+    }
+    
 
     @GetMapping("/{slug}/summary")
     public String showQuestionSummary(@PathVariable String slug, HttpSession session, Model model) {

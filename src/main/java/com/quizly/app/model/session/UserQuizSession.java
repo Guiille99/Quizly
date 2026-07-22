@@ -1,6 +1,8 @@
 package com.quizly.app.model.session;
 
+import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +29,7 @@ public class UserQuizSession {
     private int score;
     private Instant startedAt;
     private List<UserQuizResponse> responses = new ArrayList<>();
+    private LocalDateTime fechaExpiracion;
 
     public void nextQuestion(){
         currentQuestionIndex++;
@@ -50,5 +53,27 @@ public class UserQuizSession {
 
     public int getProgress(){
         return (int) ((currentQuestionIndex * 100.0) / preguntas.size());
+    }
+
+    public boolean hasTiempoLimite(){
+        return fechaExpiracion != null;
+    }
+
+    public boolean isTiempoAgotado(){
+        return hasTiempoLimite() && !LocalDateTime.now().isBefore(fechaExpiracion);
+    }
+
+    public long getSegundosRestantes(){
+        if (!hasTiempoLimite()) {
+            return -1;
+        }
+
+        Duration duration = Duration.between(LocalDateTime.now(), fechaExpiracion);
+
+        long millis = duration.toMillis();
+
+        long segundos = (long) Math.ceil(millis / 1000.0);
+        
+        return Math.max(segundos, 0);
     }
 }
