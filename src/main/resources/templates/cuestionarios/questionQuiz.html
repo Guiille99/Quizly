@@ -39,7 +39,7 @@
             <!-- Tarjeta -->
             <div id="question-card" th:fragment="question-card" class="card bg-base-100 shadow-xl border border-base-300">
             
-                <div class="card-body p-8">
+                <div class="card-body p-0">
                     <h2 class="text-2xl font-semibold leading-relaxed" th:text="${question.statement}"></h2>
             
                     <form id="answer-form" th:action="@{/cuestionarios/{slug}/answer(slug=${quizSession.slug})}"
