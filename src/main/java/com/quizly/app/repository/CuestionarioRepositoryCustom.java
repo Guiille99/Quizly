@@ -6,13 +6,11 @@ import com.quizly.app.model.entity.Cuestionario;
 
 public interface CuestionarioRepositoryCustom {
     
-    Optional<Cuestionario> findBySlug(String slug);
-
     List<Cuestionario> findByTemaId(Long temaId);
 
     List<Cuestionario> findByTemaIdAndDificultadId(Long temaId, Long dificultadId);
 
     boolean existsBySlug(String slug);
 
-    Optional<Cuestionario> getUltimaVersionCuestionarioBySlug(String slug);
+    Optional<Cuestionario> findLastVersionBySlug(String slug);
 }

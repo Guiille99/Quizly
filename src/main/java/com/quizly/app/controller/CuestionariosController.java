@@ -97,7 +97,7 @@ public class CuestionariosController {
 
     @GetMapping("/{slug}")
     public String showStart(@PathVariable String slug, Model model) {
-        Optional<Cuestionario> cuestionario = cuestionarioService.getCuestionarioBySlug(slug);
+        Optional<Cuestionario> cuestionario = cuestionarioService.getLastVersionQuizBySlug(slug);
 
         if (cuestionario.isPresent()) {
             model.addAttribute("quiz", cuestionario.get());

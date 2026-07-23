@@ -70,8 +70,8 @@ public class CuestionarioService {
         return cuestionarioRepository.getCuestionariosRecientesByUsuarioYEstado(authUser.getId(), intentosCuestionarioEstados, pageable);
     }
 
-    public Optional<Cuestionario> getCuestionarioBySlug(String slug){
-        return cuestionarioRepository.getUltimaVersionCuestionarioBySlug(slug);
+    public Optional<Cuestionario> getLastVersionQuizBySlug(String slug){
+        return cuestionarioRepository.findLastVersionBySlug(slug);
     }
 
     @LogExecution
@@ -79,7 +79,7 @@ public class CuestionarioService {
     public void startQuiz(String slug, Long userId, HttpSession session){
         
         quizSessionService.clear(session);
-        Cuestionario cuestionario = cuestionarioRepository.getUltimaVersionCuestionarioBySlug(slug)
+        Cuestionario cuestionario = cuestionarioRepository.findLastVersionBySlug(slug)
             .orElseThrow(() -> new EntityNotFoundException("No existe el cuestionario."));
         
         // Obtenemos todos los intentos abiertos del usuario para este cuestionario

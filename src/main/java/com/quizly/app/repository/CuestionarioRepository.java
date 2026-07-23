@@ -9,10 +9,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.quizly.app.model.entity.Cuestionario;
-import com.quizly.app.model.entity.Tema;
 
 @Repository
 public interface CuestionarioRepository extends JpaRepository<Cuestionario, Long>, CuestionarioRepositoryCustom {
+    @Query("""
+            SELECT c FROM Cuestionario c
+            WHERE c.version = (SELECT MAX(c2.version) FROM Cuestionario c2 WHERE c2.slug = c.slug)
+            ORDER BY c.tema.nombre ASC
+            """)
     Page<Cuestionario> findAllByOrderByTemaNombreAsc(Pageable pageable);
 
     /**
@@ -40,7 +44,18 @@ public interface CuestionarioRepository extends JpaRepository<Cuestionario, Long
      * @param pageable
      * @return Page<{@link Cuestionario}>
      */
+    @Query("""
+            SELECT c FROM Cuestionario c
+            WHERE c.tema.id = :temaId
+            AND c.version = (SELECT MAX(c2.version) FROM Cuestionario c2 WHERE c2.slug = c.slug)
+            """)
     Page<Cuestionario> findByTemaId(Long temaId, Pageable pageable);
 
+    @Query("""
+            SELECT c FROM Cuestionario c
+            WHERE LOWER(c.titulo) LIKE LOWER(CONCAT('%', :titulo, '%'))
+            AND c.tema.id = :temaId
+            AND c.version = (SELECT MAX(c2.version) FROM Cuestionario c2 WHERE c2.slug = c.slug)
+            """)
     Page<Cuestionario> findByTituloContainingIgnoreCaseAndTemaId(String titulo, Long temaId, Pageable pageable);
 }

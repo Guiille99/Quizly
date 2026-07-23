@@ -16,14 +16,6 @@ public class CuestionarioRepositoryImpl implements CuestionarioRepositoryCustom 
     private EntityManager entityManager;
 
     @Override
-    public Optional<Cuestionario> findBySlug(String slug) {
-        TypedQuery<Cuestionario> query = entityManager.createQuery(
-            "SELECT c FROM Cuestionario c WHERE c.slug = :slug", Cuestionario.class);
-        query.setParameter("slug", slug);
-        return query.getResultStream().findFirst();
-    }
-
-    @Override
     public List<Cuestionario> findByTemaId(Long temaId) {
         TypedQuery<Cuestionario> query = entityManager.createQuery(
             "SELECT c FROM Cuestionario c WHERE c.tema.id = :temaId", Cuestionario.class);
@@ -51,7 +43,7 @@ public class CuestionarioRepositoryImpl implements CuestionarioRepositoryCustom 
     }
 
     @Override
-    public Optional<Cuestionario> getUltimaVersionCuestionarioBySlug(String slug) {
+    public Optional<Cuestionario> findLastVersionBySlug(String slug) {
         TypedQuery<Cuestionario> query = entityManager.createQuery("""
             SELECT c FROM Cuestionario c WHERE c.slug = :slug ORDER BY c.version DESC
         """, Cuestionario.class);
