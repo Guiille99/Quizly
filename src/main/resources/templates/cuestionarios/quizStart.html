@@ -55,15 +55,80 @@
                     </div>
                 </div>
 
-                <form th:action="@{/cuestionarios/{slug}/start(slug=${quiz.slug})}" method="post">
+                <th:block th:if="${intentoReanudable == null}">
+                    <form th:action="@{/cuestionarios/{slug}/start(slug=${quiz.slug})}" method="post">
+    
+                        <button type="submit" class="btn btn-primary w-full">
+                            <i class="fa-solid fa-play"></i>
+                            Comenzar
+                        </button>
+                    </form>
+                </th:block>
 
-                    <button type="submit" class="btn btn-primary w-full">
+                <th:block th:unless="${intentoReanudable == null}">
+                    <button class="btn btn-primary w-full" onclick="resume_dialog.showModal()">
                         <i class="fa-solid fa-play"></i>
                         Comenzar
                     </button>
-                </form>
+                </th:block>
             </div>
         </div>
+
+        <dialog id="resume_dialog" class="modal">
+            <div class="modal-box">
+                <form method="dialog">
+                    <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">X</button>
+                </form>
+                
+                
+                <div class="flex items-center gap-3 mb-4">
+                    <i class="fa-solid fa-circle-play text-2xl text-primary"></i>
+                    
+                    <div>
+                        <h3 class="font-bold text-lg">Tienes un cuestionario en progreso</h3>
+                        <p class="text-sm opacity-70">Puedes continuar donde lo dejaste o comenzar un nuevo intento.</p>
+                    </div>
+                </div>
+                
+                <!-- Alerta en caso de que el intento pertenezca a una versión antigua del cuestionario -->
+                <div th:if="${isPreviousVersion}" class="alert alert-warning my-4">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+
+                    <div>
+                        <h3 class="font-semibold mb-1">Existe una versión más reciente de este cuestionario</h3>
+
+                        <p class="text-sm">
+                            Tu intento fue iniciado con una versión anterior de este cuestionario.
+                            Si lo reanudas continuarás esa misma versión.
+                            Si comienzas un nuevo intento utilizarás la versión actual y el intento
+                            anterior se marcará como abandonado.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="modal-action justify-center">
+                    <div class="flex gap-2">
+                        <form th:action="@{/cuestionarios/{slug}/start(slug=${quiz.slug})}" method="post">
+                    
+                            <button class="btn btn-outline">
+                                Comenzar nuevo intento
+                            </button>
+                        </form>
+
+                        <form th:action="@{/cuestionarios/{slug}/resume(slug=${quiz.slug})}" method="post">
+                    
+                            <button class="btn btn-primary">
+                                Reanudar intento
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <form method="dialog" class="modal-backdrop">
+                <button>Cerrar</button>
+            </form>
+        </dialog>
     </main>
 </body>
 </html>

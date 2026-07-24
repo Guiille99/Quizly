@@ -18,12 +18,15 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
+import com.quizly.app.exception.QuizNotResumableException;
+import com.quizly.app.exception.QuizlyException;
 import com.quizly.app.logging.LogExecution;
 import com.quizly.app.model.entity.Cuestionario;
 import com.quizly.app.model.entity.IntentoCuestionario;
 import com.quizly.app.model.entity.IntentoCuestionarioEstado;
+import com.quizly.app.model.entity.OpcionRespuesta;
+import com.quizly.app.model.entity.Pregunta;
 import com.quizly.app.model.entity.Tema;
 import com.quizly.app.model.entity.Usuario;
 import com.quizly.app.model.enums.IntentoCuestionarioEstadoEnum;
@@ -35,14 +38,13 @@ import com.quizly.app.model.view.quiz.QuestionSummary;
 import com.quizly.app.model.view.quiz.QuizSummary;
 import com.quizly.app.repository.CuestionarioRepository;
 import com.quizly.app.repository.IntentoCuestionarioRepository;
+import com.quizly.app.repository.OpcionRespuestaRepository;
 import com.quizly.app.repository.UsuarioRepository;
 import com.quizly.app.security.QuizlyUserDetails;
-
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -56,6 +58,7 @@ public class CuestionarioService {
     private final UsuarioRepository usuarioRepository;
     private final IntentoCuestionarioService intentoCuestionarioService;
     private final IntentoCuestionarioRepository intentoCuestionarioRepository;
+    private final OpcionRespuestaRepository opcionRespuestaRepository;
 
     public Page<Cuestionario> getCuestionariosPaginated(Pageable pageable){
        return cuestionarioRepository.findAllByOrderByTemaNombreAsc(pageable);
@@ -82,44 +85,52 @@ public class CuestionarioService {
         Cuestionario cuestionario = cuestionarioRepository.findLastVersionBySlug(slug)
             .orElseThrow(() -> new EntityNotFoundException("No existe el cuestionario."));
         
-        // Obtenemos todos los intentos abiertos del usuario para este cuestionario
-        List<IntentoCuestionario> cuestionariosAbiertos = intentoCuestionarioRepository.findIntentosAbiertoByUsuarioYCuestionario(
-            userId, cuestionario.getId());
+        // Obtenemos el intento abierto del usuario para este cuestionario
+        Optional<IntentoCuestionario> intentoAbierto = intentoCuestionarioRepository.findIntentoAbiertoByUsuarioYSlug(
+            userId, cuestionario.getSlug());
 
         
-        if (!CollectionUtils.isEmpty(cuestionariosAbiertos)) {
-            // Marcar como abandonados esos intentos abiertos antes de comenzar uno nuevo de este mismo cuestionario
-            List<Long> cuestionariosAbiertosId = cuestionariosAbiertos.stream()
-                .map(i -> i.getCuestionario().getId())
-                .toList();
-
-            IntentoCuestionarioEstado estadoIntentoAbandonado = intentoCuestionarioEstadoRepository.
-                findByCodigo(IntentoCuestionarioEstadoEnum.ABANDONNED.toString()).get();
-
-            intentoCuestionarioRepository.marcarIntentosAbandonados(userId, cuestionariosAbiertosId, estadoIntentoAbandonado);
+        if (intentoAbierto.isPresent()) {
+            // Marcar como abandonado el intento abierto antes de comenzar uno nuevo de este mismo cuestionario
+            intentoCuestionarioService.abandonarIntento(intentoAbierto.get());
         }
 
        
         Usuario usuario = usuarioRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("No existe el usuario."));
 
-
-
-        // Cuestionario cuestionario = cuestionarioOpt.get();
-        // Usuario usuario = usuarioOpt.get();
-
-        // Optional<IntentoCuestionario> intentoAbierto = intentoCuestionarioRepository.findIntentoAbiertoByUsuarioYCuestionario(
-        //     userId, cuestionario.getId());
-        
-
-        // if (intentoAbierto.isPresent()) {
-        //     quizSessionService.create(session, intentoAbierto.get());
-        //     return;
-        // }
-
         IntentoCuestionario intentoCuestionario = intentoCuestionarioService.crearIntentoCuestionario(cuestionario, usuario);
         quizSessionService.create(session, intentoCuestionario);
         
         log.info("El usuario '{}' inició el cuestionario '{}' (id={})", usuario.getUsername(), cuestionario.getTitulo(), cuestionario.getId());
+    }
+
+    /**
+     * Reanuda un cuestionario previamente inicido por el usuario.
+     * @param slug
+     * @param userId
+     * @param session
+     * @throws QuizNotResumableException 
+     */
+    @LogExecution
+    @Transactional
+    public void resumeQuiz(String slug, Long userId, HttpSession session) throws QuizNotResumableException{
+        // Limpiamos cualquier sesión anterior
+        quizSessionService.clear(session);
+
+        IntentoCuestionario intento = intentoCuestionarioService
+            .getIntentoReanudable(userId, slug)
+            .orElseThrow(() -> new QuizNotResumableException("El intento ya no puede reanudarse."));
+
+        quizSessionService.resume(session, intento);
+
+        intento.actualizarUltimaActividad();
+        intentoCuestionarioRepository.save(intento);
+
+        log.info("El usuario '{}' reanudó el cuestionario '{}' (intento={})",
+            intento.getUsuario().getUsername(),
+            intento.getCuestionario().getId(),
+            intento.getId()
+        );
     }
 
     @LogExecution
@@ -148,9 +159,8 @@ public class CuestionarioService {
         intentoCuestionario.setTiempoEmpleado(tiempoEmpleado);
         intentoCuestionario.setEstado(intentoCuestionarioEstadoRepository.findByCodigo(IntentoCuestionarioEstadoEnum.FINISHED.toString()).get());
 
-        // Persistimos el intento del cuestionario y las respuestas del usuario
+        // Persistimos el intento del cuestionario
         IntentoCuestionario intentoCuestionarioPersist = intentoCuestionarioRepository.save(intentoCuestionario);
-        respuestaUsuarioService.saveAll(session.getResponses(), intentoCuestionario);
 
         // Actualizamos el index de la pregunta actual a la última pregunta 
         // para que se entienda que ha llegado al final
@@ -191,7 +201,15 @@ public class CuestionarioService {
             quizSession.increaseScore();
         }
 
+        IntentoCuestionario intento = intentoCuestionarioService.getIntentoActivo(quizSession.getIntentoCuestionarioId());
+        OpcionRespuesta opcion = opcionRespuestaRepository.findById(optionId).get();
+
+        // Persistimos la respuesta
+        respuestaUsuarioService.guardarRespuesta(intento, opcion.getPregunta(), opcion);
+
         quizSession.nextQuestion();
+
+        intentoCuestionarioService.actualizarFechaUltimaActividad(quizSession);
 
     }
 

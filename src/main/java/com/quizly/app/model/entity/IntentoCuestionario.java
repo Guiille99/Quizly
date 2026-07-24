@@ -45,6 +45,9 @@ public class IntentoCuestionario extends AuditableEntity {
     @Column(name = "fecha_fin")
     private LocalDateTime fechaFin;
 
+    @Column(name = "fecha_ultima_actividad", nullable = false)
+    private LocalDateTime fechaUltimaActividad;
+
     @Column(name = "aciertos", nullable = false)
     private Integer aciertos;
 
@@ -133,6 +136,44 @@ public class IntentoCuestionario extends AuditableEntity {
         long segundos = Duration.between(LocalDateTime.now(), fechaExpiracion).getSeconds();
 
         return Math.max(segundos, 0);
+    }
+    
+    /**
+     * Actualiza la fecha de la última actividad del intento al instante actual
+     */
+    public void actualizarUltimaActividad(){
+        this.fechaUltimaActividad = LocalDateTime.now();
+    }
+
+    /**
+     * Indica si el intento puede reanudarse.
+     * Si el cuestionario tiene un tiempo límite, el intento será reanudable
+     * mientras dicho tiempo no haya expirado.
+     * En caso contrario, se comprueba que el tiempo transcurrido desde la última 
+     * actividad no supere el máximo permitido
+     * @param tiempoInactividadMaximo
+     * @return
+     */
+    public boolean puedeReanudarse(Duration tiempoInactividadMaximo){
+        LocalDateTime ahora = LocalDateTime.now();
+
+        // Si el cuestionario tiene un tiempo límite, comprobamos que no haya expirado
+        if (cuestionario.getTiempoLimite() != null) {
+           return !isTiempoAgotado();
+        }
+
+        // Si no tiene tiempo límite, comprobamos la última actividad
+        return ahora.isBefore(fechaUltimaActividad.plus(tiempoInactividadMaximo));
+    }
+
+    /**
+     * Determina si la versión asociada al intento
+     * pertenece a la versión del cuestionario indicado
+     * @param cuestionario
+     * @return
+     */
+    public boolean perteneceAVersion(Cuestionario cuestionario){
+        return this.cuestionario.getId().equals(cuestionario.getId());
     }
     
 }

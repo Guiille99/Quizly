@@ -42,6 +42,8 @@
 
     <!-- MAIN -->
     <main th:replace="${main}"></main>
+
+    <div th:replace="~{fragments/toast :: toast}"></div>
 </body>
 <script src="/js/quiz-timer.js"></script>
 </html>

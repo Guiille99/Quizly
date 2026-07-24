@@ -40,4 +40,16 @@ public class RespuestaUsuarioService {
 
             respuestaUsuarioRepository.saveAll(respuestasUsuario);
     }
+
+    @Transactional
+    public void guardarRespuesta(IntentoCuestionario intento, Pregunta pregunta, OpcionRespuesta opcionSeleccionada){
+        RespuestaUsuario respuesta = new RespuestaUsuario();
+
+        respuesta.setIntento(intento);
+        respuesta.setPregunta(pregunta);
+        respuesta.setOpcionSeleccionada(opcionSeleccionada);
+        respuesta.setCorrecta(opcionSeleccionada.getCorrecta());
+
+        respuestaUsuarioRepository.save(respuesta);
+    }
 }

@@ -1,18 +1,25 @@
 package com.quizly.app.service;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.quizly.app.config.QuizProperties;
 import com.quizly.app.model.entity.Cuestionario;
 import com.quizly.app.model.entity.IntentoCuestionario;
 import com.quizly.app.model.entity.Usuario;
 import com.quizly.app.model.enums.IntentoCuestionarioEstadoEnum;
+import com.quizly.app.model.session.UserQuizSession;
 import com.quizly.app.repository.IntentoCuestionarioEstadoRepository;
 import com.quizly.app.repository.IntentoCuestionarioRepository;
+import com.quizly.app.util.Constantes;
 
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -20,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 public class IntentoCuestionarioService {
     private final IntentoCuestionarioRepository intentoCuestionarioRepository;
     private final IntentoCuestionarioEstadoRepository intentoCuestionarioEstadoRepository;
+    private final QuizProperties quizProperties;
 
     public Page<IntentoCuestionario> getIntentosCuestionariosByUsuarioYEstadoPaginated(Long userId, String codigoEstadoIntento, 
             Pageable pageable){
@@ -32,11 +40,106 @@ public class IntentoCuestionarioService {
         intentoCuestionario.setCuestionario(cuestionario);
         intentoCuestionario.setUsuario(usuario);
         intentoCuestionario.setFechaInicio(LocalDateTime.now());
+        intentoCuestionario.actualizarUltimaActividad();
         intentoCuestionario.setAciertos(0);
         intentoCuestionario.setFallos(0);
         intentoCuestionario.setTiempoEmpleado(0L);
         intentoCuestionario.setEstado(intentoCuestionarioEstadoRepository.findByCodigo(IntentoCuestionarioEstadoEnum.IN_PROGRESS.toString()).get());
 
         return intentoCuestionarioRepository.save(intentoCuestionario);
+    }
+
+    /**
+     * Actualiza la fecha de la última actividad de un intento de cuestionario.
+     * @param quizSession
+     */
+    @Transactional
+    public void actualizarFechaUltimaActividad(UserQuizSession quizSession){
+        LocalDateTime ahora = LocalDateTime.now();
+
+        if (ahora.isBefore(quizSession.getFechaUltimaActividad().plus(quizProperties.getActivityUpdateInterval()))) {
+            return;
+        }
+
+        intentoCuestionarioRepository.actualizarFechaUltimaActividad(quizSession.getIntentoCuestionarioId(), ahora);
+
+        quizSession.setFechaUltimaActividad(ahora);
+    }
+
+    /**
+     * Devuelve el intento en progreso del usuario para el cuestionario indicado,
+     * siempre que todavía pueda reanudarse.
+     * Si el intento existe pero ya no es reanudable, se marca automáticamente
+     * como abandonado y de devuelve un {@link Optional#empty()}.
+     * @param userId
+     * @param slug
+     * @return
+     */
+    public Optional<IntentoCuestionario> getIntentoReanudable(Long userId, String slug){
+        Optional<IntentoCuestionario> intento = intentoCuestionarioRepository
+            .findIntentoAbiertoByUsuarioYSlug(userId, slug);
+
+        if (intento.isEmpty()) {
+            return Optional.empty();
+        }
+
+        if (!intento.get().puedeReanudarse(quizProperties.getInactivityMaxDuration())) {
+            abandonarIntento(intento.get());
+            return Optional.empty();
+        }
+
+        return intento;
+    }
+
+    /**
+     * Marca un intento como abandonado y registra su fecha de finalización 
+     * y el tiempo empleado
+     * @param intento
+     * @return
+     */
+    @Transactional
+    public IntentoCuestionario abandonarIntento(IntentoCuestionario intento){
+        if (IntentoCuestionarioEstadoEnum.ABANDONNED.name().equals(intento.getEstado().getCodigo())) {
+            return intento;
+        }
+
+        LocalDateTime fechaFin = LocalDateTime.now();
+
+        intento.setFechaFin(fechaFin);
+        intento.setTiempoEmpleado(Duration.between(intento.getFechaInicio(), fechaFin).toSeconds());
+
+        intento.setEstado(intentoCuestionarioEstadoRepository
+            .findByCodigo(IntentoCuestionarioEstadoEnum.ABANDONNED.name())
+            .orElseThrow()
+        );
+        
+        return intentoCuestionarioRepository.save(intento);
+    }
+
+    /**
+     * Obtiene un intento de cuestionario a partir de su identificador y verifica
+     * que continúa siendo válido.
+     * Si el intento está en progreso pero ya no puede reanudarse, se marca 
+     * automáticamente como abandonado antes de devolverlo.
+     * @param intentoId
+     * @return
+     */
+    @Transactional
+    public IntentoCuestionario getIntentoActivo(Long intentoId){
+        IntentoCuestionario intento = intentoCuestionarioRepository.findById(intentoId)
+            .orElseThrow(() -> new EntityNotFoundException("No existe el intento del cuestionario."));
+
+        // Si ya está finalizado o abandonado no hacemos ninguna comprobación
+        if (IntentoCuestionarioEstadoEnum.FINISHED.name().equals(intento.getEstado().getCodigo())
+            || IntentoCuestionarioEstadoEnum.ABANDONNED.name().equals(intento.getEstado().getCodigo())) {
+            return  intento;
+        }
+
+        // Si ya no puede reanudarse, lo marcamos como abandonado
+        if (!intento.puedeReanudarse(quizProperties.getInactivityMaxDuration())) {
+            return abandonarIntento(intento);
+        }
+
+        return intento;
     }
 }

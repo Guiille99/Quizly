@@ -1,6 +1,7 @@
 package com.quizly.app.service;
 
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -9,15 +10,14 @@ import org.springframework.stereotype.Service;
 
 import com.quizly.app.exception.UserQuizSessionNotFoundException;
 import com.quizly.app.model.entity.IntentoCuestionario;
-import com.quizly.app.model.entity.OpcionRespuesta;
 import com.quizly.app.model.entity.Pregunta;
+import com.quizly.app.model.entity.RespuestaUsuario;
 import com.quizly.app.model.session.OptionQuizRecord;
 import com.quizly.app.model.session.QuestionQuizRecord;
 import com.quizly.app.model.session.UserQuizResponse;
 import com.quizly.app.model.session.UserQuizSession;
 
 import jakarta.servlet.http.HttpSession;
-import jakarta.transaction.Transactional;
 
 @Service
 public class QuizSessionService {
@@ -49,9 +49,70 @@ public class QuizSessionService {
         session.setStartedAt(Instant.now());
         session.setResponses(new ArrayList<>());
         session.setFechaExpiracion(intentoCuestionario.getFechaExpiracion());
+        session.setFechaUltimaActividad(intentoCuestionario.getFechaUltimaActividad());
 
         httpSession.setAttribute(SESSION_KEY, session);
 
+        return session;
+    }
+
+    /**
+     * Reconstruye una sesión existente a partir de un intento en progreso.
+     * @param httpSession
+     * @param intentoCuestionario
+     * @return
+     */
+    public UserQuizSession resume(HttpSession httpSession, IntentoCuestionario intentoCuestionario){
+        UserQuizSession session = new UserQuizSession();
+
+        List<QuestionQuizRecord> questions = intentoCuestionario.getCuestionario()
+            .getPreguntas()
+            .stream()
+            .map(this::toQuestionQuizSnapshot)
+            .toList();
+
+        List<UserQuizResponse> responses = new ArrayList<>();
+
+        int score = 0;
+
+        if (intentoCuestionario.getRespuestas() != null) {
+            for (RespuestaUsuario respuesta : intentoCuestionario.getRespuestas()) {
+                boolean correcta = respuesta.getOpcionSeleccionada().getCorrecta();
+
+                responses.add(new UserQuizResponse(
+                    respuesta.getPregunta().getId(),
+                    respuesta.getOpcionSeleccionada().getId(),
+                    respuesta.getOpcionSeleccionada().getTexto(),
+                    correcta
+                ));
+
+                if (correcta) {
+                    score++;
+                }
+            }
+        }
+
+        session.setIntentoCuestionarioId(intentoCuestionario.getId());
+        session.setCuestionarioId(intentoCuestionario.getCuestionario().getId());
+        session.setTitulo(intentoCuestionario.getCuestionario().getTitulo());
+        session.setTema(intentoCuestionario.getCuestionario().getTema().getNombre());
+        session.setDificultad(intentoCuestionario.getCuestionario().getDificultad().getNombre());
+        session.setSlug(intentoCuestionario.getCuestionario().getSlug());
+        session.setPreguntas(questions);
+
+        // La siguiente pregunta será la inmediatamente posterior a las ya respondidas
+        session.setCurrentQuestionIndex(responses.size());
+
+        session.setScore(score);
+
+        // Conservamos la fecha original de inicio
+        session.setStartedAt(intentoCuestionario.getFechaInicio().atZone(ZoneId.systemDefault()).toInstant());
+
+        session.setResponses(responses);
+        session.setFechaExpiracion(intentoCuestionario.getFechaExpiracion());
+        session.setFechaUltimaActividad(intentoCuestionario.getFechaUltimaActividad());
+
+        httpSession.setAttribute(SESSION_KEY, session);
         return session;
     }
 
@@ -84,7 +145,7 @@ public class QuizSessionService {
      * @return
      */
     public UserQuizSession getRequired(HttpSession httpSession){
-        return get(httpSession).orElseThrow(() -> new UserQuizSessionNotFoundException("No existe un cuestionario activo"));
+        return get(httpSession).orElseThrow(UserQuizSessionNotFoundException::new);
     }
 
     /**

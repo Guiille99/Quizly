@@ -1,6 +1,9 @@
 package com.quizly.app.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
+
 import com.quizly.app.model.entity.IntentoCuestionario;
 import com.quizly.app.model.entity.IntentoCuestionarioEstado;
 
@@ -26,7 +29,9 @@ public interface IntentoCuestionarioRepositoryCustom {
      */
     List<IntentoCuestionario> findLatestByUsuarioIdAndEstado(Long usuarioId, List<String> intentosEstadoCodigos, int limit);
 
-    List<IntentoCuestionario> findIntentosAbiertoByUsuarioYCuestionario(Long usuarioId, Long cuestionarioId);
+    Optional<IntentoCuestionario> findIntentoAbiertoByUsuarioYCuestionario(Long usuarioId, Long cuestionarioId);
+
+    Optional<IntentoCuestionario> findIntentoAbiertoByUsuarioYSlug(Long usuarioId, String slug);
 
     /**
      * Obtiene el mayor porcentaje registrado por el usuario
@@ -40,6 +45,23 @@ public interface IntentoCuestionarioRepositoryCustom {
     Double findMaxPorcentajeAntesDe(Long usuarioId, Long cuestionarioId, Long intentoIdActual);
 
 
+    /**
+     * Marca como abandonados todos los intentos abiertos
+     * de un usuario sobre un cuestionario
+     * @param usuarioId
+     * @param cuestionariosId
+     * @param intentoEstado
+     * @return
+     */
     int marcarIntentosAbandonados(Long usuarioId, List<Long> cuestionariosId, IntentoCuestionarioEstado intentoEstado);
+
+    /**
+     * Actualiza la fecha de última actividad
+     * del intento
+     * @param intentoId
+     * @param fecha
+     * @return
+     */
+    int actualizarFechaUltimaActividad(Long intentoId, LocalDateTime fecha);
    
 }

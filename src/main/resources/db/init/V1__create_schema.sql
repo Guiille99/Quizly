@@ -206,6 +206,7 @@ CREATE TABLE intentos_cuestionario (
     usuario_id      BIGINT    NOT NULL,
     fecha_inicio    TIMESTAMP NOT NULL,
     fecha_fin       TIMESTAMP,
+    fecha_ultima_actividad    TIMESTAMP NOT NULL,
     aciertos        INTEGER   NOT NULL,
     fallos          INTEGER   NOT NULL,
     tiempo_empleado BIGINT    NOT NULL,
@@ -225,6 +226,7 @@ COMMENT ON COLUMN intentos_cuestionario.cuestionario_id IS 'Cuestionario realiza
 COMMENT ON COLUMN intentos_cuestionario.usuario_id IS 'Usuario que realizó el intento';
 COMMENT ON COLUMN intentos_cuestionario.fecha_inicio IS 'Fecha y hora de comienzo del intento';
 COMMENT ON COLUMN intentos_cuestionario.fecha_fin IS 'Fecha y hora de finalización o abandono';
+COMMENT ON COLUMN intentos_cuestionario.fecha_ultima_actividad IS 'Fecha y hora de la última actividad registrada';
 COMMENT ON COLUMN intentos_cuestionario.aciertos IS 'Número de preguntas respondidas correctamente';
 COMMENT ON COLUMN intentos_cuestionario.fallos IS 'Número de preguntas respondidas incorrectamente';
 COMMENT ON COLUMN intentos_cuestionario.tiempo_empleado IS 'Duración total del intento en segundos';

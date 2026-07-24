@@ -2,6 +2,8 @@ package com.quizly.app.repository.impl;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
+
 import com.quizly.app.model.entity.IntentoCuestionario;
 import com.quizly.app.model.entity.IntentoCuestionarioEstado;
 import com.quizly.app.model.enums.IntentoCuestionarioEstadoEnum;
@@ -99,17 +101,37 @@ public class IntentoCuestionarioRepositoryImpl implements IntentoCuestionarioRep
     }
 
     @Override
-    public List<IntentoCuestionario> findIntentosAbiertoByUsuarioYCuestionario(Long usuarioId, Long cuestionarioId) {
+    public Optional<IntentoCuestionario> findIntentoAbiertoByUsuarioYCuestionario(Long usuarioId, Long cuestionarioId) {
         TypedQuery<IntentoCuestionario> query = entityManager.createQuery("""
-            SELECT i FROM IntentoCuestionario i WHERE i.usuario.id = :usuarioId
-            AND i.cuestionario.id = :cuestionarioId AND i.estado.codigo = :estadoIntento
+            SELECT i FROM IntentoCuestionario i 
+            WHERE i.usuario.id = :usuarioId
+                AND i.cuestionario.id = :cuestionarioId 
+                AND i.estado.codigo = :estadoIntento
+            ORDER BY i.fechaInicio DESC
         """, IntentoCuestionario.class);
 
         query.setParameter("usuarioId", usuarioId);
         query.setParameter("cuestionarioId", cuestionarioId);
-        query.setParameter("estadoIntento", IntentoCuestionarioEstadoEnum.IN_PROGRESS.toString());
+        query.setParameter("estadoIntento", IntentoCuestionarioEstadoEnum.IN_PROGRESS.name());
 
-        return query.getResultList();
+        return query.getResultStream().findFirst();
+    }
+
+    @Override
+    public Optional<IntentoCuestionario> findIntentoAbiertoByUsuarioYSlug(Long usuarioId, String slug) {
+        TypedQuery<IntentoCuestionario> query = entityManager.createQuery("""
+            SELECT i FROM IntentoCuestionario i 
+            WHERE i.usuario.id = :usuarioId
+                AND i.cuestionario.slug = :slug 
+                AND i.estado.codigo = :estadoIntento
+            ORDER BY i.fechaInicio DESC
+        """, IntentoCuestionario.class);
+
+        query.setParameter("usuarioId", usuarioId);
+        query.setParameter("slug", slug);
+        query.setParameter("estadoIntento", IntentoCuestionarioEstadoEnum.IN_PROGRESS.name());
+
+        return query.getResultStream().findFirst();
     }
 
     @Override
@@ -132,5 +154,17 @@ public class IntentoCuestionarioRepositoryImpl implements IntentoCuestionarioRep
         query.setParameter("estadoAbiertoCodigo", IntentoCuestionarioEstadoEnum.IN_PROGRESS.toString());
 
         return query.executeUpdate();
+    }
+
+    @Override
+    public int actualizarFechaUltimaActividad(Long intentoId, LocalDateTime fecha) {
+        return entityManager.createQuery("""
+                UPDATE IntentoCuestionario i
+                    SET i.fechaUltimaActividad = :fecha
+                WHERE i.id = :intentoId
+            """)
+        .setParameter("fecha", fecha)
+        .setParameter("intentoId", intentoId)
+        .executeUpdate();
     }
 }

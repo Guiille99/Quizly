@@ -30,6 +30,7 @@ public class UserQuizSession {
     private Instant startedAt;
     private List<UserQuizResponse> responses = new ArrayList<>();
     private LocalDateTime fechaExpiracion;
+    private LocalDateTime fechaUltimaActividad;
 
     public void nextQuestion(){
         currentQuestionIndex++;
