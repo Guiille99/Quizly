@@ -1,5 +1,6 @@
 package com.quizly.app.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -58,4 +59,6 @@ public interface CuestionarioRepository extends JpaRepository<Cuestionario, Long
             AND c.version = (SELECT MAX(c2.version) FROM Cuestionario c2 WHERE c2.slug = c.slug)
             """)
     Page<Cuestionario> findByTituloContainingIgnoreCaseAndTemaId(String titulo, Long temaId, Pageable pageable);
+
+    long countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
 }

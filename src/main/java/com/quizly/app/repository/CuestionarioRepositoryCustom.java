@@ -13,4 +13,11 @@ public interface CuestionarioRepositoryCustom {
     boolean existsBySlug(String slug);
 
     Optional<Cuestionario> findLastVersionBySlug(String slug);
+
+    /**
+     * Devuelve los últimos cuestionarios modificados
+     * @param limit
+     * @return
+     */
+    List<Cuestionario> findLastModifiedLimit(int limit);
 }

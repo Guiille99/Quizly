@@ -1,5 +1,6 @@
 package com.quizly.app.repository;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import com.quizly.app.model.entity.Usuario;
 

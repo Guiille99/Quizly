@@ -104,6 +104,38 @@
                                     Mi progreso
                                 </a>
                             </li>
+                            
+                            <!-- Apartado ADMIN -->
+                            <th:block sec:authorize="hasRole('ADMIN')">
+                                <div class="divider"></div>
+
+                                <li>
+                                    <details open>
+                                        <summary class="btn-link">
+                                            <i class="fa-solid fa-screwdriver-wrench"></i>
+                                            Administración
+                                        </summary>
+                                        <ul>
+                                            <li>
+                                                <a th:href="@{/admin}" class="btn-link" 
+                                                    th:classappend="${currentUri == '/admin'} ? 'active'">
+                                                    Dashboard
+                                                </a>
+                                            </li>
+
+                                            <li><a class="btn-link">Cuestionarios</a></li>
+
+                                            <li>
+                                                <a class="btn-link">Temas</a>
+                                            </li>
+
+                                            <li>
+                                                <a class="btn-link">Usuarios</a>
+                                            </li>
+                                        </ul>
+                                    </details>
+                                </li>
+                            </th:block>
                         </ul>
                     </nav>
                 </div>

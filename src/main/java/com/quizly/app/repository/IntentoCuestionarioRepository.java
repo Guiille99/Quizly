@@ -1,5 +1,6 @@
 package com.quizly.app.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -28,4 +29,6 @@ public interface IntentoCuestionarioRepository extends JpaRepository<IntentoCues
             ORDER BY ic.fechaFin DESC
             """)
     Page<IntentoCuestionario> getIntentosCuestionariosByUsuarioYEstado(Long usuarioId, String codigoEstadoIntento, Pageable pageable);
+
+    long countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
 }

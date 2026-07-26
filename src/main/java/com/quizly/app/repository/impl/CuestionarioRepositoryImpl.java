@@ -51,4 +51,15 @@ public class CuestionarioRepositoryImpl implements CuestionarioRepositoryCustom 
         query.setParameter("slug", slug);
         return query.getResultStream().findFirst();
     }
+
+    @Override
+    public List<Cuestionario> findLastModifiedLimit(int limit) {
+        TypedQuery<Cuestionario> query = entityManager.createQuery(
+            """
+                SELECT c FROM Cuestionario c
+                ORDER BY c.updatedAt DESC
+            """, Cuestionario.class);
+        query.setMaxResults(limit);
+        return query.getResultList();
+    }
 }
