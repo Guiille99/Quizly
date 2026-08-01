@@ -70,3 +70,9 @@
     background-color: var(--color-badge-user-bg);
     color: var(--color-badge-user-fg);
 }
+
+.badge-muted{
+    border: 1px solid var(--color-badge-muted-border);
+    background-color: var(--color-badge-muted-bg);
+    color: var(--color-badge-muted-text);
+}

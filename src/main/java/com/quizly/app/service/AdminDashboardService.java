@@ -31,8 +31,7 @@ public class AdminDashboardService {
     public DashboardView getDashboard(){
         return DashboardView.builder()
             .stats(getStats())
-            .cuestionariosRecientes(getRecentQuizzies())
-            .actividadReciente(List.of())
+            .cuestionariosRecientes(getRecentQuizzes())
             .build();
     }
 
@@ -125,7 +124,7 @@ public class AdminDashboardService {
                 .build();
     }
 
-    private List<QuizListItemView> getRecentQuizzies(){
+    private List<QuizListItemView> getRecentQuizzes(){
         List<Cuestionario> cuestionariosRecientes = cuestionarioRepository.findLastModifiedLimit(5);
         return cuestionariosRecientes.stream()
             .map(this::toQuizListItem)
@@ -135,6 +134,7 @@ public class AdminDashboardService {
     private QuizListItemView toQuizListItem(Cuestionario cuestionario) {
         return QuizListItemView.builder()
             .id(cuestionario.getId())
+            .slug(cuestionario.getSlug())
             .titulo(cuestionario.getTitulo())
             .tema(cuestionario.getTema().getNombre())
             .dificultad(cuestionario.getDificultad())

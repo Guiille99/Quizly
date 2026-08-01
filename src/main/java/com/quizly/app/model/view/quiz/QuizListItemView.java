@@ -7,6 +7,7 @@ import lombok.Builder;
 @Builder
 public record QuizListItemView(
     Long id,
+    String slug,
     String titulo,
     String tema,
     Dificultad dificultad,

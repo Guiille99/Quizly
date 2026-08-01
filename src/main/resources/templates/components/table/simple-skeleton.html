@@ -1,0 +1,8 @@
+<th:block th:fragment="base(thead, tbody)">
+    <div class="table__container">
+        <table class="table table-zebra w-full">
+            <thead th:replace="${thead}"></thead>
+            <tbody th:replace="${tbody}"></tbody>
+        </table>
+    </div>
+</th:block>

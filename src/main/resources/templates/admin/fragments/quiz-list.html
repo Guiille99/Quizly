@@ -1,45 +1,63 @@
-<th:block th:fragment="quizList(quizzies)">
-    <div class="card bg-base-100 shadow-sm">
-        <div class="card-body p-0">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="card-title">Últimos cuestionarios</h2>
-                <a th:href="@{/admin/cuestionarios}" class="link link-primary link-hover text-sm">
-                    Ver todos
-                </a>
-            </div>
+<th:block th:fragment="quizList(quizzes)">
+    <th:block th:replace="~{components/table/simple-skeleton :: base(
+        thead=~{::thead},
+        tbody=~{::tbody}
+    )}">
 
-            <div th:if="${#lists.isEmpty(quizzies)}">
-                <div class="hero-content text-center">
-                    <div>
-                        <p class="font-semibold">Todavía no existen cuestionarios.</p>
-                        <p class="text-sm text-base-content/70 mt-2">Cuando se creen cuestionarios aparecerán aquí.</p>
-                    </div>
-                </div>
-            </div>
+        <thead>
+            <tr>
+                <th>Cuestionario</th>
+                <th>Tema</th>
+                <th>Dificultad</th>
+                <th>Versión</th>
+                <th>Última modificación</th>
+                <th class="w-20 text-center">Acciones</th>
+            </tr>
+        </thead>
 
-            <div th:unless="${#lists.isEmpty(quizzies)}" class="divide-y divide-base-300">
-                <div th:each="quiz : ${quizzies}" class="flex items-center justify-between py-4">
-                    <div class="space-y-1">
-                        <span class="font-semibold" th:text="${quiz.titulo}"></span>
-                        
-                        <div class="flex flex-wrap gap-2 text-sm">
-                            <span class="badge badge-outline" th:text="${quiz.tema}"></span>
-                            <div class="badge-difficulty"
-                                th:classappend="${quiz.dificultad.codigo == 'EASY' ? 'badge-difficulty-easy' 
-                                    : quiz.dificultad.codigo == 'MEDIUM' ? 'badge-difficulty-medium' 
-                                    : quiz.dificultad.codigo == 'HARD' ? 'badge-difficulty-hard' : ''}">
-                                <span th:text="${quiz.dificultad.nombre}"></span>
-                            </div>
-                            <span class="badge badge-neutral" th:text="${quiz.version}"></span>
-                        </div>
-                    </div>
+        <tbody>
+            <tr th:if="${#lists.isEmpty(quizzes)}">
+                <td colspan="6" class="text-center py-10 text-text-muted">Aún no existen cuestionarios para mostrar</td>
+            </tr>
 
-                    <div class="text-right text-sm">
-                        <span th:text="|${quiz.numeroPreguntas} preguntas|"></span>
-                        <span class="text-base-content/60" th:text="${quiz.fechaActualizacion}"></span>
+            <tr th:each="quiz : ${quizzes}">
+                <!-- Título -->
+                <td th:text="${quiz.titulo}"></td>
+                <!-- Tema -->
+                <td th:text="${quiz.tema}"></td>
+                <!-- Dificultad -->
+                <td>
+                    <span class="badge-difficulty" th:classappend="${quiz.dificultad.codigo == 'EASY'}
+                        ? ' badge-difficulty-easy'
+                        : (${quiz.dificultad.codigo == 'MEDIUM'}
+                            ? ' badge-difficulty-medium'
+                            : ' badge-difficulty-hard')">
+                    
+                        <span th:text="${quiz.dificultad.nombre}"></span>
+                    
+                    </span>
+                </td>
+                <!-- Versión -->
+                <td>
+                    <div class="badge badge-muted" th:text="|v${quiz.version}|"></div>
+                </td>
+                <!-- Fecha de última actualización -->
+                <td th:text="${quiz.fechaActualizacion}"></td>
+
+                <!-- Acciones -->
+                    <td>
+                    <div class="flex justify-center gap-1">
+                        <a href="" class="btn btn-ghost btn-square btn-sm">
+                            <i class="fa-regular fa-pen-to-square"></i>
+                        </a>
+
+                        <button class="btn btn-ghost btn-square btn-sm">
+                            <i class="fa-solid fa-ellipsis"></i>
+                        </button>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
+                    </td>
+            </tr>
+        </tbody>
+
+    </th:block>
 </th:block>
