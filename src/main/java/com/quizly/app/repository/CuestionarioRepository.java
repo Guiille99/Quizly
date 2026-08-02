@@ -61,4 +61,6 @@ public interface CuestionarioRepository extends JpaRepository<Cuestionario, Long
     Page<Cuestionario> findByTituloContainingIgnoreCaseAndTemaId(String titulo, Long temaId, Pageable pageable);
 
     long countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
+
+    long countByDificultadCodigo(String codigoDificultad);
 }

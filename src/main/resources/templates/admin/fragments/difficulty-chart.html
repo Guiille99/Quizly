@@ -1,0 +1,26 @@
+<th:block th:fragment="difficultyChart(chart)">
+
+    <div class="card">
+
+        <div class="card-body p-0">
+
+            <h2 class="card-title mb-4">
+                Cuestionarios por dificultad
+            </h2>
+
+            <div class="difficulty-chart">
+
+                <canvas id="difficultyChart"
+                    th:data-easy="${chart.easy}"
+                    th:data-medium="${chart.medium}"
+                    th:data-hard="${chart.hard}"
+                    th:data-total="${chart.total}">
+                </canvas>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</th:block>

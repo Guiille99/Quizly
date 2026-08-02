@@ -3580,9 +3580,6 @@
   .text-accent-green {
     color: var(--color-accent-green);
   }
-  .text-accent-green-muted {
-    color: var(--color-accent-green-muted);
-  }
   .text-accent-orange {
     color: var(--color-accent-orange);
   }
@@ -4051,6 +4048,11 @@
   .md\:justify-between {
     @media (width >= 48rem) {
       justify-content: space-between;
+    }
+  }
+  .lg\:col-span-1 {
+    @media (width >= 64rem) {
+      grid-column: span 1 / span 1;
     }
   }
   .lg\:col-span-2 {
@@ -11385,6 +11387,10 @@
       transform: translateX(3px);
     }
   }
+}
+.difficulty-chart {
+  position: relative;
+  height: 320px;
 }
 .form-stack {
   display: flex;

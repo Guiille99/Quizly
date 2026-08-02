@@ -40,3 +40,8 @@
         }
     }
 }
+
+.difficulty-chart{
+    position: relative;
+    height: 320px;
+}

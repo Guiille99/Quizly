@@ -9,6 +9,7 @@ import com.quizly.app.model.entity.Cuestionario;
 import com.quizly.app.model.enums.TrendType;
 import com.quizly.app.model.view.admin.DashboardView;
 import com.quizly.app.model.view.common.TrendIndicatorView;
+import com.quizly.app.model.view.components.QuizDifficultyChartView;
 import com.quizly.app.model.view.components.StatCardView;
 import com.quizly.app.model.view.quiz.QuizListItemView;
 import com.quizly.app.repository.CuestionarioRepository;
@@ -32,6 +33,7 @@ public class AdminDashboardService {
         return DashboardView.builder()
             .stats(getStats())
             .cuestionariosRecientes(getRecentQuizzes())
+            .difficultyChart(geDifficultyChart())
             .build();
     }
 
@@ -187,5 +189,13 @@ public class AdminDashboardService {
         }
 
         return new TrendIndicatorView(type, String.format("%+.0f%%", variation));
+    }
+
+    private QuizDifficultyChartView geDifficultyChart(){
+        return QuizDifficultyChartView.builder()
+            .easy(cuestionarioRepository.countByDificultadCodigo("EASY"))
+            .medium(cuestionarioRepository.countByDificultadCodigo("MEDIUM"))
+            .hard(cuestionarioRepository.countByDificultadCodigo("HARD"))
+            .build();
     }
 }
