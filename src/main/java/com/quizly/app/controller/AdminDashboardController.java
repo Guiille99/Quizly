@@ -8,6 +8,7 @@ import com.quizly.app.service.AdminDashboardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 
+
 @Controller
 @RequestMapping("/admin")
 @RequiredArgsConstructor
@@ -20,6 +21,6 @@ public class AdminDashboardController {
         model.addAttribute("dashboard", dashboardService.getDashboard());
 
         return "admin/dashboard";
-    }
+    }    
     
 }

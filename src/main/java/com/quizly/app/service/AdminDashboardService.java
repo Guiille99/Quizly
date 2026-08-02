@@ -5,13 +5,14 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.quizly.app.mapper.QuizViewMapper;
 import com.quizly.app.model.entity.Cuestionario;
 import com.quizly.app.model.enums.TrendType;
 import com.quizly.app.model.view.admin.DashboardView;
 import com.quizly.app.model.view.common.TrendIndicatorView;
 import com.quizly.app.model.view.components.QuizDifficultyChartView;
 import com.quizly.app.model.view.components.StatCardView;
-import com.quizly.app.model.view.quiz.QuizListItemView;
+import com.quizly.app.model.view.quiz.QuizView;
 import com.quizly.app.repository.CuestionarioRepository;
 import com.quizly.app.repository.IntentoCuestionarioRepository;
 import com.quizly.app.repository.PreguntaRepository;
@@ -27,6 +28,7 @@ public class AdminDashboardService {
     private final CuestionarioRepository cuestionarioRepository;
     private final PreguntaRepository preguntaRepository;
     private final IntentoCuestionarioRepository intentoCuestionarioRepository;
+    private final QuizViewMapper quizViewMapper;
     private final Utils utils;
 
     public DashboardView getDashboard(){
@@ -126,25 +128,13 @@ public class AdminDashboardService {
                 .build();
     }
 
-    private List<QuizListItemView> getRecentQuizzes(){
+    private List<QuizView> getRecentQuizzes(){
         List<Cuestionario> cuestionariosRecientes = cuestionarioRepository.findLastModifiedLimit(5);
         return cuestionariosRecientes.stream()
-            .map(this::toQuizListItem)
+            .map(c -> quizViewMapper.toQuizView(c))
             .toList();
     }
 
-    private QuizListItemView toQuizListItem(Cuestionario cuestionario) {
-        return QuizListItemView.builder()
-            .id(cuestionario.getId())
-            .slug(cuestionario.getSlug())
-            .titulo(cuestionario.getTitulo())
-            .tema(cuestionario.getTema().getNombre())
-            .dificultad(cuestionario.getDificultad())
-            .numeroPreguntas(cuestionario.getPreguntas().size())
-            .version(cuestionario.getVersion())
-            .fechaActualizacion(utils.formatFechaRelativa(cuestionario.getUpdatedAt()))
-            .build();
-    }
 
     /**
      * Calcula la tendencia entre dos periodos consecutivos a partir del porcentaje

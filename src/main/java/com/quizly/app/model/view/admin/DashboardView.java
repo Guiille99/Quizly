@@ -4,13 +4,13 @@ import java.util.List;
 
 import com.quizly.app.model.view.components.QuizDifficultyChartView;
 import com.quizly.app.model.view.components.StatCardView;
-import com.quizly.app.model.view.quiz.QuizListItemView;
+import com.quizly.app.model.view.quiz.QuizView;
 
 import lombok.Builder;
 
 @Builder
 public record DashboardView(
    List<StatCardView> stats,
-   List<QuizListItemView> cuestionariosRecientes,
+   List<QuizView> cuestionariosRecientes,
    QuizDifficultyChartView difficultyChart
 ) {}

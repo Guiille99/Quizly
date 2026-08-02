@@ -63,6 +63,9 @@ public class Cuestionario extends AuditableEntity {
 
     @Transient
     public String getTiempoLimiteNatural() {
+        if (tiempoLimite == null) {
+            return null;
+        }
         return Utils.formatNaturalDuration(tiempoLimite);
     }
 

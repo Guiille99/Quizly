@@ -4080,6 +4080,11 @@
       justify-content: flex-start;
     }
   }
+  .lg\:gap-0 {
+    @media (width >= 64rem) {
+      gap: calc(var(--spacing) * 0);
+    }
+  }
   .lg\:text-left {
     @media (width >= 64rem) {
       text-align: left;
