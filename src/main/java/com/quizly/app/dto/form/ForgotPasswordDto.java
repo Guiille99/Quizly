@@ -1,4 +1,4 @@
-package com.quizly.app.dto;
+package com.quizly.app.dto.form;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

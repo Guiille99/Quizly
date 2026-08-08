@@ -13,9 +13,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.quizly.app.repository.GeneroRepository;
 import com.quizly.app.repository.UsuarioRepository;
-import com.quizly.app.dto.ForgotPasswordDto;
-import com.quizly.app.dto.RegisterFormDto;
-import com.quizly.app.dto.ResetPasswordDto;
+import com.quizly.app.dto.form.ForgotPasswordDto;
+import com.quizly.app.dto.form.RegisterFormDto;
+import com.quizly.app.dto.form.ResetPasswordDto;
 import com.quizly.app.exception.DuplicateEmailException;
 import com.quizly.app.exception.DuplicateUsernameException;
 import com.quizly.app.exception.QuizlyException;

@@ -6,7 +6,7 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import com.quizly.app.dto.QuizFilterForm;
+import com.quizly.app.dto.form.QuizFilterForm;
 import com.quizly.app.model.entity.Cuestionario;
 
 public interface CuestionarioRepositoryCustom {

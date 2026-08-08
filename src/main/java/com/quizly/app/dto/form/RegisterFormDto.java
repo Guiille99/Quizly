@@ -1,4 +1,4 @@
-package com.quizly.app.dto;
+package com.quizly.app.dto.form;
 
 import org.apache.commons.lang3.StringUtils;
 

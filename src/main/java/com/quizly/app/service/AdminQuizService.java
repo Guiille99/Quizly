@@ -4,7 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.quizly.app.dto.QuizFilterForm;
+import com.quizly.app.dto.form.QuizFilterForm;
 import com.quizly.app.mapper.QuizViewMapper;
 import com.quizly.app.model.view.quiz.QuizView;
 import com.quizly.app.repository.CuestionarioRepository;

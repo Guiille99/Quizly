@@ -10,7 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.util.StringUtils;
 
-import com.quizly.app.dto.QuizFilterForm;
+import com.quizly.app.dto.form.QuizFilterForm;
 import com.quizly.app.model.entity.Asignatura;
 import com.quizly.app.model.entity.Cuestionario;
 import com.quizly.app.model.entity.Dificultad;

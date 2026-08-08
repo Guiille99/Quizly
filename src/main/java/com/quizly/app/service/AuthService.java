@@ -16,7 +16,7 @@ import com.quizly.app.repository.UsuarioRepository;
 
 import lombok.extern.slf4j.Slf4j;
 
-import com.quizly.app.dto.RegisterFormDto;
+import com.quizly.app.dto.form.RegisterFormDto;
 import com.quizly.app.exception.DuplicateEmailException;
 import com.quizly.app.exception.DuplicateUsernameException;
 import com.quizly.app.exception.QuizlyException;
