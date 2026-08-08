@@ -1,5 +1,7 @@
 package com.quizly.app.repository;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,4 +12,6 @@ import com.quizly.app.model.entity.Asignatura;
 @Repository
 public interface AsignaturaRepository extends JpaRepository<Asignatura, Long>, AsignaturaRepositoryCustom {
     Page<Asignatura> findByNombreContainingIgnoreCase(String nombre, Pageable pageable);
+
+    List<Asignatura> findAllByOrderByNombreAsc();
 }

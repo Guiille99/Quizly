@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.util.StringUtils;
 
 import com.quizly.app.dto.QuizFilterForm;
 import com.quizly.app.model.entity.Asignatura;
@@ -24,6 +25,7 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Order;
+import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 
 public class CuestionarioRepositoryImpl implements CuestionarioRepositoryCustom {
@@ -88,6 +90,12 @@ public class CuestionarioRepositoryImpl implements CuestionarioRepositoryCustom 
 
         query.select(root);
 
+        List<Predicate> predicates = buildPredicates(cb, root, filters);
+
+        if (!predicates.isEmpty()) {
+            query.where(predicates.toArray(Predicate[]::new));
+        }
+
         applySorting(cb, query, root, pageable);
 
         TypedQuery<Cuestionario> typedQuery = entityManager.createQuery(query);
@@ -102,9 +110,44 @@ public class CuestionarioRepositoryImpl implements CuestionarioRepositoryCustom 
 
         countQuery.select(cb.count(countRoot));
 
+        List<Predicate> countPredicates = buildPredicates(cb, countRoot, filters);
+
+        if (!countPredicates.isEmpty()) {
+            countQuery.where(countPredicates.toArray(Predicate[]::new));
+        }
+
         Long total = entityManager.createQuery(countQuery).getSingleResult();
 
         return new PageImpl<>(result, pageable, total);
+    }
+
+    private List<Predicate> buildPredicates(CriteriaBuilder cb, Root<Cuestionario> root, QuizFilterForm filters){
+        List<Predicate> predicates = new ArrayList<>();
+
+        // Búsqueda por título
+        if (StringUtils.hasText(filters.search())) {
+            String search = "%" + filters.search().trim().toLowerCase() + "%";
+            predicates.add(cb.like(cb.lower(root.get("titulo")), search));
+        }
+
+        // Filtro por asignatura
+        if (filters.asignaturaId() != null) {
+            Join<Cuestionario, Tema> tema = root.join("tema");
+            Join<Tema, Asignatura> asignatura = tema.join("asignatura");
+            predicates.add(cb.equal(asignatura.get("id"), filters.asignaturaId()));
+        }
+
+        // Filtro por tema
+        if (filters.temaId() != null) {
+           predicates.add(cb.equal(root.get("tema").get("id"), filters.temaId()));
+        }
+
+        // Filtro por dificultad
+        if (filters.dificultadId() != null) {
+            predicates.add(cb.equal(root.get("dificultad").get("id"), filters.dificultadId()));
+        }
+
+        return predicates;
     }
 
     private void applySorting(CriteriaBuilder cb, CriteriaQuery<?> query, Root<Cuestionario> root, Pageable pageable){

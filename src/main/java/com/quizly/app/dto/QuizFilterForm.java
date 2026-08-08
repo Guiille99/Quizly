@@ -2,7 +2,7 @@ package com.quizly.app.dto;
 
 import lombok.Builder;
 
-@Builder
+@Builder(toBuilder = true)
 public record QuizFilterForm(
     String search,
     Long asignaturaId,

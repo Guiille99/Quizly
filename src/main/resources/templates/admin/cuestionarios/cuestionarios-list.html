@@ -21,10 +21,66 @@
 
         <!-- Contenedor -->
          <div class="card mt-6">
-            <div class="card-body">
+            <div id="table-cuestionarios-container" class="card-body" th:fragment="table-cuestionarios-container_fragment">
                 <!-- Filtros -->
-                <form id="quiz-filter-form">
+                <form id="quiz-filter-form" class="flex gap-2">
+                    <!-- Buscador -->
+                    <input type="text" name="search" th:value="${filters.search}"
+                        placeholder="Buscar cuestionario..." class="input"
+                        hx-get="/admin/cuestionarios/tableData"
+                        hx-trigger="input changed delay:400ms"
+                        hx-target="#table-cuestionarios"
+                        hx-include="#quiz-filter-form"
+                        hx-swap="outerHTML">
 
+                    <!-- Asignatura -->
+                    <select name="asignaturaId" class="select"
+                        hx-get="/admin/cuestionarios/tableData"
+                        hx-trigger="change"
+                        hx-target="#table-cuestionarios"
+                        hx-include="#quiz-filter-form">
+                    
+                        <option value="">Todas las asignaturas</option>
+
+                        <option th:each="asignatura : ${asignaturas}"
+                            th:value="${asignatura.id}"
+                            th:selected="${filters.asignaturaId == asignatura.id}"
+                            th:text="${asignatura.nombre}">
+                        </option>
+                    </select>
+
+                    <!-- Tema -->
+                    <div class="contents" hx-get="/admin/cuestionarios/opcionesTema"
+                        hx-trigger="actualizarOpcionesTema from:body"
+                        hx-target="this"
+                        hx-include="#quiz-filter-form">
+
+                        <select name="temaId" class="select"
+                            th:disabled="${filters.asignaturaId == null}"
+                            hx-get="/admin/cuestionarios/tableData"
+                            hx-trigger="change"
+                            hx-target="#table-cuestionarios"
+                            hx-include="#quiz-filter-form"
+                            th:fragment="opciones-temas-filtro_fragment">
+    
+                            <option value="" selected>Todos los temas</option>
+    
+                            <option th:each="tema : ${temas}"
+                                th:value="${tema.id}"
+                                th:selected="${filters.temaId == tema.id}"
+                                th:text="${tema.nombre}">
+                            </option>
+                        </select>
+                    </div>
+
+                    <button name="resetFilters" class="btn btn-outline btn-error"
+                        hx-get="/admin/cuestionarios/tableData"
+                        hx-target="#table-cuestionarios-container"
+                        hx-swap="outerHTML">
+
+                        <i class="fa-solid fa-trash-can"></i>
+                        Limpiar
+                    </button>
                 </form>
 
                 <!-- Tabla -->
