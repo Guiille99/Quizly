@@ -2,6 +2,8 @@ package com.quizly.app.service;
 
 
 import com.quizly.app.repository.IntentoCuestionarioEstadoRepository;
+import com.quizly.app.repository.PreguntaRepository;
+import com.quizly.app.repository.TipoPreguntaRepository;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -18,16 +20,23 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
+import com.quizly.app.dto.form.OpcionRespuestaForm;
+import com.quizly.app.dto.form.PreguntaForm;
+import com.quizly.app.dto.form.QuizForm;
 import com.quizly.app.exception.QuizNotResumableException;
 import com.quizly.app.exception.QuizlyException;
 import com.quizly.app.logging.LogExecution;
+import com.quizly.app.model.entity.Asignatura;
 import com.quizly.app.model.entity.Cuestionario;
+import com.quizly.app.model.entity.Dificultad;
 import com.quizly.app.model.entity.IntentoCuestionario;
 import com.quizly.app.model.entity.IntentoCuestionarioEstado;
 import com.quizly.app.model.entity.OpcionRespuesta;
 import com.quizly.app.model.entity.Pregunta;
 import com.quizly.app.model.entity.Tema;
+import com.quizly.app.model.entity.TipoPregunta;
 import com.quizly.app.model.entity.Usuario;
 import com.quizly.app.model.enums.IntentoCuestionarioEstadoEnum;
 import com.quizly.app.model.session.OptionQuizRecord;
@@ -36,11 +45,16 @@ import com.quizly.app.model.session.UserQuizResponse;
 import com.quizly.app.model.session.UserQuizSession;
 import com.quizly.app.model.view.quiz.QuestionSummary;
 import com.quizly.app.model.view.quiz.QuizSummary;
+import com.quizly.app.repository.AsignaturaRepository;
 import com.quizly.app.repository.CuestionarioRepository;
+import com.quizly.app.repository.DificultadRepository;
 import com.quizly.app.repository.IntentoCuestionarioRepository;
 import com.quizly.app.repository.OpcionRespuestaRepository;
+import com.quizly.app.repository.TemaRepository;
 import com.quizly.app.repository.UsuarioRepository;
 import com.quizly.app.security.QuizlyUserDetails;
+
+import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
@@ -51,14 +65,120 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 public class CuestionarioService {
+    private final PreguntaRepository preguntaRepository;
+    private final TipoPreguntaRepository tipoPreguntaRepository;
     private final RespuestaUsuarioService respuestaUsuarioService;
-    private final IntentoCuestionarioEstadoRepository intentoCuestionarioEstadoRepository;
     private final QuizSessionService quizSessionService;
+    private final IntentoCuestionarioService intentoCuestionarioService;
+    private final SlugService slugService;
+
+    private final IntentoCuestionarioEstadoRepository intentoCuestionarioEstadoRepository;
     private final CuestionarioRepository cuestionarioRepository;
     private final UsuarioRepository usuarioRepository;
-    private final IntentoCuestionarioService intentoCuestionarioService;
     private final IntentoCuestionarioRepository intentoCuestionarioRepository;
     private final OpcionRespuestaRepository opcionRespuestaRepository;
+    private final TemaRepository temaRepository;
+    private final AsignaturaRepository asignaturaRepository;
+    private final DificultadRepository dificultadRepository;
+
+    private Map<String, TipoPregunta> tiposPreguntaCache;
+
+    @PostConstruct
+    public void init(){
+        List<TipoPregunta> tiposPreguntaList = tipoPreguntaRepository.findAll();
+        this.tiposPreguntaCache = tiposPreguntaList.stream()
+            .collect(Collectors.toMap(TipoPregunta::getCodigo, tipo -> tipo));
+    }
+
+    @Transactional
+    public Cuestionario createQuiz(QuizForm form){
+        Asignatura asignatura = asignaturaRepository.findById(form.getAsignaturaId())
+            .orElseThrow(() -> new EntityNotFoundException("No se ha encontrado la asignatura seleccionada"));
+
+        Tema tema = temaRepository.findById(form.getTemaId())
+            .orElseThrow(() -> new EntityNotFoundException("No se ha encontrado el tema seleccionado."));
+
+        Dificultad dificultad = dificultadRepository.findById(form.getDificultadId())
+            .orElseThrow(() -> new EntityNotFoundException("No se ha encontrado la dificultad seleccionada."));
+
+        validarTemaDeAsignatura(tema, asignatura);
+
+        Cuestionario cuestionario = new Cuestionario();
+
+        cuestionario.setTitulo(form.getTitulo());
+        cuestionario.setDescripcion(form.getDescripcion());
+        cuestionario.setTema(tema);
+        cuestionario.setDificultad(dificultad);
+        cuestionario.setSlug(slugService.generateSlug(form.getTitulo()));
+        cuestionario.setVersion(1);
+        cuestionario.setTiempoLimite(calculateTiempoLimite(form));
+        cuestionario.setPreguntasAleatorias(form.isPreguntasAleatorias());
+
+        cuestionario = cuestionarioRepository.save(cuestionario);
+        crearPreguntas(cuestionario, form.getPreguntas());
+
+        return cuestionario;
+    }
+
+    /**
+     * Crea las preguntas añadidas desde el formulario
+     * para el cuestionario pasado por parámetro.
+     * 
+     * @param cuestionario
+     * @param preguntasForm
+     */
+    private void crearPreguntas(Cuestionario cuestionario, List<PreguntaForm> preguntasForm){
+        if (CollectionUtils.isEmpty(preguntasForm)) {
+            return;
+        }
+
+        for (PreguntaForm preguntaForm : preguntasForm) {
+            Pregunta preguntaToPersist = new Pregunta();
+
+            preguntaToPersist.setCuestionario(cuestionario);
+            preguntaToPersist.setEnunciado(preguntaForm.getEnunciado());
+            preguntaToPersist.setTipoPregunta(this.tiposPreguntaCache.get(preguntaForm.getTipoPreguntaCodigo()));
+            preguntaToPersist.setOpcionesRespuesta(toOpcionRespuestaList(preguntaToPersist, preguntaForm.getOpcionesRespuesta()));
+         
+            preguntaRepository.save(preguntaToPersist);
+        }
+    }
+
+    private List<OpcionRespuesta> toOpcionRespuestaList(Pregunta pregunta, List<OpcionRespuestaForm> opcionesRespuestaForm){
+        List<OpcionRespuesta> opcionesRespuesta = new ArrayList<>();
+
+        for (OpcionRespuestaForm opcionRespuestaForm : opcionesRespuestaForm) {
+            OpcionRespuesta opcionRespuesta = new OpcionRespuesta();
+            
+            opcionRespuesta.setPregunta(pregunta);
+            opcionRespuesta.setTexto(opcionRespuestaForm.getTexto());
+            opcionRespuesta.setCorrecta(opcionRespuestaForm.isCorrecta());
+            opcionRespuesta.setRetroalimentacion(opcionRespuestaForm.getRetroalimentacion());
+
+            opcionesRespuesta.add(opcionRespuesta);
+        }
+
+        return opcionesRespuesta;
+    }
+
+    private Integer calculateTiempoLimite(QuizForm form) {
+        if (form.isSinLimiteTiempo() || form.getTiempoLimite() == null) {
+            return null;
+        }
+
+        return switch (form.getUnidadTiempo()) {
+            case SEGUNDOS -> form.getTiempoLimite();
+            case MINUTOS -> Math.multiplyExact(form.getTiempoLimite(), 60);
+            case HORAS -> Math.multiplyExact(form.getTiempoLimite(), 3600);
+        };
+    }
+
+    private void validarTemaDeAsignatura(Tema tema, Asignatura asignatura) {
+        if (!tema.getAsignatura().getId().equals(asignatura.getId())) {
+            throw new IllegalArgumentException("El tema seleccionado no pertenece a la asignatura indicada.");
+        }
+    }
+
 
     public Page<Cuestionario> getCuestionariosPaginated(Pageable pageable){
        return cuestionarioRepository.findAllByOrderByTemaNombreAsc(pageable);

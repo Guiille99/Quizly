@@ -49,6 +49,9 @@ public class Cuestionario extends AuditableEntity {
     @Column(name = "version", nullable = false)
     private Integer version;
 
+    @Column(name = "preguntas_aleatorias", nullable = false)
+    private boolean preguntasAleatorias;
+
     @ManyToOne
     @JoinColumn(name = "tema_id")
     private Tema tema;

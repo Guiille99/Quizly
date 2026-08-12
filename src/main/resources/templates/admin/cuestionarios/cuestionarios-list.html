@@ -13,7 +13,7 @@
                 </p>
             </div>
 
-            <a href="" class="btn btn-primary">
+            <a th:href="@{/admin/cuestionarios/nuevo}" class="btn btn-primary">
                 <i class="fa-solid fa-plus"></i>
                 Nuevo cuestionario
             </a>
@@ -50,7 +50,7 @@
                     </select>
 
                     <!-- Tema -->
-                    <div class="contents" hx-get="/admin/cuestionarios/opcionesTema"
+                    <div class="contents" hx-get="/admin/cuestionarios/opcionesTemaFiltro"
                         hx-trigger="actualizarOpcionesTema from:body"
                         hx-target="this"
                         hx-include="#quiz-filter-form">
@@ -165,7 +165,7 @@
                             <!-- Acciones -->
                             <td>
                                 <div class="flex justify-center gap-1">
-                                    <a href="" class="btn btn-ghost btn-square btn-sm">
+                                    <a th:href="@{/admin/cuestionarios/{id}/editar(id=${cuestionario.id})}" class="btn btn-ghost btn-square btn-sm">
                                         <i class="fa-regular fa-pen-to-square"></i>
                                     </a>
                             

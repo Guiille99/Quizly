@@ -20,6 +20,10 @@
         height: 36px;
         border-radius: 9px;
     }
+
+    .card-body{
+        padding: 0;
+    }
 }
 
 .selectable-card{

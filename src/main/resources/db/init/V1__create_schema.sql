@@ -146,6 +146,7 @@ CREATE TABLE cuestionarios (
     tiempo_limite  INTEGER,
     slug           VARCHAR(255) NOT NULL,
     version        INT       NOT NULL,
+    preguntas_aleatorias BOOLEAN NOT NULL DEFAULT FALSE,
     created_at     TIMESTAMP    NOT NULL,
     updated_at     TIMESTAMP    NOT NULL,
     tema_id        BIGINT       NOT NULL,
@@ -163,6 +164,7 @@ COMMENT ON COLUMN cuestionarios.descripcion IS 'Explicación del propósito del 
 COMMENT ON COLUMN cuestionarios.tiempo_limite IS 'Tiempo máximo en segundos para completar el cuestionario';
 COMMENT ON COLUMN cuestionarios.slug IS 'Identificador amigable para URLs';
 COMMENT ON COLUMN cuestionarios.version IS 'Número de versión para control de cambios';
+COMMENT ON COLUMN cuestionarios.preguntas_aleatorias IS 'Determina si las preguntas del cuestionario aparecerán en un orden aleatorio en cada intento.';
 COMMENT ON COLUMN cuestionarios.created_at IS 'Fecha de creación del cuestionario';
 COMMENT ON COLUMN cuestionarios.updated_at IS 'Fecha de última actualización';
 COMMENT ON COLUMN cuestionarios.tema_id IS 'Tema asociado al cuestionario';

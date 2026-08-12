@@ -3,6 +3,7 @@ package com.quizly.app.service;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,7 +33,13 @@ public class QuizSessionService {
     public UserQuizSession create(HttpSession httpSession, IntentoCuestionario intentoCuestionario){
         UserQuizSession session = new UserQuizSession();
 
-        List<QuestionQuizRecord> questions = intentoCuestionario.getCuestionario().getPreguntas()
+        List<Pregunta> questionsAux = new ArrayList<>(intentoCuestionario.getCuestionario().getPreguntas());
+
+        if (intentoCuestionario.getCuestionario().isPreguntasAleatorias()) {
+            Collections.shuffle(questionsAux);
+        }
+
+        List<QuestionQuizRecord> questions = questionsAux
             .stream()
             .map(this::toQuestionQuizSnapshot)
             .toList();
