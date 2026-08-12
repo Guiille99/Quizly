@@ -26,19 +26,18 @@ import com.quizly.app.dto.form.OpcionRespuestaForm;
 import com.quizly.app.dto.form.PreguntaForm;
 import com.quizly.app.dto.form.QuizForm;
 import com.quizly.app.exception.QuizNotResumableException;
-import com.quizly.app.exception.QuizlyException;
 import com.quizly.app.logging.LogExecution;
 import com.quizly.app.model.entity.Asignatura;
 import com.quizly.app.model.entity.Cuestionario;
 import com.quizly.app.model.entity.Dificultad;
 import com.quizly.app.model.entity.IntentoCuestionario;
-import com.quizly.app.model.entity.IntentoCuestionarioEstado;
 import com.quizly.app.model.entity.OpcionRespuesta;
 import com.quizly.app.model.entity.Pregunta;
 import com.quizly.app.model.entity.Tema;
 import com.quizly.app.model.entity.TipoPregunta;
 import com.quizly.app.model.entity.Usuario;
 import com.quizly.app.model.enums.IntentoCuestionarioEstadoEnum;
+import com.quizly.app.model.enums.TipoPreguntaEnum;
 import com.quizly.app.model.session.OptionQuizRecord;
 import com.quizly.app.model.session.QuestionQuizRecord;
 import com.quizly.app.model.session.UserQuizResponse;
@@ -109,7 +108,7 @@ public class CuestionarioService {
         cuestionario.setDescripcion(form.getDescripcion());
         cuestionario.setTema(tema);
         cuestionario.setDificultad(dificultad);
-        cuestionario.setSlug(slugService.generateSlug(form.getTitulo()));
+        cuestionario.setSlug(resolveUniqueSlug(form.getTitulo()));
         cuestionario.setVersion(1);
         cuestionario.setTiempoLimite(calculateTiempoLimite(form));
         cuestionario.setPreguntasAleatorias(form.isPreguntasAleatorias());
@@ -133,19 +132,60 @@ public class CuestionarioService {
         }
 
         for (PreguntaForm preguntaForm : preguntasForm) {
+            validarPregunta(preguntaForm);
+            
             Pregunta preguntaToPersist = new Pregunta();
 
             preguntaToPersist.setCuestionario(cuestionario);
             preguntaToPersist.setEnunciado(preguntaForm.getEnunciado());
             preguntaToPersist.setTipoPregunta(this.tiposPreguntaCache.get(preguntaForm.getTipoPreguntaCodigo()));
-            preguntaToPersist.setOpcionesRespuesta(toOpcionRespuestaList(preguntaToPersist, preguntaForm.getOpcionesRespuesta()));
-         
+            preguntaToPersist.setOpcionesRespuesta(toOpcionesRespuesta(preguntaToPersist, preguntaForm.getOpcionesRespuesta()));
+            
+            // Persistimos la pregunta
             preguntaRepository.save(preguntaToPersist);
         }
     }
 
-    private List<OpcionRespuesta> toOpcionRespuestaList(Pregunta pregunta, List<OpcionRespuestaForm> opcionesRespuestaForm){
+    private void validarPregunta(PreguntaForm preguntaForm){
+        String tipoCodigo = preguntaForm.getTipoPreguntaCodigo();
+
+        if (!this.tiposPreguntaCache.containsKey(tipoCodigo)) {
+            throw new IllegalArgumentException(
+                "El tipo de pregunta seleccionado no es válido."
+            );
+        }
+
+        int numeroOpciones = preguntaForm.getOpcionesRespuesta().size();
+
+        long numeroCorrectas = preguntaForm.getOpcionesRespuesta().stream()
+            .filter(OpcionRespuestaForm::isCorrecta)
+            .count();
+        
+        switch (tipoCodigo) {
+            case "SINGLE_CHOICE" -> {
+                if (numeroOpciones < 2 || numeroOpciones > 4) {
+                    throw new IllegalArgumentException("Las preguntas de respuesta única deben tener entre 2 y 4 opciones");
+                }
+            }        
+            
+            case "TRUE_FALSE" -> {
+                if (numeroOpciones != 2) {
+                    throw new IllegalArgumentException("Las preguntas de verdadero/falso deben tener exactamente 2 opciones");
+                }
+            }
+        }
+
+        if (numeroCorrectas != 1) {
+            throw new IllegalArgumentException("La pregunta debe tener exactamente una respuesta correcta");
+        }
+    }
+
+    private List<OpcionRespuesta> toOpcionesRespuesta(Pregunta pregunta, List<OpcionRespuestaForm> opcionesRespuestaForm){
         List<OpcionRespuesta> opcionesRespuesta = new ArrayList<>();
+
+        if (CollectionUtils.isEmpty(opcionesRespuestaForm)) {
+            return opcionesRespuesta;
+        }
 
         for (OpcionRespuestaForm opcionRespuestaForm : opcionesRespuestaForm) {
             OpcionRespuesta opcionRespuesta = new OpcionRespuesta();
@@ -177,6 +217,21 @@ public class CuestionarioService {
         if (!tema.getAsignatura().getId().equals(asignatura.getId())) {
             throw new IllegalArgumentException("El tema seleccionado no pertenece a la asignatura indicada.");
         }
+    }
+
+    private String resolveUniqueSlug(String titulo) {
+        String baseSlug = slugService.generateSlug(titulo);
+        if (!cuestionarioRepository.existsBySlug(baseSlug)) {
+            return baseSlug;
+        }
+
+        int suffix = 2;
+        String candidate;
+        do {
+            candidate = baseSlug + "-" + suffix++;
+        } while (cuestionarioRepository.existsBySlug(candidate));
+
+        return candidate;
     }
 
 

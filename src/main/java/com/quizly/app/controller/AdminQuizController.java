@@ -22,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -139,8 +140,12 @@ public class AdminQuizController {
         try {
             cuestionarioService.createQuiz(form);
             toastService.success(ra, "El cuestionario se ha creado correctamente.");
-        } catch (EntityNotFoundException e) {
+        } catch (EntityNotFoundException | IllegalArgumentException e) {
             toastService.error(model, e.getMessage());
+            loadFormOptions(model, form);
+            return "admin/cuestionarios/quiz-form";
+        } catch (DataIntegrityViolationException e) {
+            toastService.error(model, "No se pudo crear el cuestionario por un conflicto de identificador interno. Inténtalo de nuevo.");
             loadFormOptions(model, form);
             return "admin/cuestionarios/quiz-form";
         } catch (Exception e){

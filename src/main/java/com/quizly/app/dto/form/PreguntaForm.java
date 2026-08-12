@@ -3,8 +3,6 @@ package com.quizly.app.dto.form;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.quizly.app.model.entity.TipoPregunta;
-
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
