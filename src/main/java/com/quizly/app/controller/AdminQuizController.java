@@ -34,6 +34,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 
 
@@ -159,7 +161,7 @@ public class AdminQuizController {
     
 
     @GetMapping("/{id}/editar")
-    public String editarCuestionario(@PathVariable Long id, Model model) {
+    public String showEditQuizForm(@PathVariable Long id, Model model) {
         Optional<Cuestionario> cuestionario = cuestionarioRepository.findById(id);
 
         if (!cuestionario.isPresent()) {
@@ -174,6 +176,37 @@ public class AdminQuizController {
         return "admin/cuestionarios/quiz-form";
     }
 
+    
+    @PostMapping("/{id}/editar")
+    public String editQuiz(@PathVariable Long id, @Valid @ModelAttribute("quizForm") QuizForm form,
+        BindingResult bindingResult, Model model, RedirectAttributes ra) {
+        
+        if (bindingResult.hasErrors()) {
+            loadFormOptions(model, form);
+            return "admin/cuestionarios/quiz-form";
+        }
+
+        try {
+            cuestionarioService.updateQuiz(id, form);
+            toastService.success(ra, "El cuestionario se ha actualizado correctamente.");
+        } catch (EntityNotFoundException | IllegalArgumentException e) {
+            toastService.error(model, e.getMessage());
+            loadFormOptions(model, form);
+            return "admin/cuestionarios/quiz-form";
+        } catch (DataIntegrityViolationException e) {
+            toastService.error(model, "No se pudo actualizar el cuestionario por un conflicto de identificador interno. Inténtalo de nuevo.");
+            loadFormOptions(model, form);
+            return "admin/cuestionarios/quiz-form";
+        } catch (Exception e){
+            toastService.error(model, "Se ha producido un error al actualizar el cuestionario.");
+            loadFormOptions(model, form);
+            return "admin/cuestionarios/quiz-form";
+        }
+
+        return "redirect:/admin/cuestionarios";
+    }
+    
+    
     private void loadFormOptions(Model model, QuizForm quizForm){
         model.addAttribute("asignaturas", asignaturaRepository.findAllByOrderByNombreAsc());
         model.addAttribute("dificultades", dificultadRepository.findAllByOrderByNombreAsc());

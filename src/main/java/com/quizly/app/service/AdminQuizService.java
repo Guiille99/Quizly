@@ -64,10 +64,8 @@ public class AdminQuizService {
         form.setTemaId(cuestionario.getTema().getId());
         form.setAsignaturaId(cuestionario.getTema().getAsignatura().getId());
         form.setDificultadId(cuestionario.getDificultad().getId());
-        form.setTiempoLimite(cuestionario.getTiempoLimite());
-        form.setUnidadTiempo(UnidadTiempo.SEGUNDOS);
-        form.setSinLimiteTiempo(cuestionario.getTiempoLimite() == null);
         form.setDescripcion(cuestionario.getDescripcion());
+        mapTiempoLimite(cuestionario, form);
 
         // Se añaden las preguntas
         for (Pregunta pregunta : cuestionario.getPreguntas()) {
@@ -99,5 +97,27 @@ public class AdminQuizService {
         return form;
     }
     
+    private void mapTiempoLimite(Cuestionario cuestionario, QuizForm form){
 
+        Integer segundos = cuestionario.getTiempoLimite();
+
+        if (segundos == null) {
+            form.setSinLimiteTiempo(true);
+            form.setTiempoLimite(null);
+            return;
+        }
+
+        form.setSinLimiteTiempo(false);
+
+        if (segundos % 3600 == 0) {
+            form.setTiempoLimite(segundos/3600);
+            form.setUnidadTiempo(UnidadTiempo.HORAS);
+        } else if(segundos % 60 == 0){
+            form.setTiempoLimite(segundos/60);
+            form.setUnidadTiempo(UnidadTiempo.MINUTOS);
+        } else{
+            form.setTiempoLimite(segundos);
+            form.setUnidadTiempo(UnidadTiempo.SEGUNDOS);
+        }
+    }
 }

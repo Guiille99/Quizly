@@ -119,6 +119,39 @@ public class CuestionarioService {
         return cuestionario;
     }
 
+    @Transactional
+    public Cuestionario updateQuiz(Long id, QuizForm form){
+        Cuestionario cuestionarioActual = cuestionarioRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException(
+                "No se ha encontrado la versión actual del cuestionario a actualizar."
+            ));
+
+        Tema tema = temaRepository.findById(form.getTemaId())
+            .orElseThrow(() -> new EntityNotFoundException("No se ha encontrado el tema seleccionado."));
+
+        Dificultad dificultad = dificultadRepository.findById(form.getDificultadId())
+            .orElseThrow(() -> new EntityNotFoundException("No se ha encontrado la dificultad seleccionada."));
+
+        Cuestionario nuevaVersCuestionario = new Cuestionario();
+
+        nuevaVersCuestionario.setTitulo(form.getTitulo());
+        nuevaVersCuestionario.setDescripcion(form.getDescripcion());
+        nuevaVersCuestionario.setTema(tema);
+        nuevaVersCuestionario.setDificultad(dificultad);
+
+        nuevaVersCuestionario.setSlug(cuestionarioActual.getSlug());
+        nuevaVersCuestionario.setVersion(cuestionarioActual.getVersion() + 1);
+
+        nuevaVersCuestionario.setTiempoLimite(calculateTiempoLimite(form));
+        nuevaVersCuestionario.setPreguntasAleatorias(form.isPreguntasAleatorias());
+
+        nuevaVersCuestionario = cuestionarioRepository.save(nuevaVersCuestionario);
+
+        crearPreguntas(nuevaVersCuestionario, form.getPreguntas());
+
+        return nuevaVersCuestionario;
+    }
+
     /**
      * Crea las preguntas añadidas desde el formulario
      * para el cuestionario pasado por parámetro.

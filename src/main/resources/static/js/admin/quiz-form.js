@@ -117,7 +117,7 @@ function updateAnswerLetters() {
 function createAnswer() {
     const answer = document.createElement('div');
 
-    answer.className = 'flex items-center gap-2';
+    answer.className = 'flex items-start gap-2 bg-base-200 rounded p-4';
     answer.dataset.answer = '';
 
     answer.innerHTML = `
@@ -130,29 +130,40 @@ function createAnswer() {
             A
         </div>
 
-        <input type="text"
-               class="input flex-1"
-               data-answer-text
-               placeholder="Texto de la respuesta...">
+        <div class="flex-1 min-w-0">
+            <input type="text"
+                class="input w-full"
+                data-answer-text
+                maxlength="255"
+                placeholder="Texto de la respuesta...">
+        
+            <textarea 
+                class="textarea textarea-sm w-full mt-2"
+                data-answer-feedback
+                maxlength="500" 
+                placeholder="Retroalimentación opcional..."></textarea>
+        </div>
 
-        <label class="cursor-pointer"
-               title="Marcar como respuesta correcta">
+        <div class="flex items-center gap-1 self-start mt-1">
+            <label class="cursor-pointer"
+                title="Marcar como respuesta correcta">
 
-            <input type="radio"
-                   name="question-correct-answer"
-                   class="radio radio-primary"
-                   data-answer-correct>
+                <input type="radio"
+                    name="question-correct-answer"
+                    class="radio radio-primary radio-sm"
+                    data-answer-correct>
 
-        </label>
+            </label>
 
-        <button type="button"
-                class="btn btn-ghost btn-square btn-sm"
-                data-remove-answer
-                title="Eliminar respuesta">
+            <button type="button"
+                    class="btn btn-ghost btn-square btn-sm text-error"
+                    data-remove-answer
+                    title="Eliminar respuesta">
 
-            <i class="fa-regular fa-trash-can"></i>
+                <i class="fa-regular fa-trash-can"></i>
 
-        </button>
+            </button>
+        </div>
     `;
 
     return answer;
@@ -352,9 +363,16 @@ function getQuestionFromDialog() {
                     .querySelector('[data-answer-correct]')
                     .checked;
 
+            const feddback =
+                answer
+                    .querySelector('[data-answer-feedback]')
+                    ?.value
+                    .trim() || null;
+
             return {
                 texto: text,
-                correcta: correct
+                correcta: correct,
+                retroalimentacion: feddback
             };
         })
     };
@@ -541,10 +559,10 @@ function configureTrueFalseQuestion() {
     updateAnswerLetters();
 }
 
-function createFixedAnswer(text) {
+function createFixedAnswer(text, feedback = null) {
     const answer = document.createElement('div');
 
-    answer.className = 'flex items-center gap-2';
+    answer.className = 'flex items-start gap-2 bg-base-200 rounded p-4';
     answer.dataset.answer = '';
 
     answer.innerHTML = `
@@ -557,11 +575,23 @@ function createFixedAnswer(text) {
             A
         </div>
 
-        <input type="text"
-               class="input flex-1"
-               data-answer-text
-               value="${escapeHtml(text)}"
-               readonly>
+        <div class="flex-1 min-w-0">
+            <input type="text"
+                class="input w-full"
+                data-answer-text
+                maxlength="255"
+                value="${escapeHtml(text)}"
+                readonly>
+        
+            <textarea 
+                class="textarea textarea-sm w-full mt-2"
+                data-answer-feedback
+                maxlength="500" 
+                placeholder="Retroalimentación opcional...">
+                
+                ${escapeHtml(feedback ?? '')}
+            </textarea>
+        </div>
 
         <label class="cursor-pointer"
                title="Marcar como respuesta correcta">
@@ -613,7 +643,7 @@ function loadQuestionIntoDialog(question) {
         question.opcionesRespuesta.forEach(opcion => {
 
             const answer =
-                createFixedAnswer(opcion.texto);
+                createFixedAnswer(opcion.texto, opcion.retroalimentacion);
 
             const correct =
                 answer.querySelector('[data-answer-correct]');
@@ -631,6 +661,9 @@ function loadQuestionIntoDialog(question) {
 
             answer.querySelector('[data-answer-text]').value =
                 opcion.texto;
+
+            answer.querySelector('[data-answer-feedback]').value =
+                opcion.retroalimentacion ?? '';
 
             answer.querySelector('[data-answer-correct]').checked =
                 opcion.correcta;
@@ -674,6 +707,11 @@ function syncQuestionsWithForm() {
                 appendHiddenInput(
                     `preguntas[${questionIndex}].opcionesRespuesta[${answerIndex}].correcta`,
                     opcion.correcta
+                );
+
+                appendHiddenInput(
+                    `preguntas[${questionIndex}].opcionesRespuesta[${answerIndex}].retroalimentacion`,
+                    opcion.retroalimentacion
                 );
             }
         );
