@@ -15,6 +15,7 @@ public record QuizView(
     int numeroPreguntas,
     String tiempoLimite,
     int version,
-    String fechaActualizacion    
+    String fechaActualizacion,
+    boolean ultimaVersion    
 ) {
 }

@@ -1,7 +1,9 @@
 package com.quizly.app.repository;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -63,4 +65,27 @@ public interface CuestionarioRepository extends JpaRepository<Cuestionario, Long
     long countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
 
     long countByDificultadCodigo(String codigoDificultad);
+
+    /**
+     * Obtiene los identificadores de las últimas versiones de los cuestionarios
+     * cuyos identificadores se encuentran en la colección proporcionada.
+     * 
+     * @param ids Identificadores de los cuestionarios que se quieren comprobar
+     * @return Conjunto de identificadores correspondientes a las últimas versiones
+     * de los cuestionarios indicados
+     */
+    
+    @Query("""
+        SELECT c.id
+        FROM Cuestionario c
+        WHERE c.version = (
+                SELECT MAX(c2.version)
+                FROM Cuestionario c2
+                WHERE c2.slug = c.slug
+        )
+        AND c.id IN :ids
+        """)
+    Set<Long> findLastVersionIds(Collection<Long> ids);
+
+    boolean existsBySlugAndVersionGreaterThan(String slug, Integer version);
 }

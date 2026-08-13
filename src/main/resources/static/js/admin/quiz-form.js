@@ -428,27 +428,29 @@ function createQuestionRow(question, index) {
             </span>
         </td>
 
-        <td>
-            <div class="flex justify-center gap-1">
-
-                <button type="button"
-                        class="btn btn-ghost btn-square btn-sm"
-                        title="Editar pregunta"
-                        data-edit-question
-                        data-question-index="${index}">
-                    <i class="fa-regular fa-pen-to-square"></i>
-                </button>
-
-                <button type="button"
-                        class="btn btn-ghost btn-square btn-sm"
-                        title="Eliminar pregunta"
-                        data-delete-question
-                        data-question-index="${index}">
-                    <i class="fa-regular fa-trash-can"></i>
-                </button>
-
-            </div>
-        </td>
+        ${quizFormData.editable ? `
+            <td>
+                <div class="flex justify-center gap-1">
+    
+                    <button type="button"
+                            class="btn btn-ghost btn-square btn-sm"
+                            title="Editar pregunta"
+                            data-edit-question
+                            data-question-index="${index}">
+                        <i class="fa-regular fa-pen-to-square"></i>
+                    </button>
+    
+                    <button type="button"
+                            class="btn btn-ghost btn-square btn-sm"
+                            title="Eliminar pregunta"
+                            data-delete-question
+                            data-question-index="${index}">
+                        <i class="fa-regular fa-trash-can"></i>
+                    </button>
+    
+                </div>
+            </td>
+        `: ''}
     `;
 
     return row;

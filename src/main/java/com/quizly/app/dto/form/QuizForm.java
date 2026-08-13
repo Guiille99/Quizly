@@ -49,4 +49,6 @@ public class QuizForm {
     private List<PreguntaForm> preguntas;
 
     private boolean preguntasAleatorias;
+
+    private boolean editable = true;
 }

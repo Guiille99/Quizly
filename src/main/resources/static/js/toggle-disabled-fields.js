@@ -9,8 +9,14 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        const readOnlyElements = Array.from(targets).filter(target => target.disabled);
+
         const updateState = () => {
             targets.forEach(target => {
+                // Si el elemento ya estaba deshabilitado de origen, no modificamos
+                if (readOnlyElements.includes(target)) {
+                    return;
+                }
                 target.disabled = toggle.checked;
             });
         };

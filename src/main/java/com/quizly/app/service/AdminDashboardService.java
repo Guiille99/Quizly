@@ -17,7 +17,6 @@ import com.quizly.app.repository.CuestionarioRepository;
 import com.quizly.app.repository.IntentoCuestionarioRepository;
 import com.quizly.app.repository.PreguntaRepository;
 import com.quizly.app.repository.UsuarioRepository;
-import com.quizly.app.util.Utils;
 
 import lombok.RequiredArgsConstructor;
 
@@ -29,7 +28,6 @@ public class AdminDashboardService {
     private final PreguntaRepository preguntaRepository;
     private final IntentoCuestionarioRepository intentoCuestionarioRepository;
     private final QuizViewMapper quizViewMapper;
-    private final Utils utils;
 
     public DashboardView getDashboard(){
         return DashboardView.builder()

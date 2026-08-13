@@ -13,6 +13,11 @@
             </p>
         </div>
 
+        <div th:if="${!quizForm.editable}" class="alert alert-info mb-3">
+            <i class="fa-solid fa-circle-info"></i>
+            Este cuestionario no puede modificarse porque existen versiones posteriores.
+        </div>
+
         <form id="quiz-form" class="form-stack"
             th:action="${quizForm.id == null ? '/admin/cuestionarios/nuevo' : '/admin/cuestionarios/' + quizForm.id + '/editar'}" 
             method="post" th:object="${quizForm}">
@@ -33,7 +38,9 @@
                                 </span>
                             </label>
                             <input type="text" class="input w-full" th:field="*{titulo}" 
-                                placeholder="Título del cuestionario" th:classappend="${#fields.hasErrors('titulo')} ? 'input-error'">
+                                placeholder="Título del cuestionario" 
+                                th:classappend="${#fields.hasErrors('titulo')} ? 'input-error'"
+                                th:readonly="${!quizForm.editable}">
                             <p th:if="${#fields.hasErrors('titulo')}" th:errors="*{titulo}" class="text-error"></p>
                         </fieldset>
 
@@ -52,7 +59,8 @@
                                     hx-target="#temaId"
                                     hx-swap="innerHTML"
                                     hx-include="this"
-                                    th:classappend="${#fields.hasErrors('asignaturaId')} ? 'input-error'">
+                                    th:classappend="${#fields.hasErrors('asignaturaId')} ? 'input-error'"
+                                    th:disabled="${!quizForm.editable}">
     
                                     <option value="">Selecciona una asignatura</option>
 
@@ -73,7 +81,8 @@
                                     </span>
                                 </label>
                                 <select id="temaId" class="select w-full md:w-auto" th:field="*{temaId}"
-                                    th:classappend="${#fields.hasErrors('temaId')} ? 'input-error'">
+                                    th:classappend="${#fields.hasErrors('temaId')} ? 'input-error'"
+                                    th:disabled="${!quizForm.editable}">
     
                                     <th:block th:fragment="temas-options">
                                         <option value="">Selecciona un tema</option>
@@ -96,7 +105,8 @@
                                     </span>
                                 </label>
                                 <select class="select w-full md:w-auto" th:field="*{dificultadId}" 
-                                    th:classappend="${#fields.hasErrors('dificultadId')} ? 'input-error'">
+                                    th:classappend="${#fields.hasErrors('dificultadId')} ? 'input-error'"
+                                    th:disabled="${!quizForm.editable}">
     
                                     <option value="">Selecciona una dificultad</option>
 
@@ -118,11 +128,13 @@
                             <div class="flex items-center gap-3">
                                 <input id="tiempoLimite" class="input w-3/12 lg:w-1/12" type="number" 
                                     name="tiempoLimite" th:field="*{tiempoLimite}"
-                                    min="1">
+                                    min="1"
+                                    th:readonly="${!quizForm.editable}">
 
                                 <!-- Unidad de tiempo -->
                                 <select id="unidadTiempo" class="select w-32" 
-                                    name="unidadTiempo" th:field="*{unidadTiempo}">
+                                    name="unidadTiempo" th:field="*{unidadTiempo}"
+                                    th:disabled="${!quizForm.editable}">
 
                                     <option th:each="unidad : ${T(com.quizly.app.model.enums.UnidadTiempo).values()}"
                                         th:value="${unidad}" th:text="${unidad.nombre}"></option>
@@ -131,7 +143,8 @@
                                 <label class="label cursor-pointer">
                                     <input id="sinLimite" type="checkbox" name="sinLimite" class="checkbox checkbox-primary"
                                         th:field="*{sinLimiteTiempo}"
-                                        data-toggle-disabled="#tiempoLimite, #unidadTiempo">
+                                        data-toggle-disabled="#tiempoLimite, #unidadTiempo"
+                                        th:disabled="${!quizForm.editable}">
                                     <span>Sin límite de tiempo</span>
                                 </label>
                             </div>
@@ -147,7 +160,8 @@
                                 placeholder="Breve descripción del cuestionario (opcional)"
                                 th:field="*{descripcion}" 
                                 th:classappend="${#fields.hasErrors('descripcion')} ? 'input-error'"
-                                maxlength="255">
+                                maxlength="255"
+                                th:readonly="${!quizForm.editable}">
                             </textarea>
 
                             <p th:if="${#fields.hasErrors('descripcion')}" th:errors="*{descripcion}" class="text-error"></p>
@@ -163,7 +177,7 @@
                     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                         <h1 class="card-title">Preguntas</h1>
     
-                        <button type="button" class="btn btn-primary" onclick="openQuestionDialog()">
+                        <button th:if="${quizForm.editable}" type="button" class="btn btn-primary" onclick="openQuestionDialog()">
                             <i class="fa-solid fa-plus"></i>
                             Añadir pregunta
                         </button>
@@ -174,17 +188,29 @@
                         class="border border-dashed border-border rounded-lg">
                     
                         <div class="flex flex-col items-center justify-center text-center py-12 px-6">
-                            <div class="icon__container bg-accent-muted text-primary w-20! h-20! rounded-xl mb-4">
-                                <i class="fa-solid fa-circle-plus text-2xl"></i>
-                            </div>
+                            <th:block th:if="${quizForm.editable}">
+                                <div class="icon__container bg-accent-muted text-primary w-20! h-20! rounded-xl mb-4">
+                                    <i class="fa-solid fa-circle-plus text-2xl"></i>
+                                </div>
+    
+                                <h3 class="font-semibold text-text">Este cuestionario aún no tiene preguntas</h3>
+                                <p class="text-sm text-text-muted mt-1">Añade tu primera pregunta para comenzar.</p>
+    
+                                <button type="button" class="btn btn-primary mt-5" onclick="openQuestionDialog()">
+                                    <i class="fa-solid fa-plus"></i>
+                                    Añadir primera pregunta
+                                </button>
+                            </th:block>
 
-                            <h3 class="font-semibold text-text">Este cuestionario aún no tiene preguntas</h3>
-                            <p class="text-sm text-text-muted mt-1">Añade tu primera pregunta para comenzar.</p>
-
-                            <button type="button" class="btn btn-primary mt-5" onclick="openQuestionDialog()">
-                                <i class="fa-solid fa-plus"></i>
-                                Añadir primera pregunta
-                            </button>
+                            <th:block th:unless="${quizForm.editable}">
+                                <div class="icon__container bg-accent-muted text-primary w-20! h-20! rounded-xl mb-4">
+                                    <i class="fa-solid fa-circle-question text-2xl"></i>
+                                </div>
+    
+                                <h3 class="font-semibold text-text">
+                                    Esta versión del cuestionario no tiene preguntas asociadas.
+                                </h3>
+                            </th:block>
                         </div>
                     </div>
 
@@ -200,51 +226,11 @@
                                     <th>Tipo</th>
                                     <th>Opciones</th>
                                     <th>Respuesta correcta</th>
-                                    <th class="w-32 text-center">Acciones</th>
+                                    <th th:if="${quizForm.editable}" class="w-32 text-center">Acciones</th>
                                 </tr>
                             </thead>
 
-                            <tbody id="questions-list-body">
-                                <!-- <tr th:each="pregunta, stat : ${quizForm.preguntas}"
-                                    th:data-question-index="${stat.index}">
-                                    <td th:text="${stat.count}"></td>
-                                    
-                                    <td>
-                                        <span class="font-medium" th:text="${pregunta.enunciado}"></span>
-                                    </td>
-
-                                    <td>
-                                        <span class="badge badge-muted" th:text="${pregunta.tipoPregunta.nombre}"></span>
-                                    </td>
-
-                                    <td th:text="${pregunta.opcionesRespuesta != null 
-                                        ? #lists.size(pregunta.opcionesRespuesta) : '0'}">
-                                    </td>
-
-                                    <td>
-                                        <span class="badge badge-status badge-status-active">
-                                            <i class="fa-solid fa-check mr-1"></i>
-                                            Correcta
-                                        </span>
-                                    </td>
-
-                                    <td>
-                                        <div class="flex justify-center gap-1">
-                                            <button type="button" class="btn btn-ghost btn-square btn-sm"
-                                                title="Editar pregunta"
-                                                th:data-question-index="${stat.index}">
-                                                <i class="fa-regular fa-pen-to-square"></i>
-                                            </button>
-
-                                            <button type="button" class="btn btn-ghost btn-square btn-sm"
-                                                title="Eliminar pregunta"
-                                                th:data-question-index="${stat.index}">
-                                                <i class="fa-regular fa-trash-can"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr> -->
-                            </tbody>
+                            <tbody id="questions-list-body"></tbody>
                         </table>
                      </div>
                 </div>
@@ -276,7 +262,8 @@
                                     <p class="text-xs text-text-muted mt-1">Mostrar las preguntas en un orden diferente en cada intento.</p>
                                 </div>
 
-                                <input type="checkbox" class="toggle toggle-primary" th:field="*{preguntasAleatorias}">
+                                <input type="checkbox" class="toggle toggle-primary" th:field="*{preguntasAleatorias}"
+                                    th:disabled="${!quizForm.editable}">
                             </label>
                         </div>
                     </div>
@@ -384,6 +371,7 @@
 
         <script th:inline="javascript">
             const quizFormData = {
+                editable: /*[[${quizForm.editable}]]*/ true,
                 preguntas: /*[[${quizForm.preguntas}]]*/ [],
                 tiposPregunta: /*[[${tiposPregunta}]]*/ []
             };

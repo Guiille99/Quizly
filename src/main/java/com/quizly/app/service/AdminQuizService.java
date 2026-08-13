@@ -2,6 +2,8 @@ package com.quizly.app.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,8 +30,22 @@ public class AdminQuizService {
     private final QuizViewMapper quizViewMapper;
 
     public Page<QuizView> getCuestionarios(QuizFilterForm filters, Pageable pageable){
-        return cuestionarioRepository.findAll(filters, pageable)
-            .map(c -> quizViewMapper.toQuizView(c));
+        Page<Cuestionario> page = cuestionarioRepository.findAll(filters, pageable);
+
+        if (page.isEmpty()) {
+            return page.map(c -> quizViewMapper.toQuizView(c));
+        }
+
+        // Obtenemos los ids de los cuestionarios mostrados en la página
+        Set<Long> cuestionariosIds = page.getContent()
+            .stream()
+            .map(Cuestionario::getId)
+            .collect(Collectors.toSet());
+
+        // Obtenemos los ids de las últimas versiones de los cuestionarios
+        Set<Long> ultimasVersionesIds = cuestionarioRepository.findLastVersionIds(cuestionariosIds);
+
+        return page.map(c -> quizViewMapper.toQuizView(c, ultimasVersionesIds.contains(c.getId())));
     }
 
     /**

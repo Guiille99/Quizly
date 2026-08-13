@@ -484,4 +484,15 @@ public class CuestionarioService {
 
         return new PageImpl<>(cuestionariosPage.getContent(), sortedPageable, cuestionariosPage.getTotalElements());
     }
+
+    /**
+     * Determina si la instancia del cuestionario pasada por parámetro
+     * es la última versión
+     * 
+     * @param cuestionario
+     * @return
+     */
+    public boolean isLastVersion(Cuestionario cuestionario){
+        return !cuestionarioRepository.existsBySlugAndVersionGreaterThan(cuestionario.getSlug(), cuestionario.getVersion());
+    }
 }

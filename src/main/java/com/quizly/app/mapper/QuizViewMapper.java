@@ -13,7 +13,11 @@ import lombok.RequiredArgsConstructor;
 public class QuizViewMapper {
     private final Utils utils;
     
-    public QuizView toQuizView(Cuestionario cuestionario) {
+    public QuizView toQuizView(Cuestionario cuestionario){
+        return toQuizView(cuestionario, true);
+    }
+
+    public QuizView toQuizView(Cuestionario cuestionario, boolean ultimaVersion) {
         return QuizView.builder()
                 .id(cuestionario.getId())
                 .slug(cuestionario.getSlug())
@@ -25,6 +29,7 @@ public class QuizViewMapper {
                 .tiempoLimite(cuestionario.getTiempoLimiteNatural())
                 .version(cuestionario.getVersion())
                 .fechaActualizacion(utils.formatFechaRelativa(cuestionario.getUpdatedAt()))
+                .ultimaVersion(ultimaVersion)
                 .build();
     }
 }
