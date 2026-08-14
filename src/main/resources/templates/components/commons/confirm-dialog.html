@@ -1,0 +1,50 @@
+<dialog id="confirm-dialog" class="modal" th:fragment="confirmDialog">
+
+    <div class="modal-box max-w-md">
+
+        <!-- Icono -->
+        <div class="flex justify-center mb-4">
+            <div id="confirm-dialog-icon-container"
+                 class="icon__container flex items-center justify-center w-16! h-16! rounded-xl">
+
+                <i id="confirm-dialog-icon"
+                   class="fa-solid fa-triangle-exclamation text-2xl">
+                </i>
+
+            </div>
+        </div>
+
+        <!-- Título -->
+        <h3 id="confirm-dialog-title"
+            class="text-lg font-semibold text-center">
+        </h3>
+
+        <!-- Mensaje -->
+        <p id="confirm-dialog-message"
+           class="text-sm text-text-muted text-center mt-2">
+        </p>
+
+        <!-- Acciones -->
+        <div class="modal-action justify-center gap-2">
+
+            <button type="button"
+                    id="confirm-dialog-cancel"
+                    class="btn btn-outline">
+                Cancelar
+            </button>
+
+            <button type="button"
+                    id="confirm-dialog-confirm"
+                    class="btn btn-error">
+                Confirmar
+            </button>
+
+        </div>
+
+    </div>
+
+    <form method="dialog" class="modal-backdrop">
+        <button type="submit">close</button>
+    </form>
+
+</dialog>
