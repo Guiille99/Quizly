@@ -164,10 +164,6 @@ public class AdminQuizController {
     public String showEditQuizForm(@PathVariable Long id, Model model) {
         Optional<Cuestionario> cuestionario = cuestionarioRepository.findById(id);
 
-        if (!cuestionarioService.isLastVersion(cuestionario.get())) {
-            return "admin/cuestionarios/quiz-form";
-        }
-
         if (!cuestionario.isPresent()) {
             toastService.error(model, "No ha encontrado el cuestionario solicitado");
             return "admin/cuestionarios/quiz-form";

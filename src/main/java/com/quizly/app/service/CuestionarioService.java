@@ -126,6 +126,12 @@ public class CuestionarioService {
                 "No se ha encontrado la versión actual del cuestionario a actualizar."
             ));
 
+        if (!isLastVersion(cuestionarioActual)) {
+            throw new IllegalArgumentException(
+                "Esta versión del cuestionario ya no puede modificarse porque existe una versión posterior."
+            );
+        }
+
         Tema tema = temaRepository.findById(form.getTemaId())
             .orElseThrow(() -> new EntityNotFoundException("No se ha encontrado el tema seleccionado."));
 
