@@ -360,9 +360,10 @@
             <div id="questions-form-data"></div>
 
             <div class="flex items-center justify-end gap-2 mt-6">
-                <a th:href="@{/admin/cuestionarios}" class="btn btn-outline">Cancelar</a>
+                <a th:href="@{/admin/cuestionarios}" class="btn btn-outline"
+                    th:text="${quizForm.editable ? 'Cancelar' : 'Volver'}"></a>
     
-                <button type="submit" form="quiz-form" class="btn btn-primary">
+                <button th:if="${quizForm.editable}" type="submit" form="quiz-form" class="btn btn-primary">
                     <i class="fa-regular fa-floppy-disk"></i>
                     <span th:text="${quizForm.id == null ? 'Crear cuestionario' : 'Guardar cambios'}"></span> 
                 </button>
