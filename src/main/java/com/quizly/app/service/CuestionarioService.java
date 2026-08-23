@@ -26,6 +26,7 @@ import com.quizly.app.dto.form.OpcionRespuestaForm;
 import com.quizly.app.dto.form.PreguntaForm;
 import com.quizly.app.dto.form.QuizForm;
 import com.quizly.app.exception.QuizNotResumableException;
+import com.quizly.app.exception.QuizlyException;
 import com.quizly.app.logging.LogExecution;
 import com.quizly.app.model.entity.Asignatura;
 import com.quizly.app.model.entity.Cuestionario;
@@ -156,6 +157,29 @@ public class CuestionarioService {
         crearPreguntas(nuevaVersCuestionario, form.getPreguntas());
 
         return nuevaVersCuestionario;
+    }
+
+    @Transactional
+    public void deleteQuizVersion(Long id) throws QuizlyException{
+        Cuestionario cuestionario = cuestionarioRepository.findById(id)
+            .orElseThrow(() -> new EntityNotFoundException("No se ha encontrado el cuestionario solicitado"));
+
+        if (!isLastVersion(cuestionario)) {
+            throw new QuizlyException("Solo se puede eliminar la última versión del cuestionario.");
+        }
+
+        if (intentoCuestionarioRepository.existsByCuestionarioId(cuestionario.getId())) {
+            throw new QuizlyException("No se puede eliminar esta versión porque tiene intentos asociados.");
+        }
+
+        // Eliminamos las opciones de respuesta
+        opcionRespuestaRepository.deleteByCuestionarioId(id);
+
+        // Eliminamos las preguntas asociadas
+        preguntaRepository.deleteByCuestionarioId(id);
+        
+        // Eliminamos el cuestionario
+        cuestionarioRepository.delete(cuestionario);
     }
 
     /**

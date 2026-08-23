@@ -173,9 +173,16 @@
                                             th:classappend="${cuestionario.ultimaVersion ? 'fa-pen-to-square' : 'fa-eye'}"></i>
                                     </a>
                             
-                                    <!-- Más acciones -->
-                                    <button class="btn btn-ghost btn-square btn-sm">
-                                        <i class="fa-solid fa-ellipsis"></i>
+                                    <!-- Eliminar -->
+                                    <button type="button" class="btn btn-ghost btn-square btn-sm text-error"
+                                            title="Eliminar cuestionario"
+                                            th:attr="hx-post=@{/admin/cuestionarios/{id}/eliminar(id=${cuestionario.id})}"
+                                            hx-trigger="confirmed"
+                                            hx-target="#table-cuestionarios-container"
+                                            hx-include="#quiz-filter-form"
+                                            th:onclick="|confirmDeleteQuiz(this)|">
+
+                                        <i class="fa-regular fa-trash-can"></i>
                                     </button>
                                 </div>
                             </td>
@@ -184,6 +191,27 @@
                 </div>
             </div>
          </div>
+         
+         <script th:inline="javascript">
+            async function confirmDeleteQuiz(button) {
+                const result = await confirmDialog.open({
+                    title: "Eliminar cuestionario",
+                    message: "Esta acción eliminará la versión seleccionada del cuestionario. Esta acción no se podrá deshacer.",
+                    confirmBtnText: "Eliminar",
+                    cancelBtnText: "Cancelar",
+                    icon: "fa-solid fa-trash-can",
+                    type: "danger"
+                });
+
+                if (!result.isConfirmed) {
+                    return;
+                } else{
+                    htmx.trigger(button, "confirmed");
+                }
+
+                
+            }
+         </script>
     </main>
 </body>
 </html>

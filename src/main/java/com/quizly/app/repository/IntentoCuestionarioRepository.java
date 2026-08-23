@@ -31,4 +31,6 @@ public interface IntentoCuestionarioRepository extends JpaRepository<IntentoCues
     Page<IntentoCuestionario> getIntentosCuestionariosByUsuarioYEstado(Long usuarioId, String codigoEstadoIntento, Pageable pageable);
 
     long countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
+    
+    boolean existsByCuestionarioId(long cuestionarioId);
 }

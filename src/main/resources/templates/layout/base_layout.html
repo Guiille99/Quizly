@@ -169,5 +169,16 @@
     <div th:replace="~{components/commons/confirm-dialog :: confirmDialog}"></div>
 
 
+    <script>
+        // Script para incluir el token CSRF en todas las peticiones HTMX
+        document.addEventListener('htmx:configRequest', (evt) => {
+            const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
+            const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
+            
+            if (csrfHeader && csrfToken) {
+                evt.detail.headers[csrfHeader] = csrfToken;
+            }
+        });
+    </script>
 </body>
 </html>

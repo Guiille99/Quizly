@@ -86,3 +86,12 @@ const ToastSystem = (function() {
 
     return { mostrar };
 })();
+
+
+document.addEventListener("DOMContentLoaded", () => {
+    // Listener
+    document.body.addEventListener("showToast", function(evt) {
+        const data = evt.detail;
+        ToastSystem.mostrar(data.tipo, data.mensaje);
+    });
+});

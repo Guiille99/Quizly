@@ -7,6 +7,7 @@ import com.quizly.app.repository.PreguntaRepositoryCustom;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 
 public class PreguntaRepositoryImpl implements PreguntaRepositoryCustom {
@@ -22,5 +23,17 @@ public class PreguntaRepositoryImpl implements PreguntaRepositoryCustom {
         );
         query.setParameter("cuestionarioId", cuestionarioId);
         return query.getResultList();
+    }
+
+    @Override
+    public int deleteByCuestionarioId(Long cuestionarioId) {
+        Query query = entityManager.createQuery("""
+            DELETE FROM Pregunta p
+            WHERE p.cuestionario.id = :cuestionarioId
+        """);
+
+        query.setParameter("cuestionarioId", cuestionarioId);
+
+        return query.executeUpdate();
     }
 }

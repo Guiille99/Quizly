@@ -6,4 +6,6 @@ import com.quizly.app.model.entity.Pregunta;
 public interface PreguntaRepositoryCustom {
     
     List<Pregunta> findByCuestionarioId(Long cuestionarioId);
+
+    int deleteByCuestionarioId(Long cuestionarioId);
 }

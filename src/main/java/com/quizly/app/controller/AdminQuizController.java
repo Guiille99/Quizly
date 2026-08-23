@@ -2,6 +2,7 @@ package com.quizly.app.controller;
 
 import com.quizly.app.dto.form.QuizFilterForm;
 import com.quizly.app.dto.form.QuizForm;
+import com.quizly.app.exception.QuizlyException;
 import com.quizly.app.model.entity.Cuestionario;
 import com.quizly.app.model.entity.Tema;
 import com.quizly.app.repository.AsignaturaRepository;
@@ -35,6 +36,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 
 
@@ -54,13 +56,20 @@ public class AdminQuizController {
     private final AdminQuizService adminQuizService;
     private final CuestionarioService cuestionarioService;
     private final ToastService toastService;
-
-    @GetMapping
-    public String showCuestionariosList(@ModelAttribute QuizFilterForm filters, Pageable pageable, Model model) {
+    
+    private void loadCuestionariosTableAttributes(QuizFilterForm filters, Pageable pageable, Model model){
         model.addAttribute("cuestionariosPage", adminQuizService.getCuestionarios(filters, pageable));
         model.addAttribute("filters", filters);
         model.addAttribute("asignaturas", asignaturaRepository.findAllByOrderByNombreAsc());
 
+        model.addAttribute("temas", filters.asignaturaId() != null 
+            ? temaRepository.findByAsignaturaId(filters.asignaturaId()) 
+            : List.of());
+    }
+
+    @GetMapping
+    public String showCuestionariosList(@ModelAttribute QuizFilterForm filters, Pageable pageable, Model model) {
+        loadCuestionariosTableAttributes(filters, pageable, model);
         return "admin/cuestionarios/cuestionarios-list";
     }
 
@@ -208,6 +217,42 @@ public class AdminQuizController {
 
         return "redirect:/admin/cuestionarios";
     }
+
+    @PostMapping("/{id}/eliminar")
+    public String deleteQuiz(@PathVariable Long id, @ModelAttribute QuizFilterForm filters, 
+        Pageable pageable, Model model, RedirectAttributes ra, HttpServletResponse response,
+        @RequestHeader(value = "HX-Request", required = false) String hxRequest) {
+
+        try {
+            cuestionarioService.deleteQuizVersion(id);
+            String successMsg = "El cuestionario se ha eliminado correctamente.";
+
+            if (hxRequest != null) {
+                toastService.success(response, successMsg);
+            } else{
+                toastService.success(ra, successMsg);
+            }
+        } catch (QuizlyException | EntityNotFoundException e) {
+            if (hxRequest != null) {
+                toastService.error(response, e.getMessage());
+            } else {
+                toastService.error(ra, e.getMessage());
+            }
+        } catch (Exception e) {
+            String errorMsg = "Se ha producido un error al eliminar el cuestionario.";
+
+            if (hxRequest != null) {
+                toastService.error(response, errorMsg);    
+            } else {
+                toastService.error(ra, errorMsg);
+            }
+        }
+        
+        return hxRequest != null 
+            ? refreshQuizTable(filters, pageable, model) 
+            : "redirect:/admin/cuestionarios";
+    }
+    
     
     
     private void loadFormOptions(Model model, QuizForm quizForm){
@@ -222,5 +267,9 @@ public class AdminQuizController {
         }
     }
     
+    private String refreshQuizTable(QuizFilterForm filters, Pageable pageable, Model model){
+        loadCuestionariosTableAttributes(filters, pageable, model);
+        return "admin/cuestionarios/cuestionarios-list :: table-cuestionarios-container_fragment"; 
+    }
     
 }
