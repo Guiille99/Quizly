@@ -131,7 +131,10 @@
                                             </li>
 
                                             <li>
-                                                <a class="btn-link">Temas</a>
+                                                <a th:href="@{/admin/temas}" class="btn-link"
+                                                    th:classappend="${currentUri == '/admin/temas'} ? 'active'">
+                                                    Temas
+                                                </a>
                                             </li>
 
                                             <li>

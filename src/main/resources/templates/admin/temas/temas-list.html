@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es" th:replace="~{layout/base_layout :: layout(~{::main})}">
+<head th:replace="~{fragments/head :: head('Quizly')}"></head>
+<body>
+    <main th:fragment="main" class="w-full px-6 py-8">
+        <!-- Cabecera -->
+        <div class="flex flex-wrap gap-3 lg:gap-0 items-start justify-between mb-5">
+            <div>
+                <h1 class="text-xl font-semibold tracking-tight text-text">Gestión de temas</h1>
+                
+                <p class="mt-1 text-sm text-text-muted ">
+                    Visualiza, crea, edita y gestiona todos los temas disponibles en el sistema.
+                </p>
+            </div>
+
+            <a class="btn btn-primary">
+                <i class="fa-solid fa-plus"></i>
+                Nuevo tema
+            </a>
+        </div>
+
+        <!-- Contenedor -->
+         <div class="card mt-6">
+            <div id="table-temas-container" class="card-body" th:fragment="table-temas-container_fragment">
+                <!-- Filtros -->
+                <!-- TODO -->
+                
+                <!-- Tabla -->
+                <div th:replace="~{components/table/skeleton :: base(
+                        tableId='table-temas', 
+                        page=${temasPage}, 
+                        thead=~{::thead}, 
+                        tbody=~{::tbody}, 
+                        filterFormId='', 
+                        targetUrl=@{/admin/temas/tableData},
+                        pageParamName='page',
+                        sizeOptions=${ {5, 10, 20, 50} })}" th:fragment="table-temas_fragment">
+
+                    <thead>
+                        <tr>
+                            <th th:replace="~{components/table/sort-header :: cell(
+                                field='nombre', 
+                                fieldLabel='Nombre', 
+                                page=${temasPage}, 
+                                filterFormId='', 
+                                targetUrl=@{/admin/temas/tableData}, 
+                                tableId='table-temas', 
+                                pageParamName='page')}">
+                            </th>
+                            <th th:replace="~{components/table/sort-header :: cell(
+                                field='orden', 
+                                fieldLabel='Nº tema', 
+                                page=${temasPage}, 
+                                filterFormId='', 
+                                targetUrl=@{/admin/temas/tableData}, 
+                                tableId='table-temas', 
+                                pageParamName='page')}">
+                            </th>
+                            <th th:replace="~{components/table/sort-header :: cell(
+                                field='asignatura', 
+                                fieldLabel='Asignatura', 
+                                page=${temasPage}, 
+                                filterFormId='', 
+                                targetUrl=@{/admin/temas/tableData}, 
+                                tableId='table-temas', 
+                                pageParamName='page')}">
+                            </th>
+                            <th th:replace="~{components/table/sort-header :: cell(
+                                field='nCuestionarios', 
+                                fieldLabel='Nº cuestionarios', 
+                                page=${temasPage}, 
+                                filterFormId='', 
+                                targetUrl=@{/admin/temas/tableData}, 
+                                tableId='table-temas', 
+                                pageParamName='page')}">
+                            </th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr th:each="tema : ${temasPage.content}">
+                            <!-- Nombre -->
+                            <td th:text="${tema.nombre}"></td>
+
+                            <!-- Nº tema -->
+                            <td th:text="${tema.orden}"></td>
+
+                            <!-- Asignatura -->
+                            <td th:text="${tema.asignatura}"></td>
+
+                            <!-- Nº cuestionarios -->
+                            <td th:text="${tema.nCuestionarios}"></td>
+
+                            <!-- Acciones -->
+                            <td>
+                                <div class="flex justify-center gap-1">
+                                    <!-- Editar -->
+                                    <a href="" 
+                                        class="btn btn-ghost btn-square btn-sm">
+
+                                        <i class="fa-regular fa-pen-to-square"></i>
+                                    </a>
+                            
+                                    <!-- Eliminar -->
+                                    <button type="button" class="btn btn-ghost btn-square btn-sm text-error"
+                                            hx-trigger="confirmed"
+                                            th:onclick="|confirmDeleteTema(this)|">
+
+                                        <i class="fa-regular fa-trash-can"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                
+                </div>
+            </div>
+        </div>
+
+        <script th:inline="javascript">
+            async function confirmDeleteTema(button) {
+                const result = await confirmDialog.open({
+                    title: "Eliminar tema",
+                    message: "Esta acción eliminará el tema seleccionado. Esta acción no se podrá deshacer.",
+                    confirmBtnText: "Eliminar",
+                    cancelBtnText: "Cancelar",
+                    icon: "fa-solid fa-trash-can",
+                    type: "danger"
+                });
+
+                if (!result.isConfirmed) {
+                    return;
+                } else{
+                    htmx.trigger(button, "confirmed");
+                } 
+            }
+        </script>
+    </main>
+</body>
+</html>

@@ -1,9 +1,17 @@
 package com.quizly.app.repository.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+
 import com.quizly.app.dto.TemaEstadisticaDto;
+import com.quizly.app.model.entity.Asignatura;
+import com.quizly.app.model.entity.Cuestionario;
 import com.quizly.app.model.entity.Tema;
 import com.quizly.app.model.enums.IntentoCuestionarioEstadoEnum;
 import com.quizly.app.repository.TemaRepositoryCustom;
@@ -11,6 +19,12 @@ import com.quizly.app.repository.TemaRepositoryCustom;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.Order;
+import jakarta.persistence.criteria.Root;
 
 public class TemaRepositoryImpl implements TemaRepositoryCustom {
 
@@ -62,5 +76,75 @@ public class TemaRepositoryImpl implements TemaRepositoryCustom {
                .setParameter("usuarioId", usuarioId)
                .setParameter("estadoIntento", IntentoCuestionarioEstadoEnum.FINISHED.toString())
                .getResultList();
+    }
+
+    @Override
+    public Page<Tema> findAllWithFilters(Pageable pageable) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+
+        // Consulta para obtener los datos
+        CriteriaQuery<Tema> query = cb.createQuery(Tema.class);
+        Root<Tema> root = query.from(Tema.class);
+        query.select(root);
+
+        // Aplicar ordenación basada en el objeto Pageable
+        applySorting(cb, query, root, pageable);
+
+        TypedQuery<Tema> typedQuery = entityManager.createQuery(query);
+        typedQuery.setFirstResult((int) pageable.getOffset());
+        typedQuery.setMaxResults(pageable.getPageSize());
+
+        List<Tema> result = typedQuery.getResultList();
+
+        // Consulta para obtener el total de elementos
+        CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
+        Root<Tema> counRoot = countQuery.from(Tema.class);
+        countQuery.select(cb.count(counRoot));
+
+        Long total = entityManager.createQuery(countQuery).getSingleResult();
+
+        // Devolver la página
+        return new PageImpl<>(result, pageable, total);
+    }
+
+    private void applySorting(CriteriaBuilder cb, CriteriaQuery<?> query, Root<Tema> root, Pageable pageable) {
+        if (pageable.getSort().isUnsorted()) {
+            query.orderBy(cb.desc(root.get("updatedAt")));
+        }
+
+        List<Order> orders = new ArrayList<>();
+
+        Join<Tema, Asignatura> asignatura = null;
+
+        for (Sort.Order sort : pageable.getSort()) {
+            Expression<?> expression;
+
+            switch (sort.getProperty()) {
+                case "nombre":
+                    expression = root.get("nombre");
+                    break;
+                case "orden":
+                    expression = root.get("orden");
+                    break;
+
+                case "asignatura":
+                    if (asignatura == null) {
+                        asignatura = root.join("asignatura");
+                    }
+
+                    expression = asignatura.get("nombre");
+                    break;
+
+                case "nCuestionarios":
+                    expression = cb.size(root.get("cuestionarios"));
+                    break;
+                default:
+                    expression = root.get("updatedAt");
+            }
+
+            orders.add(sort.isAscending() ? cb.asc(expression) : cb.desc(expression));
+        }
+
+        query.orderBy(orders);
     }
 }

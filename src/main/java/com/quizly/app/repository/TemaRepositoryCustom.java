@@ -3,6 +3,9 @@ package com.quizly.app.repository;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import com.quizly.app.dto.TemaEstadisticaDto;
 import com.quizly.app.model.entity.Tema;
 
@@ -21,4 +24,6 @@ public interface TemaRepositoryCustom {
      * @return Lista de {@link TemaEstadisticaDto}
      */
     List<TemaEstadisticaDto> getEstadisticasTemasPorUsuario(Long usuarioId);
+
+    Page<Tema> findAllWithFilters(Pageable pageable);
 }

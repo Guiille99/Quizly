@@ -13,6 +13,7 @@ import com.quizly.app.model.entity.Tema;
 public interface TemaRepository extends JpaRepository<Tema, Long>, TemaRepositoryCustom {
     Page<Tema> findByNombreContainingIgnoreCaseAndAsignaturaId(String nombre, Long asignaturaId, Pageable pageable);
     Page<Tema> findByAsignaturaId(Long asignaturaId, Pageable pageable);
+    Page<Tema> findAllByOrderByUpdatedAt(Pageable pageable);
     List<Tema> findAllByOrderByNombreAsc();
     
 }
