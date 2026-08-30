@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.quizly.app.dto.form.TemaFilterForm;
+import com.quizly.app.dto.form.TemaForm;
 import com.quizly.app.mapper.TemaViewMapper;
 import com.quizly.app.model.entity.Tema;
 import com.quizly.app.model.view.tema.TemaView;
@@ -21,5 +22,14 @@ public class AdminTemaService {
     public Page<TemaView> getTemas(TemaFilterForm filters, Pageable pageable){
         Page<Tema> page = temaRepository.findAllWithFilters(filters, pageable);
         return page.map(t -> temaViewMapper.toTemaView(t));
+    }
+
+    /**
+     * Prepara un cuestionario vacío para la creación
+     * de un nuevo tema
+     * @return formulacio de tema con sus valores iniciales.
+     */
+    public TemaForm creatTemaForm(){
+        return new TemaForm();
     }
 }
