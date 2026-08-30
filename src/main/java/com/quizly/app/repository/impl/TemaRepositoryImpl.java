@@ -8,10 +8,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.util.StringUtils;
 
 import com.quizly.app.dto.TemaEstadisticaDto;
+import com.quizly.app.dto.form.TemaFilterForm;
 import com.quizly.app.model.entity.Asignatura;
-import com.quizly.app.model.entity.Cuestionario;
 import com.quizly.app.model.entity.Tema;
 import com.quizly.app.model.enums.IntentoCuestionarioEstadoEnum;
 import com.quizly.app.repository.TemaRepositoryCustom;
@@ -24,6 +25,7 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Order;
+import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 
 public class TemaRepositoryImpl implements TemaRepositoryCustom {
@@ -79,13 +81,18 @@ public class TemaRepositoryImpl implements TemaRepositoryCustom {
     }
 
     @Override
-    public Page<Tema> findAllWithFilters(Pageable pageable) {
+    public Page<Tema> findAllWithFilters(TemaFilterForm filters, Pageable pageable) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 
         // Consulta para obtener los datos
         CriteriaQuery<Tema> query = cb.createQuery(Tema.class);
         Root<Tema> root = query.from(Tema.class);
         query.select(root);
+
+        List<Predicate> predicates = buildPredicates(cb, root, filters);
+        if (!predicates.isEmpty()) {
+            query.where(predicates.toArray(Predicate[]::new));
+        }
 
         // Aplicar ordenación basada en el objeto Pageable
         applySorting(cb, query, root, pageable);
@@ -105,6 +112,26 @@ public class TemaRepositoryImpl implements TemaRepositoryCustom {
 
         // Devolver la página
         return new PageImpl<>(result, pageable, total);
+    }
+
+    private List<Predicate> buildPredicates(CriteriaBuilder cb, Root<Tema> root, TemaFilterForm filters){
+        List<Predicate> predicates = new ArrayList<>();
+
+        if (filters != null) {
+            // Filtro por nombre
+            if (StringUtils.hasText(filters.search())){
+                String search = "%" + filters.search().trim().toLowerCase() + "%";
+                predicates.add(cb.like(cb.lower(root.get("nombre")), search));
+            }
+
+            // Filtro por asignatura
+            if (filters.asignaturaId() != null) {
+                Join<Tema, Asignatura> asignatura = root.join("asignatura");
+                predicates.add(cb.equal(asignatura.get("id"), filters.asignaturaId()));
+            }
+        }
+
+        return predicates;
     }
 
     private void applySorting(CriteriaBuilder cb, CriteriaQuery<?> query, Root<Tema> root, Pageable pageable) {

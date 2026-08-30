@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.quizly.app.dto.TemaEstadisticaDto;
+import com.quizly.app.dto.form.TemaFilterForm;
 import com.quizly.app.model.entity.Tema;
 
 public interface TemaRepositoryCustom {
@@ -25,5 +26,5 @@ public interface TemaRepositoryCustom {
      */
     List<TemaEstadisticaDto> getEstadisticasTemasPorUsuario(Long usuarioId);
 
-    Page<Tema> findAllWithFilters(Pageable pageable);
+    Page<Tema> findAllWithFilters(TemaFilterForm filters, Pageable pageable);
 }

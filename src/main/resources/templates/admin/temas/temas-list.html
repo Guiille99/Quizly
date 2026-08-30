@@ -23,7 +23,41 @@
          <div class="card mt-6">
             <div id="table-temas-container" class="card-body" th:fragment="table-temas-container_fragment">
                 <!-- Filtros -->
-                <!-- TODO -->
+                <form id="tema-filter-form" class="flex gap-2">
+                    <!-- Buscador -->
+                    <input type="text" name="search" th:value="${filters.search}"
+                        placeholder="Nombre del tema" class="input"
+                        hx-get="/admin/temas/tableData"
+                        hx-trigger="input changed delay:400ms"
+                        hx-target="#table-temas"
+                        hx-include="#tema-filter-form"
+                        hx-swap="outerHTML">
+
+                    <!-- Asignatura -->
+                    <select name="asignaturaId" class="select"
+                        hx-get="/admin/temas/tableData"
+                        hx-trigger="change"
+                        hx-target="#table-temas"
+                        hx-include="#tema-filter-form">
+                    
+                        <option value="">Todas las asignaturas</option>
+
+                        <option th:each="asignatura : ${asignaturas}"
+                            th:value="${asignatura.id}"
+                            th:selected="${filters.asignaturaId == asignatura.id}"
+                            th:text="${asignatura.nombre}">
+                        </option>
+                    </select>
+
+                    <button name="resetFilters" class="btn btn-outline btn-error"
+                        hx-get="/admin/temas/tableData"
+                        hx-target="#table-temas-container"
+                        hx-swap="outerHTML">
+
+                        <i class="fa-solid fa-trash-can"></i>
+                        Limpiar
+                    </button>
+                </form>
                 
                 <!-- Tabla -->
                 <div th:replace="~{components/table/skeleton :: base(
