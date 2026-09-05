@@ -125,15 +125,22 @@
 
                                             <li>
                                                 <a th:href="@{/admin/cuestionarios}" class="btn-link"
-                                                    th:classappend="${currentUri == '/admin/cuestionarios'} ? 'active'">
+                                                    th:classappend="${currentUri.startsWith('/admin/cuestionarios')} ? 'active'">
                                                     Cuestionarios
                                                 </a>
                                             </li>
 
                                             <li>
                                                 <a th:href="@{/admin/temas}" class="btn-link"
-                                                    th:classappend="${currentUri == '/admin/temas'} ? 'active'">
+                                                    th:classappend="${currentUri.startsWith('/admin/temas')} ? 'active'">
                                                     Temas
+                                                </a>
+                                            </li>
+
+                                            <li>
+                                                <a th:href="@{/admin/asignaturas}" class="btn-link"
+                                                    th:classappend="${currentUri.startsWith('/admin/asignaturas')} ? 'active'">
+                                                    Asignaturas
                                                 </a>
                                             </li>
 

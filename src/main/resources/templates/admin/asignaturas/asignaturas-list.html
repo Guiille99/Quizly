@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es" th:replace="~{layout/base_layout :: layout(~{::main})}">
+<head th:replace="~{fragments/head :: head('Quizly')}"></head>
+<body>
+    <main th:fragment="main" class="w-full px-6 py-8">
+        <!-- Cabecera -->
+        <div class="flex flex-wrap gap-3 lg:gap-0 items-start justify-between mb-5">
+            <div>
+                <h1 class="text-xl font-semibold tracking-tight text-text">Gestión de asignaturas</h1>
+                
+                <p class="mt-1 text-sm text-text-muted ">
+                    Visualiza, crea, edita y gestiona todas las asignaturas disponibles en el sistema.
+                </p>
+            </div>
+
+            <a th:href="@{/admin/asignaturas/nuevo}" class="btn btn-primary">
+                <i class="fa-solid fa-plus"></i>
+                Nueva asignatura
+            </a>
+        </div>
+
+        <!-- Contenedor -->
+         <div class="card mt-6">
+            <div id="table-asignaturas-container" class="card-body" th:fragment="table-asignaturas-container_fragment">
+                <!-- Filtros -->
+                <form id="asignatura-filter-form" class="flex gap-2">
+                    <!-- Buscador -->
+                    <input type="text" name="search" th:value="${filters.search}"
+                        placeholder="Nombre de la asignatura" class="input"
+                        hx-get="/admin/asignaturas/tableData"
+                        hx-trigger="input changed delay:400ms"
+                        hx-target="#table-asignaturas"
+                        hx-include="#asignatura-filter-form"
+                        hx-swap="outerHTML">
+
+                    <button name="resetFilters" class="btn btn-outline btn-error"
+                        hx-get="/admin/asignaturas/tableData"
+                        hx-target="#table-asignaturas-container"
+                        hx-swap="outerHTML">
+                        <i class="fa-solid fa-trash-can"></i>
+                        Limpiar
+                    </button>
+                </form>
+                
+                <!-- Tabla -->
+                <div th:replace="~{components/table/skeleton :: base(
+                        tableId='table-asignaturas', 
+                        page=${asignaturasPage}, 
+                        thead=~{::thead}, 
+                        tbody=~{::tbody}, 
+                        filterFormId='', 
+                        targetUrl=@{/admin/asignaturas/tableData},
+                        pageParamName='page',
+                        sizeOptions=${ {5, 10, 20, 50} })}" th:fragment="table-asignaturas_fragment">
+
+                    <thead>
+                        <tr>
+                            <th th:replace="~{components/table/sort-header :: cell(
+                                field='nombre', 
+                                fieldLabel='Nombre', 
+                                page=${asignaturasPage}, 
+                                filterFormId='', 
+                                targetUrl=@{/admin/asignaturas/tableData}, 
+                                tableId='table-asignaturas', 
+                                pageParamName='page')}">
+                            </th>
+                            <th th:replace="~{components/table/sort-header :: cell(
+                                field='descripcion', 
+                                fieldLabel='Descripción', 
+                                page=${asignaturasPage}, 
+                                filterFormId='', 
+                                targetUrl=@{/admin/asignaturas/tableData}, 
+                                tableId='table-asignaturas', 
+                                pageParamName='page')}">
+                            </th>
+                            <th th:replace="~{components/table/sort-header :: cell(
+                                field='nTemas', 
+                                fieldLabel='Nº temas', 
+                                page=${asignaturasPage}, 
+                                filterFormId='', 
+                                targetUrl=@{/admin/asignaturas/tableData}, 
+                                tableId='table-asignaturas', 
+                                pageParamName='page')}">
+                            </th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr th:each="asignatura : ${asignaturasPage.content}">
+                            <!-- Nombre -->
+                            <td th:text="${asignatura.nombre}"></td>
+
+                            <!-- Descripción -->
+                            <td th:text="${asignatura.descripcion}"></td>
+
+                            <!-- Nº temas -->
+                            <td th:text="${asignatura.nTemas}"></td>
+
+                            <!-- Acciones -->
+                            <td>
+                                <div class="flex justify-center gap-1">
+                                    <!-- Editar -->
+                                    <a th:href="@{/admin/asignaturas/{id}/editar(id=${asignatura.id})}" 
+                                        class="btn btn-ghost btn-square btn-sm">
+
+                                        <i class="fa-regular fa-pen-to-square"></i>
+                                    </a>
+                            
+                                    <!-- Eliminar -->
+                                    <button type="button" class="btn btn-ghost btn-square btn-sm text-error"
+                                            title="Eliminar asignatura"
+                                            th:attr="hx-post=@{/admin/asignaturas/{id}/eliminar(id=${asignatura.id})}"
+                                            hx-trigger="confirmed"
+                                            hx-target="#table-asignaturas-container"
+                                            hx-include="#asignatura-filter-form"
+                                            th:onclick="|confirmDeleteAsignatura(this)|">
+
+                                        <i class="fa-regular fa-trash-can"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </div>
+            </div>
+        </div>
+
+        <script th:inline="javascript">
+            async function confirmDeleteAsignatura(button) {
+                const result = await confirmDialog.open({
+                    title: "Eliminar asignatura",
+                    message: "Esta acción eliminará la asignatura seleccionada. Esta acción no se podrá deshacer.",
+                    confirmBtnText: "Eliminar",
+                    cancelBtnText: "Cancelar",
+                    icon: "fa-solid fa-trash-can",
+                    type: "danger"
+                });
+
+                if (!result.isConfirmed) {
+                    return;
+                } else{
+                    htmx.trigger(button, "confirmed");
+                } 
+            }
+        </script>
+    </main>
+</body>
+</html>

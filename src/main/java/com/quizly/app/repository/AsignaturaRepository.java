@@ -14,4 +14,15 @@ public interface AsignaturaRepository extends JpaRepository<Asignatura, Long>, A
     Page<Asignatura> findByNombreContainingIgnoreCase(String nombre, Pageable pageable);
 
     List<Asignatura> findAllByOrderByNombreAsc();
+
+    /**
+     * Consulta si existen asignaturas con el nombre
+     * pasado por parámetro, excluyendo una asignatura en específico
+     * @param nombre
+     * @param id
+     * @return
+     */
+    boolean existsByNombreIgnoreCaseAndIdNot(String nombre, Long id);
+    
+    boolean existsBySlug(String slug);
 }
