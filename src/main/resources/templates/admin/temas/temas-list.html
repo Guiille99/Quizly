@@ -138,7 +138,11 @@
                             
                                     <!-- Eliminar -->
                                     <button type="button" class="btn btn-ghost btn-square btn-sm text-error"
+                                            title="Eliminar tema"
+                                            th:attr="hx-post=@{/admin/temas/{id}/eliminar(id=${tema.id})}"
                                             hx-trigger="confirmed"
+                                            hx-target="#table-temas-container"
+                                            hx-include="#tema-filter-form"
                                             th:onclick="|confirmDeleteTema(this)|">
 
                                         <i class="fa-regular fa-trash-can"></i>

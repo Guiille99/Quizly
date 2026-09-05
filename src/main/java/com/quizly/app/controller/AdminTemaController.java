@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.quizly.app.dto.form.TemaFilterForm;
 import com.quizly.app.dto.form.TemaForm;
+import com.quizly.app.exception.QuizlyException;
 import com.quizly.app.model.entity.Tema;
 import com.quizly.app.repository.AsignaturaRepository;
 import com.quizly.app.repository.TemaRepository;
@@ -22,12 +23,12 @@ import com.quizly.app.web.notification.ToastService;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 
 
@@ -153,8 +154,49 @@ public class AdminTemaController {
     }
     
 
+    @PostMapping("{id}/eliminar")
+    public String deleteTema(@PathVariable Long id, @ModelAttribute TemaFilterForm filters, 
+        Pageable pageable, Model model, RedirectAttributes ra, HttpServletResponse response,
+        @RequestHeader(value = "HX-Request", required = false) String hxRequest) {
+                
+            
+        try {
+            temaService.deleteTema(id);
+            String successMsg = "El tema se ha eliminado correctamente.";
+
+            if (hxRequest != null) {
+                toastService.success(response, successMsg);
+            } else{
+                toastService.success(ra, successMsg);
+            }
+        } catch (QuizlyException | EntityNotFoundException e) {
+            if (hxRequest != null) {
+                toastService.error(response, e.getMessage());
+            } else {
+                toastService.error(ra, e.getMessage());
+            }
+        } catch (Exception e) {
+            String errorMsg = "Se ha producido un error al eliminar el tema.";
+
+            if (hxRequest != null) {
+                toastService.error(response, errorMsg);    
+            } else {
+                toastService.error(ra, errorMsg);
+            }
+        }
+        
+        return hxRequest != null 
+            ? refreshTemaTable(filters, pageable, model) 
+            : "redirect:/admin/cuestionarios";
+    }
+    
     private void loadFormOptions(Model model, TemaForm form){
         model.addAttribute("asignaturas", asignaturaRepository.findAllByOrderByNombreAsc());
+    }
+
+    private String refreshTemaTable(TemaFilterForm filters, Pageable pageable, Model model){
+        loadTemasTableAttributes(filters, pageable, model);
+        return "admin/temas/temas-list :: table-temas-container_fragment"; 
     }
     
 }

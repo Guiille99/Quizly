@@ -1,6 +1,9 @@
 package com.quizly.app.service;
 
+
+import com.quizly.app.exception.QuizlyException;
 import com.quizly.app.repository.AsignaturaRepository;
+
 import com.quizly.app.repository.IntentoCuestionarioRepository;
 import com.quizly.app.repository.TemaRepository;
 
@@ -11,8 +14,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+
+
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.CollectionUtils;
 import org.springframework.data.domain.Page;
+
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -199,7 +206,32 @@ public class TemaService {
      * @param slug
      * @return {@link Tema}
      */
+
+
+
+
     public Tema getTemaBySlug(String slug){
         return temaRepository.findBySlug(slug).orElse(null);
     }
+
+    /**
+     * Elimina un tema por su ID.
+     * Valida que no tenga cuestionarios asociados antes de eliminar.
+     * 
+     * @param id Identificador del tema a eliminar
+     * @throws QuizlyException Si el tema tiene cuestionarios asociados
+     * @throws EntityNotFoundException Si el tema no existe
+     */
+    @Transactional
+    public void deleteTema(Long id) throws QuizlyException {
+        Tema tema = temaRepository.findById(id)
+            .orElseThrow(() -> new EntityNotFoundException("No se ha encontrado el tema solicitado"));
+
+        if (!CollectionUtils.isEmpty(tema.getCuestionarios())) {
+            throw new QuizlyException("No se puede eliminar el tema porque tiene cuestionarios asociados. Elimine primero los cuestionarios.");
+        }
+
+        temaRepository.delete(tema);
+    }
 }
+
