@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es" th:replace="~{layout/base_layout :: layout(~{::main})}">
+<head th:replace="~{fragments/head :: head('Quizly - Usuarios')}"></head>
+<body>
+    <main th:fragment="main" class="w-full px-6 py-8">
+        <!-- Cabecera -->
+        <div class="flex flex-wrap gap-3 lg:gap-0 items-start justify-between mb-5">
+            <div>
+                <h1 class="text-xl font-semibold tracking-tight text-text">Gestión de usuarios</h1>
+                <p class="mt-1 text-sm text-text-muted">
+                    Visualiza, crea, edita y gestiona los usuarios y sus roles.
+                </p>
+            </div>
+            <a th:href="@{/admin/usuarios/nuevo}" class="btn btn-primary">
+                <i class="fa-solid fa-user-plus"></i> Nuevo usuario
+            </a>
+        </div>
+
+        <!-- Contenedor dinámico HTMX -->
+        <div class="card mt-6">
+            <div id="table-usuarios-container" class="card-body" th:fragment="table-usuarios-container_fragment">
+                
+                <!-- Filtros -->
+                <form id="usuario-filter-form" class="flex flex-wrap gap-2 items-center">
+                    
+                    <!-- Buscador general -->
+                    <input type="text" name="search" th:value="${filters.search}"
+                        placeholder="Buscar por nombre, email, usuario..." class="input max-w-xs"
+                        hx-get="/admin/usuarios/tableData"
+                        hx-trigger="input changed delay:400ms"
+                        hx-target="#table-usuarios"
+                        hx-include="#usuario-filter-form"
+                        hx-swap="outerHTML">
+
+                    <!-- Filtro por Rol -->
+                    <select name="rol" class="select max-w-xs"
+                        hx-get="/admin/usuarios/tableData"
+                        hx-trigger="change"
+                        hx-target="#table-usuarios"
+                        hx-include="#usuario-filter-form"
+                        hx-swap="outerHTML">
+                        <option value="">Todos los roles</option>
+                        <option th:each="rolOpt : ${rolesDisponibles}" 
+                                th:value="${rolOpt}" 
+                                th:text="${rolOpt.name()}"
+                                th:selected="${filters.rol == rolOpt}">
+                        </option>
+                    </select>
+
+                    <!-- Reset -->
+                    <button name="resetFilters" class="btn btn-outline btn-error"
+                        hx-get="/admin/usuarios/tableData"
+                        hx-target="#table-usuarios-container"
+                        hx-swap="outerHTML">
+                        <i class="fa-solid fa-trash-can"></i> Limpiar
+                    </button>
+                </form>
+                
+                <!-- Tabla. Invocando tu esqueleto reutilizable[cite: 3] -->
+                <div th:replace="~{components/table/skeleton :: base(
+                        tableId='table-usuarios', 
+                        page=${usuariosPage}, 
+                        thead=~{::thead}, 
+                        tbody=~{::tbody}, 
+                        filterFormId='#usuario-filter-form', 
+                        targetUrl=@{/admin/usuarios/tableData},
+                        pageParamName='page',
+                        sizeOptions=${ {10, 20, 50} })}" th:fragment="table-usuarios_fragment">
+
+                    <thead>
+                        <tr>
+                            <th>Usuario</th>
+                            <th th:replace="~{components/table/sort-header :: cell(
+                                field='email', fieldLabel='Email', page=${usuariosPage}, 
+                                filterFormId='#usuario-filter-form', targetUrl=@{/admin/usuarios/tableData}, 
+                                tableId='table-usuarios', pageParamName='page')}"></th>
+                            <th th:replace="~{components/table/sort-header :: cell(
+                                field='rol', fieldLabel='Rol', page=${usuariosPage}, 
+                                filterFormId='#usuario-filter-form', targetUrl=@{/admin/usuarios/tableData}, 
+                                tableId='table-usuarios', pageParamName='page')}"></th>
+                            <th th:replace="~{components/table/sort-header :: cell(
+                                field='intentos', fieldLabel='Nº Intentos', page=${usuariosPage}, 
+                                filterFormId='#usuario-filter-form', targetUrl=@{/admin/usuarios/tableData}, 
+                                tableId='table-usuarios', pageParamName='page')}"></th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr th:each="usuario : ${usuariosPage.content}">
+                            <!-- Columna Compuesta: Avatar, Nombre e Iniciales -->
+                            <td>
+                                <div class="flex items-center gap-3">
+                                    <div class="avatar size-9 min-h-0 placeholder">
+                                        <div class="badge-default">
+                                            <span class="text-xs" th:text="${usuario.iniciales}"></span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="font-bold" th:text="${usuario.nombreCompleto}"></div>
+                                        <div class="text-sm opacity-50" th:text="${'@' + usuario.username}"></div>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td th:text="${usuario.email}"></td>
+                            
+                            <td>
+                                <div class="badge badge-sm" th:classappend="${usuario.rol == 'ADMIN' ? 'badge-admin' : 'badge-user'}" 
+                                    th:text="${usuario.rol}"></div>
+                            </td>
+
+                            <td th:text="${usuario.nIntentos}"></td>
+
+                            <!-- Acciones -->
+                            <td>
+                                <div class="flex items-center gap-1">
+                                    <a th:href="@{/admin/usuarios/{id}/editar(id=${usuario.id})}" 
+                                        class="btn btn-ghost btn-square btn-sm">
+                                        <i class="fa-regular fa-pen-to-square"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-ghost btn-square btn-sm text-error"
+                                            title="Eliminar usuario"
+                                            th:attr="hx-post=@{/admin/usuarios/{id}/eliminar(id=${usuario.id})}"
+                                            hx-trigger="confirmed"
+                                            hx-target="#table-usuarios-container"
+                                            hx-include="#usuario-filter-form"
+                                            th:onclick="|confirmDeleteUsuario(this)|">
+                                        <i class="fa-regular fa-trash-can"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </div>
+            </div>
+        </div>
+
+        <script th:inline="javascript">
+            async function confirmDeleteUsuario(button) {
+                const result = await confirmDialog.open({
+                    title: "Eliminar usuario",
+                    message: "Esta acción eliminará el usuario seleccionado. Esta acción no se podrá deshacer.",
+                    confirmBtnText: "Eliminar",
+                    cancelBtnText: "Cancelar",
+                    icon: "fa-solid fa-trash-can",
+                    type: "danger"
+                });
+
+                if (!result.isConfirmed) {
+                    return;
+                } else{
+                    htmx.trigger(button, "confirmed");
+                } 
+            }
+        </script>
+    </main>
+</body>
+</html>

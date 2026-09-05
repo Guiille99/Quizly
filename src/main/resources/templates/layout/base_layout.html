@@ -145,7 +145,10 @@
                                             </li>
 
                                             <li>
-                                                <a class="btn-link">Usuarios</a>
+                                                <a th:href="@{/admin/usuarios}" class="btn-link"
+                                                    th:classappend="${currentUri.startsWith('/admin/usuarios')} ? 'active'">
+                                                    Usuarios
+                                                </a>
                                             </li>
                                         </ul>
                                     </details>
