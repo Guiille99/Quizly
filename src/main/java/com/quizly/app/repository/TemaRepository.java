@@ -15,6 +15,25 @@ public interface TemaRepository extends JpaRepository<Tema, Long>, TemaRepositor
     Page<Tema> findByAsignaturaId(Long asignaturaId, Pageable pageable);
     Page<Tema> findAllByOrderByUpdatedAt(Pageable pageable);
     List<Tema> findAllByOrderByNombreAsc();
-    boolean existsByAsignaturaIdAndOrden(Long asignaturaId, Integer orden);
-    boolean existsByAsignaturaIdAndNombreIgnoreCase(Long asignaturaId, String nombre);
+
+
+    /**
+     * Comprueba si existe un tema con el mismo orden asignado
+     * dentro de la misma asignatura, excluyendo un tema en específico
+     * @param asignaturaId
+     * @param orden
+     * @param idTemaAExcluir
+     * @return
+     */
+    boolean existsByAsignaturaIdAndOrdenAndIdNot(Long asignaturaId, Integer orden, Long idTemaAExcluir);
+    
+    /**
+     * Comprueba si existe un tema con el mismo nombre
+     * dentro de la misma asignatura, excluyendo un tema en específico
+     * @param asignaturaId
+     * @param nombre
+     * @param idTemaAExcluir
+     * @return
+     */
+    boolean existsByAsignaturaIdAndNombreIgnoreCaseAndIdNot(Long asignaturaId, String nombre, Long idTemaAExcluir);
 }

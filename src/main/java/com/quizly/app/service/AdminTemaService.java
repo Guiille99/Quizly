@@ -29,7 +29,25 @@ public class AdminTemaService {
      * de un nuevo tema
      * @return formulacio de tema con sus valores iniciales.
      */
-    public TemaForm creatTemaForm(){
+    public TemaForm createTemaForm(){
         return new TemaForm();
+    }
+
+    /**
+     * Prepara el cuestionario de edición
+     * del tema pasado por parámetro
+     * @param tema
+     * @return
+     */
+    public TemaForm createTemaForm(Tema tema){
+        TemaForm form = new TemaForm();
+        
+        form.setId(tema.getId());
+        form.setNombre(tema.getNombre());
+        form.setOrden(tema.getOrden());
+        form.setAsignaturaId(tema.getAsignatura().getId());
+        form.setDescripcion(tema.getDescripcion());
+
+        return form;
     }
 }

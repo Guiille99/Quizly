@@ -78,7 +78,7 @@ public class AdminTemaController {
 
     @GetMapping("/nuevo")
     public String showCreateTemaForm(Model model) {
-        TemaForm form = adminTemaService.creatTemaForm();
+        TemaForm form = adminTemaService.createTemaForm();
         model.addAttribute("temaForm", form);
         loadFormOptions(model, form);
         return "admin/temas/tema-form";
@@ -117,11 +117,41 @@ public class AdminTemaController {
 
         if (!tema.isPresent()) {
             toastService.error(model, "No se ha encontrado el tema seleccionado.");
+            return "admin/temas/temas-list";
+        }
+
+        TemaForm form = adminTemaService.createTemaForm(tema.get());
+
+        model.addAttribute("temaForm", form);
+        loadFormOptions(model, form);
+        return "admin/temas/tema-form";
+    }
+
+    @PostMapping("{id}/editar")
+    public String editTema(@PathVariable Long id, @Valid @ModelAttribute("temaForm") TemaForm form,
+        BindingResult bindingResult, Model model, RedirectAttributes ra) {
+        
+        if (bindingResult.hasErrors()) {
+            loadFormOptions(model, form);
             return "admin/temas/tema-form";
         }
 
-        return "admin/temas/tema-form";
+        try {
+            temaService.updateTema(id, form);
+            toastService.success(ra, "El tema se ha actualizado correctamente.");
+        } catch (EntityNotFoundException | IllegalArgumentException e) {
+            toastService.error(model, e.getMessage());
+            loadFormOptions(model, form);
+            return "admin/temas/tema-form";
+        } catch (Exception e){
+            toastService.error(model, "Se ha producido un error al actualizar el tema.");
+            loadFormOptions(model, form);
+            return "admin/temas/tema-form";
+        }
+
+        return "redirect:/admin/temas";        
     }
+    
 
     private void loadFormOptions(Model model, TemaForm form){
         model.addAttribute("asignaturas", asignaturaRepository.findAllByOrderByNombreAsc());

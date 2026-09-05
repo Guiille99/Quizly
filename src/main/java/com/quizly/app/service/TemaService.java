@@ -64,12 +64,35 @@ public class TemaService {
 
     }
 
+    @Transactional
+    public Tema updateTema(Long id, TemaForm form){
+        Tema tema = temaRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("No se ha encontrado el tema a actualizar"));
+
+        Asignatura asignatura = asignaturaRepository.findById(form.getAsignaturaId())
+            .orElseThrow(() -> new EntityNotFoundException("No se ha encontrado la asignatura seleccionada"));
+
+        validateTema(form);
+
+        tema.setAsignatura(asignatura);
+        tema.setDescripcion(form.getDescripcion());
+        tema.setNombre(form.getNombre());
+        tema.setOrden(form.getOrden());
+        tema.setSlug(resolveUniqueSlug(form.getNombre()));
+
+        tema = temaRepository.save(tema);
+
+        return tema;
+    }
+
     private void validateTema(TemaForm form){
-        if (temaRepository.existsByAsignaturaIdAndOrden(form.getAsignaturaId(), form.getOrden())) {
+        Long temaId = form.getId() != null ? form.getId() : -1L;
+
+        if (temaRepository.existsByAsignaturaIdAndOrdenAndIdNot(form.getAsignaturaId(), form.getOrden(), temaId)) {
             throw new IllegalArgumentException("El número de tema " + form.getOrden() + " ya está ocupado por otro tema en esa asignatura.");
         }
 
-        if (temaRepository.existsByAsignaturaIdAndNombreIgnoreCase(form.getAsignaturaId(), form.getNombre())) {
+        if (temaRepository.existsByAsignaturaIdAndNombreIgnoreCaseAndIdNot(form.getAsignaturaId(), form.getNombre(), temaId)) {
             throw new IllegalArgumentException("Ya existe un tema con ese nombre en la asignatura seleccionada.");
         }
     }

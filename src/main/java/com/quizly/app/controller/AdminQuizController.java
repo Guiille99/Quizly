@@ -175,7 +175,7 @@ public class AdminQuizController {
 
         if (!cuestionario.isPresent()) {
             toastService.error(model, "No ha encontrado el cuestionario solicitado");
-            return "admin/cuestionarios/quiz-form";
+            return "admin/cuestionarios/cuestionarios-list";
         }
 
         QuizForm quizForm = adminQuizService.createQuizForm(cuestionario.get());
