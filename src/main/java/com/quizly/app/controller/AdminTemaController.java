@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,11 +17,18 @@ import com.quizly.app.model.entity.Tema;
 import com.quizly.app.repository.AsignaturaRepository;
 import com.quizly.app.repository.TemaRepository;
 import com.quizly.app.service.AdminTemaService;
+import com.quizly.app.service.TemaService;
 import com.quizly.app.web.notification.ToastService;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 
 
@@ -30,6 +38,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class AdminTemaController {
     private final ToastService toastService;
     private final AdminTemaService adminTemaService;
+    private final TemaService temaService;
+
     private final AsignaturaRepository asignaturaRepository;
     private final TemaRepository temaRepository;
 
@@ -73,6 +83,32 @@ public class AdminTemaController {
         loadFormOptions(model, form);
         return "admin/temas/tema-form";
     }
+
+    @PostMapping("/nuevo")
+    public String createNewTema(@Valid @ModelAttribute("temaForm") TemaForm form,
+        BindingResult bindingResult, Model model, RedirectAttributes ra) {
+
+        if (bindingResult.hasErrors()) {
+            loadFormOptions(model, form);
+            return "admin/temas/tema-form";
+        }
+
+        try {
+            temaService.createTema(form);
+            toastService.success(ra, "El tema se ha creado correctamente.");
+        } catch (EntityNotFoundException | IllegalArgumentException e) {
+            toastService.error(model, e.getMessage());
+            loadFormOptions(model, form);
+            return "admin/temas/tema-form";
+        } catch (Exception e){
+            toastService.error(model, "Se ha producido un error al crear el tema.");
+            loadFormOptions(model, form);
+            return "admin/temas/tema-form";
+        }
+
+        return "redirect:/admin/temas";
+    }
+    
     
 
     @GetMapping("{id}/editar")

@@ -50,6 +50,8 @@
                                     placeholder="Número del tema"
                                     th:classappend="${#fields.hasErrors('orden')} ? 'input-error'"
                                     th:readonly="${!temaForm.editable}">
+
+                                <p th:if="${#fields.hasErrors('orden')}" th:errors="*{orden}" class="text-error"></p>
                             </fieldset>
     
                             <!-- Asignatura -->
@@ -72,6 +74,8 @@
                                          th:text="${asignatura.nombre}">
                                      </option>
                                  </select>
+
+                                 <p th:if="${#fields.hasErrors('asignaturaId')}" th:errors="*{asignaturaId}" class="text-error"></p>
                              </fieldset>
                         </div>
 
@@ -79,7 +83,6 @@
                             <label for="descripcion" class="label">
                                 <span>
                                     Descripción
-                                    <span class="text-error" aria-hidden="true">*</span>
                                 </span>
                             </label>
 
@@ -100,7 +103,7 @@
                 <a th:href="@{/admin/temas}" class="btn btn-outline"
                     th:text="${temaForm.editable ? 'Cancelar' : 'Volver'}"></a>
     
-                <button th:if="${temaForm.editable}" type="submit" form="quiz-form" class="btn btn-primary">
+                <button th:if="${temaForm.editable}" type="submit" form="tema-form" class="btn btn-primary">
                     <i class="fa-regular fa-floppy-disk"></i>
                     <span th:text="${temaForm.id == null ? 'Crear tema' : 'Guardar cambios'}"></span> 
                 </button>

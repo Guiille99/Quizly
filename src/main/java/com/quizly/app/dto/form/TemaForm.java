@@ -1,6 +1,7 @@
 package com.quizly.app.dto.form;
 
 
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -17,7 +18,8 @@ public class TemaForm {
     @Size(max = 255, message = "La descripción no puede superar los 255 caracteres")
     private String descripcion;
 
-    @NotBlank(message = "El nombre es obligatorio")
+    @NotNull(message = "El número del tema es obligatorio")
+    @Min(value = 0, message = "El número del tema debe ser un número positivo")
     private Integer orden;
 
     @NotNull(message = "La asignatura es obligatoria")

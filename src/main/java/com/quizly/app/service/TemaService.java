@@ -1,9 +1,12 @@
 package com.quizly.app.service;
 
+import com.quizly.app.repository.AsignaturaRepository;
 import com.quizly.app.repository.IntentoCuestionarioRepository;
 import com.quizly.app.repository.TemaRepository;
 
-import java.util.Collections;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
+
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -18,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import com.quizly.app.dto.TemaEstadisticaDto;
 import com.quizly.app.dto.TemaProgresoDto;
+import com.quizly.app.dto.form.TemaForm;
 import com.quizly.app.model.entity.Asignatura;
 import com.quizly.app.model.entity.Cuestionario;
 import com.quizly.app.model.entity.Tema;
@@ -32,6 +36,58 @@ public class TemaService {
 
     private final TemaRepository temaRepository;
     private final IntentoCuestionarioRepository intentoCuestionarioRepository;
+    private final AsignaturaRepository asignaturaRepository;
+
+    private final SlugService slugService;
+
+
+    @Transactional 
+    public Tema createTema(TemaForm form){
+        Tema tema = new Tema();
+
+        Asignatura asignatura = asignaturaRepository.findById(form.getAsignaturaId())
+            .orElseThrow(() -> new EntityNotFoundException("No se ha encontrado la asignatura seleccionada"));
+
+        validateTema(form);
+
+        tema.setNombre(form.getNombre());
+        tema.setOrden(form.getOrden());
+        tema.setDescripcion(form.getDescripcion());
+        tema.setSlug(resolveUniqueSlug(form.getNombre()));
+
+
+        tema.setAsignatura(asignatura);
+
+        tema = temaRepository.save(tema);
+
+        return tema;
+
+    }
+
+    private void validateTema(TemaForm form){
+        if (temaRepository.existsByAsignaturaIdAndOrden(form.getAsignaturaId(), form.getOrden())) {
+            throw new IllegalArgumentException("El número de tema " + form.getOrden() + " ya está ocupado por otro tema en esa asignatura.");
+        }
+
+        if (temaRepository.existsByAsignaturaIdAndNombreIgnoreCase(form.getAsignaturaId(), form.getNombre())) {
+            throw new IllegalArgumentException("Ya existe un tema con ese nombre en la asignatura seleccionada.");
+        }
+    }
+
+    private String resolveUniqueSlug(String txt) {
+        String baseSlug = slugService.generateSlug(txt);
+        if (!temaRepository.existsBySlug(baseSlug)) {
+            return baseSlug;
+        }
+
+        int suffix = 2;
+        String candidate;
+        do {
+            candidate = baseSlug + "-" + suffix++;
+        } while (temaRepository.existsBySlug(candidate));
+
+        return candidate;
+    }
 
     /**
      * Obtiene los temas con mejor porcentaje de media
