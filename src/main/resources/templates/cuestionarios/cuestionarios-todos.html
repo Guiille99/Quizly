@@ -14,7 +14,7 @@
                 <div th:each="cuestionario : ${cuestionariosPage}" class="card selectable-card quiz-card">
                     <div class="flex flex-col gap-1">
                         <span class="quiz-title" th:text="${cuestionario.titulo}"></span>
-                        <span class="quiz-meta" th:text="|${cuestionario.tema.asignatura.nombre} - ${cuestionario.preguntas.size()} preguntas|"></span>
+                        <span class="quiz-meta" th:text="|${cuestionario.tema != null ? cuestionario.tema.asignatura.nombre : 'Personal'} - ${cuestionario.preguntas.size()} preguntas|"></span>
                     </div>
                     <div class="badge-difficulty" th:classappend="${cuestionario.dificultad.codigo == 'EASY' ? 'badge-difficulty-easy' : cuestionario.dificultad.codigo == 'MEDIUM' ? 'badge-difficulty-medium' : cuestionario.dificultad.codigo == 'HARD' ? 'badge-difficulty-hard' : ''}">
                         <span th:text="${cuestionario.dificultad.nombre}"></span>

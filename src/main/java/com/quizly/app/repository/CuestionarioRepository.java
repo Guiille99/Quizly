@@ -17,10 +17,19 @@ import com.quizly.app.model.entity.Cuestionario;
 public interface CuestionarioRepository extends JpaRepository<Cuestionario, Long>, CuestionarioRepositoryCustom {
     @Query("""
             SELECT c FROM Cuestionario c
+            LEFT JOIN c.tema t
             WHERE c.version = (SELECT MAX(c2.version) FROM Cuestionario c2 WHERE c2.slug = c.slug)
-            ORDER BY c.tema.nombre ASC
+            ORDER BY t.nombre ASC NULLS LAST, c.titulo ASC
             """)
     Page<Cuestionario> findAllByOrderByTemaNombreAsc(Pageable pageable);
+
+    @Query("""
+            SELECT c FROM Cuestionario c
+            WHERE c.usuario.id = :usuarioId
+            AND c.version = (SELECT MAX(c2.version) FROM Cuestionario c2 WHERE c2.slug = c.slug)
+            ORDER BY c.createdAt DESC
+            """)
+    Page<Cuestionario> findByUsuarioId(Long usuarioId, Pageable pageable);
 
     /**
      * Devuelve los cuestionarios recientes realizados por el usuario

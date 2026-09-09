@@ -92,16 +92,25 @@ public class CuestionarioService {
 
     @Transactional
     public Cuestionario createQuiz(QuizForm form){
-        Asignatura asignatura = asignaturaRepository.findById(form.getAsignaturaId())
-            .orElseThrow(() -> new EntityNotFoundException("No se ha encontrado la asignatura seleccionada"));
+        return createQuiz(form, null);
+    }
 
-        Tema tema = temaRepository.findById(form.getTemaId())
-            .orElseThrow(() -> new EntityNotFoundException("No se ha encontrado el tema seleccionado."));
+    @Transactional
+    public Cuestionario createQuiz(QuizForm form, Usuario usuario){
+        Tema tema = null;
+        if (form.getTemaId() != null) {
+            tema = temaRepository.findById(form.getTemaId())
+                .orElseThrow(() -> new EntityNotFoundException("No se ha encontrado el tema seleccionado."));
+
+            if (form.getAsignaturaId() != null) {
+                Asignatura asignatura = asignaturaRepository.findById(form.getAsignaturaId())
+                    .orElseThrow(() -> new EntityNotFoundException("No se ha encontrado la asignatura seleccionada"));
+                validarTemaDeAsignatura(tema, asignatura);
+            }
+        }
 
         Dificultad dificultad = dificultadRepository.findById(form.getDificultadId())
             .orElseThrow(() -> new EntityNotFoundException("No se ha encontrado la dificultad seleccionada."));
-
-        validarTemaDeAsignatura(tema, asignatura);
 
         Cuestionario cuestionario = new Cuestionario();
 
@@ -109,6 +118,7 @@ public class CuestionarioService {
         cuestionario.setDescripcion(form.getDescripcion());
         cuestionario.setTema(tema);
         cuestionario.setDificultad(dificultad);
+        cuestionario.setUsuario(usuario);
         cuestionario.setSlug(resolveUniqueSlug(form.getTitulo()));
         cuestionario.setVersion(1);
         cuestionario.setTiempoLimite(calculateTiempoLimite(form));
@@ -133,8 +143,11 @@ public class CuestionarioService {
             );
         }
 
-        Tema tema = temaRepository.findById(form.getTemaId())
-            .orElseThrow(() -> new EntityNotFoundException("No se ha encontrado el tema seleccionado."));
+        Tema tema = null;
+        if (form.getTemaId() != null) {
+            tema = temaRepository.findById(form.getTemaId())
+                .orElseThrow(() -> new EntityNotFoundException("No se ha encontrado el tema seleccionado."));
+        }
 
         Dificultad dificultad = dificultadRepository.findById(form.getDificultadId())
             .orElseThrow(() -> new EntityNotFoundException("No se ha encontrado la dificultad seleccionada."));
@@ -145,6 +158,7 @@ public class CuestionarioService {
         nuevaVersCuestionario.setDescripcion(form.getDescripcion());
         nuevaVersCuestionario.setTema(tema);
         nuevaVersCuestionario.setDificultad(dificultad);
+        nuevaVersCuestionario.setUsuario(cuestionarioActual.getUsuario());
 
         nuevaVersCuestionario.setSlug(cuestionarioActual.getSlug());
         nuevaVersCuestionario.setVersion(cuestionarioActual.getVersion() + 1);

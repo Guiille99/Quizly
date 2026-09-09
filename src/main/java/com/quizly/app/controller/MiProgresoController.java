@@ -48,7 +48,8 @@ public class MiProgresoController {
                 .orElse(0.0);
 
             long nAsignaturasActivas = intentosCuestionarioUsuario.stream()
-                .map(i -> i.getCuestionario().getTema().getAsignatura().getId())
+                .map(i -> i.getCuestionario().getTema() != null ? i.getCuestionario().getTema().getAsignatura().getId() : null)
+                .filter(java.util.Objects::nonNull)
                 .distinct()
                 .count();
 

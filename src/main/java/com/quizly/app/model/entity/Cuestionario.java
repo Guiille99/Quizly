@@ -60,6 +60,10 @@ public class Cuestionario extends AuditableEntity {
     @JoinColumn(name = "dificultad_id")
     private Dificultad dificultad;
 
+    @ManyToOne
+    @JoinColumn(name = "usuario_id")
+    private Usuario usuario;
+
     @OneToMany(mappedBy = "cuestionario")
     private List<Pregunta> preguntas;
 
