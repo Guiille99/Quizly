@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
@@ -32,6 +33,7 @@ public class AiQuizGeneratorService {
     private final ObjectMapper objectMapper;
     private final String model;
 
+    @Autowired 
     public AiQuizGeneratorService(
             @Value("${ai.base-url:https://generativelanguage.googleapis.com/v1beta/openai}") String baseUrl,
             @Value("${ai.api-key:}") String apiKey,
