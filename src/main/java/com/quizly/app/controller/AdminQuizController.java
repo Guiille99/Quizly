@@ -2,6 +2,7 @@ package com.quizly.app.controller;
 
 import com.quizly.app.dto.form.QuizFilterForm;
 import com.quizly.app.dto.form.QuizForm;
+import com.quizly.app.dto.form.QuizFormOptions;
 import com.quizly.app.exception.QuizlyException;
 import com.quizly.app.model.entity.Cuestionario;
 import com.quizly.app.model.entity.Tema;
@@ -12,6 +13,7 @@ import com.quizly.app.repository.TemaRepository;
 import com.quizly.app.repository.TipoPreguntaRepository;
 import com.quizly.app.service.AdminQuizService;
 import com.quizly.app.service.CuestionarioService;
+import com.quizly.app.service.QuizFormService;
 import com.quizly.app.web.notification.ToastService;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -54,6 +56,7 @@ public class AdminQuizController {
     private final CuestionarioRepository cuestionarioRepository;
 
     private final AdminQuizService adminQuizService;
+    private final QuizFormService quizFormService;
     private final CuestionarioService cuestionarioService;
     private final ToastService toastService;
     
@@ -132,7 +135,7 @@ public class AdminQuizController {
 
     @GetMapping("/nuevo")
     public String showCreateQuizForm(Model model) {
-        QuizForm quizForm = adminQuizService.createQuizForm();
+        QuizForm quizForm = quizFormService.createQuizForm();
         model.addAttribute("quizForm", quizForm);
         loadFormOptions(model, quizForm);
 
@@ -178,7 +181,7 @@ public class AdminQuizController {
             return "admin/cuestionarios/cuestionarios-list";
         }
 
-        QuizForm quizForm = adminQuizService.createQuizForm(cuestionario.get());
+        QuizForm quizForm = quizFormService.createQuizForm(cuestionario.get());
         boolean isLastVersion = cuestionarioService.isLastVersion(cuestionario.get());
         quizForm.setEditable(isLastVersion);
 
@@ -256,15 +259,19 @@ public class AdminQuizController {
     
     
     private void loadFormOptions(Model model, QuizForm quizForm){
-        model.addAttribute("asignaturas", asignaturaRepository.findAllByOrderByNombreAsc());
-        model.addAttribute("dificultades", dificultadRepository.findAllByOrderByNombreAsc());
-        model.addAttribute("tiposPregunta", tipoPreguntaRepository.findAllByOrderByNombreAsc());
+        QuizFormOptions options = quizFormService.getOptions(quizForm.getAsignaturaId());
+        model.addAttribute("asignaturas", options.asignaturas());
+        model.addAttribute("temas", options.tema());
+        model.addAttribute("dificultades", options.dificultad());
+        model.addAttribute("tiposPregunta", options.tiposPregunta());
 
-        if (quizForm.getAsignaturaId() != null) {
-            model.addAttribute("temas", temaRepository.findByAsignaturaId(quizForm.getAsignaturaId()));
-        } else{
-            model.addAttribute("temas", List.of());
-        }
+        // URLs del formulario: action, cancelación y opciones de tema
+        String formAction = quizForm.getId() == null
+                ? "/admin/cuestionarios/nuevo"
+                : "/admin/cuestionarios/" + quizForm.getId() + "/editar";
+        model.addAttribute("formAction", formAction);
+        model.addAttribute("cancelUrl", "/admin/cuestionarios");
+        model.addAttribute("opcionesTemaUrl", "/admin/cuestionarios/opcionesTema");
     }
     
     private String refreshQuizTable(QuizFilterForm filters, Pageable pageable, Model model){

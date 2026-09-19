@@ -31,3 +31,28 @@
         background-color: color-mix(in srgb, var(--color-red-500), black 20%);
     }
 }
+
+/* BUTTONS CARDS */
+.btn-option-card{
+    @apply flex flex-col items-start p-5 rounded-2xl transition text-left bg-badge-muted-bg;
+    
+}
+.btn-option-card-icon {
+    @apply w-10 h-10 rounded-xl flex items-center justify-center mb-4 text-lg transition;
+}
+
+.btn-option-card:hover .btn-option-card-icon{
+    @apply scale-110;
+}
+
+
+/* Variantes de color */
+.btn-option-blue {
+    @apply hover:outline-1 outline-blue-500;
+}
+.btn-option-emerald {
+    @apply hover:outline-1 border-emerald-500;
+}
+.btn-option-purple {
+    @apply hover:outline-1 border-purple-500;
+}

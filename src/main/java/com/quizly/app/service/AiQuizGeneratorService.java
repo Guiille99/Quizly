@@ -12,12 +12,14 @@ import org.springframework.http.MediaType;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientResponseException;
 
 import com.quizly.app.dto.ai.PdfQuizGeneratorRequest;
 import com.quizly.app.dto.form.OpcionRespuestaForm;
 import com.quizly.app.dto.form.PreguntaForm;
 import com.quizly.app.dto.form.QuizForm;
 import com.quizly.app.exception.AiGenerationException;
+import com.quizly.app.exception.AiHighDemandException;
 
 import lombok.extern.slf4j.Slf4j;
 import tools.jackson.databind.DeserializationFeature;
@@ -35,7 +37,7 @@ public class AiQuizGeneratorService {
 
     @Autowired 
     public AiQuizGeneratorService(
-            @Value("${ai.base-url:https://generativelanguage.googleapis.com/v1beta/openai}") String baseUrl,
+            @Value("${ai.base-url:https://generativelanguage.googleapis.com}") String baseUrl,
             @Value("${ai.api-key:}") String apiKey,
             @Value("${ai.model:gemini-1.5-flash}") String model,
             @Value("${ai.timeout-seconds:45}") int timeoutSeconds) {
@@ -91,17 +93,29 @@ public class AiQuizGeneratorService {
             log.info("Enviando petición de generación a la API de IA (Modelo: {})...", this.model);
 
             String jsonResponse = restClient.post()
-                .uri("/chat/completions")
+                .uri("/v1beta/openai/chat/completions")
                 .body(requestBody)
                 .retrieve()
                 .body(String.class);
 
             return parseAiResponseToQuizForm(jsonResponse, filename, request);
+        } catch(RestClientResponseException e){
+            log.error("Error HTTP del proveedor IA [{}] Body: {}", e.getStatusCode(), e.getResponseBodyAsString());
+
+            int statusCode = e.getStatusCode().value();
+            String responseBody = e.getResponseBodyAsString() != null ? e.getResponseBodyAsString() : "";
+
+            // Detección de alta demanda o cuotas agotadas
+            if (statusCode == 429 || statusCode == 503 || responseBody.contains("RESOURCE_EXHAUSTED") || responseBody.contains("UNAVAILABLE")) {
+                throw new AiHighDemandException("El modelo de IA está experimentando una alta demanda en este momento");
+            }
+            
+            throw new AiGenerationException(e.getMessage());
         } catch (AiGenerationException e) {
             throw e;
         } catch (Exception e) {
             log.error("Error al comunicarse con el proveedor de IA", e);
-            throw new AiGenerationException("No se pudo generar el cuestionario con la IA: " + e.getMessage(), e);
+            throw new AiGenerationException(e.getMessage());        
         }
     }
 

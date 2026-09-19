@@ -530,6 +530,49 @@ public class CuestionarioService {
     }
 
     /**
+     * Devuelve los cuestionarios personales de un usuario (sólo la última versión de cada uno),
+     * filtrados opcionalmente por título y dificultad, y ordenados por fecha de creación descendente.
+     *
+     * @param usuarioId    identificador del usuario propietario
+     * @param search       texto opcional para filtrar por título
+     * @param dificultadId identificador opcional de la dificultad
+     * @param pageable     parámetros de paginación
+     * @return página de cuestionarios
+     */
+    public Page<Cuestionario> getCuestionariosByUsuario(Long usuarioId, String search, Long dificultadId, Pageable pageable) {
+        String cleanSearch = StringUtils.isNotBlank(search) ? search.trim() : null;
+        if (cleanSearch != null || dificultadId != null) {
+            return cuestionarioRepository.findByUsuarioIdAndFilters(usuarioId, cleanSearch, dificultadId, pageable);
+        }
+        return cuestionarioRepository.findByUsuarioId(usuarioId, pageable);
+    }
+
+    /**
+     * Devuelve los cuestionarios personales de un usuario (sólo la última versión de cada uno),
+     * ordenados por fecha de creación descendente.
+     *
+     * @param usuarioId identificador del usuario propietario
+     * @param pageable  parámetros de paginación
+     * @return página de cuestionarios
+     */
+    public Page<Cuestionario> getCuestionariosByUsuario(Long usuarioId, Pageable pageable) {
+        return getCuestionariosByUsuario(usuarioId, null, null, pageable);
+    }
+
+    /**
+     * Obtiene un cuestionario personal verificando que pertenece al usuario indicado.
+     * Devuelve vacío si el cuestionario no existe o no es propiedad del usuario.
+     *
+     * @param cuestionarioId identificador del cuestionario
+     * @param usuarioId      identificador del usuario propietario esperado
+     * @return Optional con el cuestionario, o vacío si no pertenece al usuario
+     */
+    public Optional<Cuestionario> getPersonalQuizById(Long cuestionarioId, Long usuarioId) {
+        return cuestionarioRepository.findById(cuestionarioId)
+                .filter(c -> c.getUsuario() != null && c.getUsuario().getId().equals(usuarioId));
+    }
+
+    /**
      * Determina si la instancia del cuestionario pasada por parámetro
      * es la última versión
      * 

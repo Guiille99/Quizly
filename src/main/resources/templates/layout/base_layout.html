@@ -86,6 +86,10 @@
                                         <a th:href="@{/cuestionarios}" class="btn-link" 
                                             th:classappend="${currentUri == '/cuestionarios'} ? 'active'">Todos</a>
                                     </li>
+                                    <li>
+                                        <a th:href="@{/mis-cuestionarios}" class="btn-link" 
+                                            th:classappend="${currentUri.startsWith('/mis-cuestionarios')} ? 'active'">Mis cuestionarios</a>
+                                    </li>
                                     <li><a href="" class="btn-link">Favoritos</a></li>
                                     <li>
                                         <a th:href="@{/cuestionarios/recientes}" class="btn-link"

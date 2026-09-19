@@ -20,6 +20,11 @@ spring:
           auth: true
           starttls:
             enable: true
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 20MB
+      max-request-size: 25MB
 server:
   port: 8080
 ai:
@@ -28,7 +33,7 @@ ai:
   model: ${AI_MODEL}
   timeout-seconds: 45
   max-pages: 30
-  max-file-size-mb: 10
+  max-file-size-mb: 20
 app:
   url: http://localhost:8080
 quiz:

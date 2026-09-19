@@ -31,6 +31,16 @@ public interface CuestionarioRepository extends JpaRepository<Cuestionario, Long
             """)
     Page<Cuestionario> findByUsuarioId(Long usuarioId, Pageable pageable);
 
+    @Query("""
+            SELECT c FROM Cuestionario c
+            WHERE c.usuario.id = :usuarioId
+            AND (:search IS NULL OR :search = '' OR LOWER(c.titulo) LIKE LOWER(CONCAT('%', :search, '%')))
+            AND (:dificultadId IS NULL OR c.dificultad.id = :dificultadId)
+            AND c.version = (SELECT MAX(c2.version) FROM Cuestionario c2 WHERE c2.slug = c.slug)
+            ORDER BY c.createdAt DESC
+            """)
+    Page<Cuestionario> findByUsuarioIdAndFilters(Long usuarioId, String search, Long dificultadId, Pageable pageable);
+
     /**
      * Devuelve los cuestionarios recientes realizados por el usuario
      * cuyo estado del intento coincide con el pasado por parámetro
