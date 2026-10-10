@@ -180,7 +180,7 @@ CREATE TABLE preguntas (
     tipo_pregunta_id  BIGINT       NOT NULL,
     cuestionario_id   BIGINT       NOT NULL,
     created_at        TIMESTAMP    NOT NULL,
-    updated_at        TIMESTAMP    NOT NULL
+    updated_at        TIMESTAMP    NOT NULL,
     CONSTRAINT fk_preguntas_tipo_pregunta
         FOREIGN KEY (tipo_pregunta_id) REFERENCES tipo_preguntas (id),
     CONSTRAINT fk_preguntas_cuestionario
@@ -220,7 +220,7 @@ CREATE TABLE intentos_cuestionario (
     tiempo_empleado BIGINT    NOT NULL,
     estado_id       BIGINT    NOT NULL,
     created_at      TIMESTAMP NOT NULL,
-    updated_at      TIMESTAMP NOT NULL
+    updated_at      TIMESTAMP NOT NULL,
     CONSTRAINT fk_intentos_cuestionario_cuestionario
         FOREIGN KEY (cuestionario_id) REFERENCES cuestionarios (id),
     CONSTRAINT fk_intentos_cuestionario_usuario
