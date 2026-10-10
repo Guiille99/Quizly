@@ -87,8 +87,9 @@ class BreadcrumbServiceTest {
     @DisplayName("misCuestionarios(), nuevo y editar devuelven la jerarquía esperada")
     void testMisCuestionarios() {
         List<BreadcrumbItem> list = breadcrumbService.misCuestionarios();
-        assertEquals(1, list.size());
-        assertEquals("Mis cuestionarios", list.get(0).label());
+        assertEquals(2, list.size());
+        assertEquals("Cuestionarios", list.get(0).label());
+        assertEquals("Mis cuestionarios", list.get(1).label());
 
         List<BreadcrumbItem> nuevo = breadcrumbService.misCuestionariosNuevo();
         assertEquals(2, nuevo.size());
