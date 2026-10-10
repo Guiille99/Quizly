@@ -15,7 +15,7 @@
             </tr>
         </thead>
 
-        <tbody>
+        <tbody class="text-xs">
             <tr th:if="${#lists.isEmpty(quizzes)}">
                 <td colspan="6" class="text-center py-10 text-text-muted">Aún no existen cuestionarios para mostrar</td>
             </tr>
@@ -47,13 +47,13 @@
                 <!-- Acciones -->
                 <td>
                     <div class="flex justify-center gap-1">
-                        <a href="" class="btn btn-ghost btn-square btn-sm">
+                        <a th:href="@{/admin/cuestionarios/{id}/editar(id=${quiz.id})}" class="btn btn-ghost btn-square btn-sm">
                             <i class="fa-regular fa-pen-to-square"></i>
                         </a>
                 
-                        <button class="btn btn-ghost btn-square btn-sm">
+                        <!-- <button class="btn btn-ghost btn-square btn-sm">
                             <i class="fa-solid fa-ellipsis"></i>
-                        </button>
+                        </button> -->
                     </div>
                 </td>
             </tr>

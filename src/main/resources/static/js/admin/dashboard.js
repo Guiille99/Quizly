@@ -16,7 +16,6 @@ const centerTextPlugin = {
         ctx.font = "bold 74px Sora";
         ctx.fillStyle = "#1f2937";
         ctx.textAlign = "center";
-        ctx.textBaseline = "center";
 
         ctx.fillText(options.value, centerX, centerY);
 
