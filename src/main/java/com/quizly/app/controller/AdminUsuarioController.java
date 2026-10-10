@@ -41,10 +41,13 @@ public class AdminUsuarioController {
 
     private final UsuarioRepository usuarioRepository;
     private final GeneroRepository generoRepository;
+    private final com.quizly.app.web.model.BreadcrumbContext breadcrumbContext;
+    private final com.quizly.app.service.BreadcrumbService breadcrumbService;
 
     @GetMapping
     public String showUsuariosList(@ModelAttribute UsuarioFilterForm filters, Pageable pageable, Model model){
         loadUsuariosTableAttributes(filters, pageable, model);
+        breadcrumbContext.set(breadcrumbService.adminUsuarios());
         return "admin/usuarios/usuarios-list";
     }
 
@@ -74,6 +77,7 @@ public class AdminUsuarioController {
         model.addAttribute("usuarioForm", adminUsuarioService.createUsuarioForm());
         model.addAttribute("generos", generoRepository.findAll());
         model.addAttribute("rolesDisponibles", Rol.values());
+        breadcrumbContext.set(breadcrumbService.adminUsuarioNuevo());
         return "admin/usuarios/usuario-form";
     }
 
@@ -84,6 +88,7 @@ public class AdminUsuarioController {
         if (bindingResult.hasErrors()) {
             model.addAttribute("generos", generoRepository.findAll());
             model.addAttribute("rolesDisponibles", Rol.values());
+            breadcrumbContext.set(breadcrumbService.adminUsuarioNuevo());
             return "admin/usuarios/usuario-form";
         }
 
@@ -94,11 +99,13 @@ public class AdminUsuarioController {
             toastService.error(model, e.getMessage());
             model.addAttribute("generos", generoRepository.findAll());
             model.addAttribute("rolesDisponibles", Rol.values());
+            breadcrumbContext.set(breadcrumbService.adminUsuarioNuevo());
             return "admin/usuarios/usuario-form";
         } catch (Exception e){
             toastService.error(model, "Se ha producido un error al crear el usuario.");
             model.addAttribute("generos", generoRepository.findAll());
             model.addAttribute("rolesDisponibles", Rol.values());
+            breadcrumbContext.set(breadcrumbService.adminUsuarioNuevo());
             return "admin/usuarios/usuario-form";
         }
 
@@ -117,6 +124,7 @@ public class AdminUsuarioController {
         model.addAttribute("usuarioForm", adminUsuarioService.createUsuarioForm(usuario.get()));
         model.addAttribute("generos", generoRepository.findAll());
         model.addAttribute("rolesDisponibles", Rol.values());
+        breadcrumbContext.set(breadcrumbService.adminUsuarioEditar(usuario.get().getUsername()));
         return "admin/usuarios/usuario-form";
     }
 
@@ -127,6 +135,7 @@ public class AdminUsuarioController {
         if (bindingResult.hasErrors()) {
             model.addAttribute("generos", generoRepository.findAll());
             model.addAttribute("rolesDisponibles", Rol.values());
+            breadcrumbContext.set(breadcrumbService.adminUsuarioEditar(form.getUsername()));
             return "admin/usuarios/usuario-form";
         }
 
@@ -137,11 +146,13 @@ public class AdminUsuarioController {
             toastService.error(model, e.getMessage());
             model.addAttribute("generos", generoRepository.findAll());
             model.addAttribute("rolesDisponibles", Rol.values());
+            breadcrumbContext.set(breadcrumbService.adminUsuarioEditar(form.getUsername()));
             return "admin/usuarios/usuario-form";
         } catch (Exception e){
             toastService.error(model, "Se ha producido un error al actualizar el usuario.");
             model.addAttribute("generos", generoRepository.findAll());
             model.addAttribute("rolesDisponibles", Rol.values());
+            breadcrumbContext.set(breadcrumbService.adminUsuarioEditar(form.getUsername()));
             return "admin/usuarios/usuario-form";
         }
 

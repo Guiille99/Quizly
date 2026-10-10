@@ -59,6 +59,8 @@ public class CuestionariosController {
     private final QuizSessionService quizSessionService;
     private final IntentoCuestionarioService intentoCuestionarioService;
     private final DificultadRepository dificultadRepository;
+    private final com.quizly.app.web.model.BreadcrumbContext breadcrumbContext;
+    private final com.quizly.app.service.BreadcrumbService breadcrumbService;
 
 
     @GetMapping
@@ -75,6 +77,7 @@ public class CuestionariosController {
         model.addAttribute("search", search);
         model.addAttribute("dificultadId", dificultadId);
         model.addAttribute(Constantes.ATTR_CURRENT_URI, request.getRequestURI());
+        breadcrumbContext.set(breadcrumbService.cuestionariosTodos());
         return "cuestionarios/cuestionarios-todos";
     }
 
@@ -93,6 +96,7 @@ public class CuestionariosController {
         model.addAttribute("search", search);
         model.addAttribute("dificultadId", dificultadId);
         model.addAttribute(Constantes.ATTR_CURRENT_URI, request.getRequestURI());
+        breadcrumbContext.set(breadcrumbService.cuestionariosRecientes());
         return "cuestionarios/cuestionarios-recientes";
     }
     

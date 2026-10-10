@@ -61,6 +61,8 @@ public class MisCuestionariosController {
     private final DificultadRepository dificultadRepository;
     private final TemaRepository temaRepository;
     private final ToastService toastService;
+    private final com.quizly.app.web.model.BreadcrumbContext breadcrumbContext;
+    private final com.quizly.app.service.BreadcrumbService breadcrumbService;
 
     @ModelAttribute("maxFileSizeMb")
     public int getMaxFileSizeMb() {
@@ -80,6 +82,7 @@ public class MisCuestionariosController {
             Model model) {
 
         loadCuestionariosData(authUser.getId(), search, dificultadId, pageable, model);
+        breadcrumbContext.set(breadcrumbService.misCuestionarios());
         return "cuestionarios/mis-cuestionarios";
     }
 
@@ -153,6 +156,7 @@ public class MisCuestionariosController {
             // 5. Cargar opciones del editor y renderizar quiz-form para revisión humana
             model.addAttribute("quizForm", quizForm);
             loadFormOptions(model, quizForm);
+            breadcrumbContext.set(breadcrumbService.misCuestionariosNuevo());
 
             toastService.info(model, "Cuestionario generado con éxito. Revisa y edita las preguntas antes de guardarlo.");
             return "admin/cuestionarios/quiz-form";
@@ -185,6 +189,7 @@ public class MisCuestionariosController {
         QuizForm quizForm = quizFormService.createQuizForm();
         model.addAttribute("quizForm", quizForm);
         loadFormOptions(model, quizForm);
+        breadcrumbContext.set(breadcrumbService.misCuestionariosNuevo());
         return "admin/cuestionarios/quiz-form";
     }
 
@@ -198,6 +203,7 @@ public class MisCuestionariosController {
 
         if (bindingResult.hasErrors()) {
             loadFormOptions(model, form);
+            breadcrumbContext.set(breadcrumbService.misCuestionariosNuevo());
             return "admin/cuestionarios/quiz-form";
         }
 
@@ -207,15 +213,18 @@ public class MisCuestionariosController {
         } catch (EntityNotFoundException | IllegalArgumentException e) {
             toastService.error(model, e.getMessage());
             loadFormOptions(model, form);
+            breadcrumbContext.set(breadcrumbService.misCuestionariosNuevo());
             return "admin/cuestionarios/quiz-form";
         } catch (DataIntegrityViolationException e) {
             toastService.error(model, "No se pudo crear el cuestionario por un conflicto de identificador interno. Inténtalo de nuevo.");
             loadFormOptions(model, form);
+            breadcrumbContext.set(breadcrumbService.misCuestionariosNuevo());
             return "admin/cuestionarios/quiz-form";
         } catch (Exception e) {
             log.error("Error al crear cuestionario personal para usuario {}", authUser.getId(), e);
             toastService.error(model, "Se ha producido un error al crear el cuestionario.");
             loadFormOptions(model, form);
+            breadcrumbContext.set(breadcrumbService.misCuestionariosNuevo());
             return "admin/cuestionarios/quiz-form";
         }
 
@@ -248,6 +257,7 @@ public class MisCuestionariosController {
         QuizForm quizForm = quizFormService.createQuizForm(cuestionario);
         model.addAttribute("quizForm", quizForm);
         loadFormOptions(model, quizForm);
+        breadcrumbContext.set(breadcrumbService.misCuestionariosEditar(cuestionario.getTitulo()));
 
         return "admin/cuestionarios/quiz-form";
     }
@@ -263,6 +273,7 @@ public class MisCuestionariosController {
 
         if (bindingResult.hasErrors()) {
             loadFormOptions(model, form);
+            breadcrumbContext.set(breadcrumbService.misCuestionariosEditar(form.getTitulo()));
             return "admin/cuestionarios/quiz-form";
         }
 
@@ -278,15 +289,18 @@ public class MisCuestionariosController {
         } catch (EntityNotFoundException | IllegalArgumentException e) {
             toastService.error(model, e.getMessage());
             loadFormOptions(model, form);
+            breadcrumbContext.set(breadcrumbService.misCuestionariosEditar(form.getTitulo()));
             return "admin/cuestionarios/quiz-form";
         } catch (DataIntegrityViolationException e) {
             toastService.error(model, "No se pudo actualizar el cuestionario por un conflicto de identificador interno. Inténtalo de nuevo.");
             loadFormOptions(model, form);
+            breadcrumbContext.set(breadcrumbService.misCuestionariosEditar(form.getTitulo()));
             return "admin/cuestionarios/quiz-form";
         } catch (Exception e) {
             log.error("Error al actualizar cuestionario {} del usuario {}", id, authUser.getId(), e);
             toastService.error(model, "Se ha producido un error al actualizar el cuestionario.");
             loadFormOptions(model, form);
+            breadcrumbContext.set(breadcrumbService.misCuestionariosEditar(form.getTitulo()));
             return "admin/cuestionarios/quiz-form";
         }
 

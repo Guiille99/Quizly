@@ -28,6 +28,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class MiProgresoController {
     private final IntentoCuestionarioService intentoCuestionarioService;
     private final IntentoCuestionarioRepository intentoCuestionarioRepository;
+    private final com.quizly.app.web.model.BreadcrumbContext breadcrumbContext;
+    private final com.quizly.app.service.BreadcrumbService breadcrumbService;
 
 
     @GetMapping("/miProgreso")

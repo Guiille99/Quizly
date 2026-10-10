@@ -59,6 +59,8 @@ public class AdminQuizController {
     private final QuizFormService quizFormService;
     private final CuestionarioService cuestionarioService;
     private final ToastService toastService;
+    private final com.quizly.app.web.model.BreadcrumbContext breadcrumbContext;
+    private final com.quizly.app.service.BreadcrumbService breadcrumbService;
     
     private void loadCuestionariosTableAttributes(QuizFilterForm filters, Pageable pageable, Model model){
         model.addAttribute("cuestionariosPage", adminQuizService.getCuestionarios(filters, pageable));
@@ -73,6 +75,7 @@ public class AdminQuizController {
     @GetMapping
     public String showCuestionariosList(@ModelAttribute QuizFilterForm filters, Pageable pageable, Model model) {
         loadCuestionariosTableAttributes(filters, pageable, model);
+        breadcrumbContext.set(breadcrumbService.adminCuestionarios());
         return "admin/cuestionarios/cuestionarios-list";
     }
 
@@ -138,6 +141,7 @@ public class AdminQuizController {
         QuizForm quizForm = quizFormService.createQuizForm();
         model.addAttribute("quizForm", quizForm);
         loadFormOptions(model, quizForm);
+        breadcrumbContext.set(breadcrumbService.adminCuestionarioNuevo());
 
         return "admin/cuestionarios/quiz-form";
     }
@@ -148,6 +152,7 @@ public class AdminQuizController {
         
         if (bindingResult.hasErrors()) {
             loadFormOptions(model, form);
+            breadcrumbContext.set(breadcrumbService.adminCuestionarioNuevo());
             return "admin/cuestionarios/quiz-form";
         }
 
@@ -157,14 +162,17 @@ public class AdminQuizController {
         } catch (EntityNotFoundException | IllegalArgumentException e) {
             toastService.error(model, e.getMessage());
             loadFormOptions(model, form);
+            breadcrumbContext.set(breadcrumbService.adminCuestionarioNuevo());
             return "admin/cuestionarios/quiz-form";
         } catch (DataIntegrityViolationException e) {
             toastService.error(model, "No se pudo crear el cuestionario por un conflicto de identificador interno. Inténtalo de nuevo.");
             loadFormOptions(model, form);
+            breadcrumbContext.set(breadcrumbService.adminCuestionarioNuevo());
             return "admin/cuestionarios/quiz-form";
         } catch (Exception e){
             toastService.error(model, "Se ha producido un error al crear el cuestionario.");
             loadFormOptions(model, form);
+            breadcrumbContext.set(breadcrumbService.adminCuestionarioNuevo());
             return "admin/cuestionarios/quiz-form";
         }
 
@@ -187,6 +195,7 @@ public class AdminQuizController {
 
         model.addAttribute("quizForm", quizForm);
         loadFormOptions(model, quizForm);
+        breadcrumbContext.set(breadcrumbService.adminCuestionarioEditar(cuestionario.get().getTitulo()));
         
         return "admin/cuestionarios/quiz-form";
     }
@@ -198,6 +207,7 @@ public class AdminQuizController {
         
         if (bindingResult.hasErrors()) {
             loadFormOptions(model, form);
+            breadcrumbContext.set(breadcrumbService.adminCuestionarioEditar(form.getTitulo()));
             return "admin/cuestionarios/quiz-form";
         }
 
@@ -207,14 +217,17 @@ public class AdminQuizController {
         } catch (EntityNotFoundException | IllegalArgumentException e) {
             toastService.error(model, e.getMessage());
             loadFormOptions(model, form);
+            breadcrumbContext.set(breadcrumbService.adminCuestionarioEditar(form.getTitulo()));
             return "admin/cuestionarios/quiz-form";
         } catch (DataIntegrityViolationException e) {
             toastService.error(model, "No se pudo actualizar el cuestionario por un conflicto de identificador interno. Inténtalo de nuevo.");
             loadFormOptions(model, form);
+            breadcrumbContext.set(breadcrumbService.adminCuestionarioEditar(form.getTitulo()));
             return "admin/cuestionarios/quiz-form";
         } catch (Exception e){
             toastService.error(model, "Se ha producido un error al actualizar el cuestionario.");
             loadFormOptions(model, form);
+            breadcrumbContext.set(breadcrumbService.adminCuestionarioEditar(form.getTitulo()));
             return "admin/cuestionarios/quiz-form";
         }
 

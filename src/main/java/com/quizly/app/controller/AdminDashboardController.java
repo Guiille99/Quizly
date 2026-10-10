@@ -15,10 +15,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class AdminDashboardController {
 
     private final AdminDashboardService dashboardService;
+    private final com.quizly.app.web.model.BreadcrumbContext breadcrumbContext;
+    private final com.quizly.app.service.BreadcrumbService breadcrumbService;
 
     @GetMapping
     public String showDashboard(Model model) {
         model.addAttribute("dashboard", dashboardService.getDashboard());
+        breadcrumbContext.set(breadcrumbService.adminDashboard());
 
         return "admin/dashboard";
     }    

@@ -39,10 +39,13 @@ public class AdminAsignaturaController {
     private final AsignaturaService asignaturaService;
     
     private final AsignaturaRepository asignaturaRepository;
+    private final com.quizly.app.web.model.BreadcrumbContext breadcrumbContext;
+    private final com.quizly.app.service.BreadcrumbService breadcrumbService;
 
     @GetMapping
     public String showAsignaturasList(@ModelAttribute AsignaturaFilterForm filters, Pageable pageable, Model model) {
         loadAsignaturasTableAttributes(filters, pageable, model);
+        breadcrumbContext.set(breadcrumbService.adminAsignaturas());
         return "/admin/asignaturas/asignaturas-list";
     }
 
@@ -72,6 +75,7 @@ public class AdminAsignaturaController {
     public String showCreateAsignaturaForm(Model model) {
         AsignaturaForm form = adminAsignaturaService.createAsignaturaForm();
         model.addAttribute("asignaturaForm", form);
+        breadcrumbContext.set(breadcrumbService.adminAsignaturaNuevo());
         return "admin/asignaturas/asignatura-form";
     }
 
@@ -80,6 +84,7 @@ public class AdminAsignaturaController {
         BindingResult bindingResult, Model model, RedirectAttributes ra) {
 
         if (bindingResult.hasErrors()) {
+            breadcrumbContext.set(breadcrumbService.adminAsignaturaNuevo());
             return "admin/asignaturas/asignatura-form";
         }
 
@@ -88,9 +93,11 @@ public class AdminAsignaturaController {
             toastService.success(ra, "La asignatura se ha creado correctamente.");
         } catch (EntityNotFoundException | IllegalArgumentException e) {
             toastService.error(model, e.getMessage());
+            breadcrumbContext.set(breadcrumbService.adminAsignaturaNuevo());
             return "admin/asignaturas/asignatura-form";
         } catch (Exception e){
             toastService.error(model, "Se ha producido un error al crear la asignatura.");
+            breadcrumbContext.set(breadcrumbService.adminAsignaturaNuevo());
             return "admin/asignaturas/asignatura-form";
         }
 
@@ -108,6 +115,7 @@ public class AdminAsignaturaController {
 
         AsignaturaForm form = adminAsignaturaService.createAsignaturaForm(asignatura.get());
         model.addAttribute("asignaturaForm", form);
+        breadcrumbContext.set(breadcrumbService.adminAsignaturaEditar(asignatura.get().getNombre()));
         return "admin/asignaturas/asignatura-form";
     }
 
@@ -116,6 +124,7 @@ public class AdminAsignaturaController {
         BindingResult bindingResult, Model model, RedirectAttributes ra) {
         
         if (bindingResult.hasErrors()) {
+            breadcrumbContext.set(breadcrumbService.adminAsignaturaEditar(form.getNombre()));
             return "admin/asignaturas/asignatura-form";
         }
 
@@ -124,9 +133,11 @@ public class AdminAsignaturaController {
             toastService.success(ra, "La asignatura se ha actualizado correctamente.");
         } catch (EntityNotFoundException | IllegalArgumentException e) {
             toastService.error(model, e.getMessage());
+            breadcrumbContext.set(breadcrumbService.adminAsignaturaEditar(form.getNombre()));
             return "admin/asignaturas/asignatura-form";
         } catch (Exception e){
             toastService.error(model, "Se ha producido un error al actualizar la asignatura.");
+            breadcrumbContext.set(breadcrumbService.adminAsignaturaEditar(form.getNombre()));
             return "admin/asignaturas/asignatura-form";
         }
 

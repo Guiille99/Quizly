@@ -43,10 +43,13 @@ public class AdminTemaController {
 
     private final AsignaturaRepository asignaturaRepository;
     private final TemaRepository temaRepository;
+    private final com.quizly.app.web.model.BreadcrumbContext breadcrumbContext;
+    private final com.quizly.app.service.BreadcrumbService breadcrumbService;
 
     @GetMapping
     public String showTemasList(@ModelAttribute TemaFilterForm filters, Pageable pageable, Model model){
         loadTemasTableAttributes(filters, pageable, model);
+        breadcrumbContext.set(breadcrumbService.adminTemas());
         return "admin/temas/temas-list";
     }
 
@@ -82,6 +85,7 @@ public class AdminTemaController {
         TemaForm form = adminTemaService.createTemaForm();
         model.addAttribute("temaForm", form);
         loadFormOptions(model, form);
+        breadcrumbContext.set(breadcrumbService.adminTemaNuevo());
         return "admin/temas/tema-form";
     }
 
@@ -91,6 +95,7 @@ public class AdminTemaController {
 
         if (bindingResult.hasErrors()) {
             loadFormOptions(model, form);
+            breadcrumbContext.set(breadcrumbService.adminTemaNuevo());
             return "admin/temas/tema-form";
         }
 
@@ -100,10 +105,12 @@ public class AdminTemaController {
         } catch (EntityNotFoundException | IllegalArgumentException e) {
             toastService.error(model, e.getMessage());
             loadFormOptions(model, form);
+            breadcrumbContext.set(breadcrumbService.adminTemaNuevo());
             return "admin/temas/tema-form";
         } catch (Exception e){
             toastService.error(model, "Se ha producido un error al crear el tema.");
             loadFormOptions(model, form);
+            breadcrumbContext.set(breadcrumbService.adminTemaNuevo());
             return "admin/temas/tema-form";
         }
 
@@ -125,6 +132,7 @@ public class AdminTemaController {
 
         model.addAttribute("temaForm", form);
         loadFormOptions(model, form);
+        breadcrumbContext.set(breadcrumbService.adminTemaEditar(tema.get().getNombre()));
         return "admin/temas/tema-form";
     }
 
@@ -134,6 +142,7 @@ public class AdminTemaController {
         
         if (bindingResult.hasErrors()) {
             loadFormOptions(model, form);
+            breadcrumbContext.set(breadcrumbService.adminTemaEditar(form.getNombre()));
             return "admin/temas/tema-form";
         }
 
@@ -143,10 +152,12 @@ public class AdminTemaController {
         } catch (EntityNotFoundException | IllegalArgumentException e) {
             toastService.error(model, e.getMessage());
             loadFormOptions(model, form);
+            breadcrumbContext.set(breadcrumbService.adminTemaEditar(form.getNombre()));
             return "admin/temas/tema-form";
         } catch (Exception e){
             toastService.error(model, "Se ha producido un error al actualizar el tema.");
             loadFormOptions(model, form);
+            breadcrumbContext.set(breadcrumbService.adminTemaEditar(form.getNombre()));
             return "admin/temas/tema-form";
         }
 
