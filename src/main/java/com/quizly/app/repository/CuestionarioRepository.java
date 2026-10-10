@@ -25,6 +25,16 @@ public interface CuestionarioRepository extends JpaRepository<Cuestionario, Long
 
     @Query("""
             SELECT c FROM Cuestionario c
+            LEFT JOIN c.tema t
+            WHERE (:search IS NULL OR :search = '' OR LOWER(c.titulo) LIKE LOWER(CONCAT('%', :search, '%')))
+            AND (:dificultadId IS NULL OR c.dificultad.id = :dificultadId)
+            AND c.version = (SELECT MAX(c2.version) FROM Cuestionario c2 WHERE c2.slug = c.slug)
+            ORDER BY t.nombre ASC NULLS LAST, c.titulo ASC
+            """)
+    Page<Cuestionario> findAllByFilters(String search, Long dificultadId, Pageable pageable);
+
+    @Query("""
+            SELECT c FROM Cuestionario c
             WHERE c.usuario.id = :usuarioId
             AND c.version = (SELECT MAX(c2.version) FROM Cuestionario c2 WHERE c2.slug = c.slug)
             ORDER BY c.createdAt DESC
@@ -60,6 +70,23 @@ public interface CuestionarioRepository extends JpaRepository<Cuestionario, Long
             """)
     Page<Cuestionario> getCuestionariosRecientesByUsuarioYEstado(Long usuarioId, List<String> listIntentosCuestionarioEstado, Pageable pageable);
 
+    @Query("""
+            SELECT c FROM IntentoCuestionario ic
+            JOIN ic.cuestionario c
+            JOIN ic.estado e
+            WHERE ic.usuario.id = :usuarioId AND e.codigo IN :listIntentosCuestionarioEstado
+            AND (:search IS NULL OR :search = '' OR LOWER(c.titulo) LIKE LOWER(CONCAT('%', :search, '%')))
+            AND (:dificultadId IS NULL OR c.dificultad.id = :dificultadId)
+            GROUP BY c
+            ORDER BY MAX(ic.fechaFin) DESC
+            """)
+    Page<Cuestionario> getCuestionariosRecientesByUsuarioYEstadoAndFilters(
+            Long usuarioId,
+            List<String> listIntentosCuestionarioEstado,
+            String search,
+            Long dificultadId,
+            Pageable pageable);
+
     /**
      * Obtiene los cuestionarios de un tema paginados
      * @param temaId
@@ -80,6 +107,16 @@ public interface CuestionarioRepository extends JpaRepository<Cuestionario, Long
             AND c.version = (SELECT MAX(c2.version) FROM Cuestionario c2 WHERE c2.slug = c.slug)
             """)
     Page<Cuestionario> findByTituloContainingIgnoreCaseAndTemaId(String titulo, Long temaId, Pageable pageable);
+
+    @Query("""
+            SELECT c FROM Cuestionario c
+            WHERE c.tema.id = :temaId
+            AND (:search IS NULL OR :search = '' OR LOWER(c.titulo) LIKE LOWER(CONCAT('%', :search, '%')))
+            AND (:dificultadId IS NULL OR c.dificultad.id = :dificultadId)
+            AND c.version = (SELECT MAX(c2.version) FROM Cuestionario c2 WHERE c2.slug = c.slug)
+            ORDER BY c.titulo ASC
+            """)
+    Page<Cuestionario> findByTemaIdAndFilters(Long temaId, String search, Long dificultadId, Pageable pageable);
 
     long countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
 

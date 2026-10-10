@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <!--
+        Fragmento reutilizable para el formulario de filtros de cuestionarios.
+        - formId: ID del formulario (por defecto 'quiz-filter-form')
+        - targetUrl: URL a la que se envían las peticiones GET con HTMX
+        - targetId: ID del contenedor que se actualizará con HTMX (por defecto '#lista-cuestionarios')
+    -->
+    <form th:fragment="filters(formId, targetUrl, targetId)"
+          th:id="${formId ?: 'quiz-filter-form'}"
+          class="flex flex-wrap gap-2 mb-4">
+
+        <!-- Buscador por título -->
+        <input type="text" name="search"
+            th:value="${search}"
+            placeholder="Buscar cuestionario..." class="input"
+            th:hx-get="${targetUrl}"
+            hx-trigger="input changed delay:400ms, search"
+            th:hx-target="${targetId ?: '#lista-cuestionarios'}"
+            th:hx-include="'#' + ${formId ?: 'quiz-filter-form'}"
+            hx-swap="outerHTML">
+
+        <!-- Selector de dificultad -->
+        <select name="dificultadId" class="select"
+            th:hx-get="${targetUrl}"
+            hx-trigger="change"
+            th:hx-target="${targetId ?: '#lista-cuestionarios'}"
+            th:hx-include="'#' + ${formId ?: 'quiz-filter-form'}"
+            hx-swap="outerHTML">
+            <option value="">Todas las dificultades</option>
+            <option th:each="dif : ${dificultades}"
+                th:value="${dif.id}"
+                th:text="${dif.nombre}"
+                th:selected="${dificultadId != null && dificultadId == dif.id}">
+            </option>
+        </select>
+    </form>
+</body>
+</html>
+

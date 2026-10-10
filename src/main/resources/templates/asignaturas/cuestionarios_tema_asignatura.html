@@ -8,61 +8,38 @@
             <p class="mt-1 text-sm text-text-muted">Explora los cuestionarios disponibles de este tema</p>
         </div>
 
-        <!-- Filtro de los cuestionarios -->
-        <form id="form-filtros-cuestionarios" class="flex justify-between gap-4 mb-4">
-            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-        
-            <fieldset class="fieldset p-0 flex-1">
-                <input class="input w-full" type="search" id="titleFilter" name="titleFilter"
-                    placeholder="Título del cuestionario"
-                    th:hx-get="@{/asignaturas/{slugAsig}/{slugTema}/tableData(slugAsig=${asignatura.slug}, slugTema=${tema.slug})}"
-                    hx-trigger="input changed delay:400ms, search"
-                    hx-target="#lista-cuestionarios"
-                    hx-include="#form-filtros-cuestionarios" />
-            </fieldset>
-    
-            <button class="btn btn-neutral" type="button" onclick="document.getElementById('form-filtros-cuestionarios').reset()"
-                th:hx-get="@{/asignaturas/{slugAsig}/{slugTema}/tableData(slugAsig=${asignatura.slug}, slugTema=${tema.slug})}"
-                hx-target="#lista-cuestionarios"
-                hx-swap="outerHTML">
-                Limpiar
-            </button>
-        </form>
-    
-    
+        <!-- Filtros combinados: Búsqueda y Dificultad -->
+        <div th:replace="~{components/quiz/quiz-filters :: filters(formId='quiz-filter-form', targetUrl=@{/asignaturas/{slugAsig}/{slugTema}/tableData(slugAsig=${asignatura.slug}, slugTema=${tema.slug})}, targetId='#lista-cuestionarios')}"></div>
+
         <!-- Contenedor de los cuestionarios del tema -->
         <div id="lista-cuestionarios" th:fragment="lista-cuestionarios_fragment">
-            <th:block th:if="${cuestionariosTemaPage.totalElements > 0}">
-                <div class="quiz__container flex flex-col gap-2 mb-4">
-                    <div th:each="cuestionario : ${cuestionariosTemaPage}" class="card selectable-card quiz-card">
-                        <div class="flex flex-col gap-1">
-                            <span class="quiz-title" th:text="${cuestionario.titulo}"></span>
-                            <span class="quiz-meta" th:text="|${cuestionario.tema.asignatura.nombre} - ${cuestionario.preguntas.size()} preguntas|"></span>
-                        </div>
-                        <div class="badge-difficulty" th:classappend="${cuestionario.dificultad.codigo == 'EASY' ? 'badge-difficulty-easy' : cuestionario.dificultad.codigo == 'MEDIUM' ? 'badge-difficulty-medium' : cuestionario.dificultad.codigo == 'HARD' ? 'badge-difficulty-hard' : ''}">
-                            <span th:text="${cuestionario.dificultad.nombre}"></span>
-                        </div>
-        
-                        <a class="btn btn-primary" th:href="@{/cuestionarios/{slug}(slug=${cuestionario.slug})}" role="button">Empezar</a>
-                    </div>
+            <!-- Estado vacío -->
+            <div th:if="${cuestionariosTemaPage.empty}" class="flex flex-col items-center justify-center py-16 text-center">
+                <div class="w-16 h-16 rounded-2xl bg-surface-alt flex items-center justify-center mb-4">
+                    <i class="fa-solid fa-book-open text-2xl text-text-muted"></i>
                 </div>
-        
-                <div th:if="${cuestionariosTemaPage.totalPages > 0}">
-                    <div th:replace="~{components/commons/pagination :: controls(
-                        page=${cuestionariosTemaPage},
-                        filterFormId='#form-filtros-cuestionarios',
-                        targetUrl=@{/asignaturas/{slugAsig}/{slugTema}(slugAsig=${asignatura.slug}, slugTema=${tema.slug})},
-                        tableId='lista-cuestionarios',
-                        pageParamName='page',
-                        sizeOptions=${ {5, 10, 15, 20} }
-                    )}">
-        
-                    </div>
-                </div>
-            </th:block>
+                <h3 class="font-semibold text-text">No se encontraron cuestionarios</h3>
+                <p class="text-sm text-text-muted mt-1 max-w-xs">No hay cuestionarios que coincidan con los filtros seleccionados.</p>
+            </div>
 
-            <div th:unless="${cuestionariosTemaPage.totalElements > 0}" class="w-full flex flex-col items-center justify-center py-16 px-4">
-                <p>No se encontraron resultados</p>
+            <!-- Tarjetas -->
+            <div th:if="${!cuestionariosTemaPage.empty}" class="quiz__container flex flex-col gap-2 mb-4">
+                <th:block th:each="cuestionario : ${cuestionariosTemaPage}">
+                    <div th:replace="~{components/quiz/quiz-card :: card(cuestionario=${cuestionario}, showActions=false, filterFormId='quiz-filter-form')}"></div>
+                </th:block>
+            </div>
+
+            <!-- Paginación -->
+            <div th:if="${cuestionariosTemaPage.totalPages > 1}">
+                <div th:replace="~{components/commons/pagination :: controls(
+                    page=${cuestionariosTemaPage},
+                    filterFormId='quiz-filter-form',
+                    targetUrl=@{/asignaturas/{slugAsig}/{slugTema}(slugAsig=${asignatura.slug}, slugTema=${tema.slug})},
+                    tableId='lista-cuestionarios',
+                    pageParamName='page',
+                    sizeOptions=${ {5, 10, 15, 20} }
+                )}">
+                </div>
             </div>
         </div>
     </main>

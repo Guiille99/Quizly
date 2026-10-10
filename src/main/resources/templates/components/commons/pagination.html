@@ -3,7 +3,8 @@
     th:with="prefix=${pageParamName.contains('_') ? pageParamName.substring(0, pageParamName.lastIndexOf('_') + 1) : ''},
              sortParam=${prefix + 'sort'},
              sizeParam=${prefix + 'size'},
-             currentSort=${page.sort.sorted ? page.sort.![property + ',' + direction.name().toLowerCase()] : ''}">
+             currentSort=${page.sort.sorted ? page.sort.![property + ',' + direction.name().toLowerCase()] : ''},
+             formSelector=${filterFormId != null and filterFormId != '' ? (filterFormId.startsWith('#') ? filterFormId : '#' + filterFormId) : null}">
 
     <div class="flex flex-wrap items-center gap-3 text-sm text-base-content/70">
         <!-- Selector de Tamaño Dinámico -->
@@ -14,7 +15,7 @@
                     th:hx-get="${targetUrl + '?' + pageParamName + '=0' + '&' + sortParam + '=' + currentSort}"
                     th:hx-target="'#' + ${tableId}"
                     th:hx-swap="'outerHTML'"
-                    th:hx-include="${filterFormId != null and filterFormId != '' ? filterFormId : null}">
+                    th:hx-include="${formSelector}">
                 <option th:each="opt : ${sizeOptions}" 
                         th:value="${opt}" 
                         th:text="${opt}"
@@ -33,7 +34,7 @@
         <button class="join-item btn btn-sm"
             th:disabled="${page.first}"
             th:hx-get="${targetUrl + '?' + pageParamName + '=0' + '&' + sizeParam + '=' + page.size + '&' + sortParam + '=' + currentSort}"
-            th:hx-include="${filterFormId != null and filterFormId != '' ? filterFormId : null}"
+            th:hx-include="${formSelector}"
             th:hx-target="'#' + ${tableId}"
             th:hx-swap="'outerHTML'">
 
@@ -43,7 +44,7 @@
         <button class="join-item btn btn-sm"
             th:disabled="${page.first}"
             th:hx-get="${targetUrl + '?' + pageParamName + '=' + (page.number - 1) + '&' + sizeParam + '=' + page.size + '&' + sortParam + '=' + currentSort}"
-            th:hx-include="${filterFormId != null and filterFormId != '' ? filterFormId : null}"
+            th:hx-include="${formSelector}"
             th:hx-target="'#' + ${tableId}"
             th:hx-swap="'outerHTML'">
 
@@ -57,7 +58,7 @@
         <button class="join-item btn btn-sm"
             th:disabled="${page.last}"
             th:hx-get="${targetUrl + '?' + pageParamName + '=' + (page.number + 1) + '&' + sizeParam + '=' + page.size + '&' + sortParam + '=' + currentSort}"
-            th:hx-include="${filterFormId != null and filterFormId != '' ? filterFormId : null}"
+            th:hx-include="${formSelector}"
             th:hx-target="'#' + ${tableId}"
             th:hx-swap="'outerHTML'">
                     
@@ -67,7 +68,7 @@
         <button class="join-item btn btn-sm"
             th:disabled="${page.last}"
             th:hx-get="${targetUrl + '?' + pageParamName + '=' + (page.totalPages - 1) + '&' + sizeParam + '=' + page.size + '&' + sortParam + '=' + currentSort}"
-            th:hx-include="${filterFormId != null and filterFormId != '' ? filterFormId : null}"
+            th:hx-include="${formSelector}"
             th:hx-target="'#' + ${tableId}"
             th:hx-swap="'outerHTML'">
                 

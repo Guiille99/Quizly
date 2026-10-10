@@ -8,32 +8,37 @@
             <p class="mt-1 text-sm text-text-muted">Últimos cuestionarios abiertos</p>
         </div>
 
+        <!-- Filtros combinados: Búsqueda y Dificultad -->
+        <div th:replace="~{components/quiz/quiz-filters :: filters(formId='quiz-filter-form', targetUrl='/cuestionarios/recientes/table-data', targetId='#lista-cuestionarios')}"></div>
+
         <!-- Contenedor de cuestionarios -->
         <div id="lista-cuestionarios" th:fragment="lista-cuestionarios_fragment">
-            <div class="quiz__container flex flex-col gap-2 mb-4">
-                <div th:each="cuestionario : ${cuestionariosRecientesPage}" class="card selectable-card quiz-card">
-                    <div class="flex flex-col gap-1">
-                        <span class="quiz-title" th:text="${cuestionario.titulo}"></span>
-                        <span class="quiz-meta" th:text="|${cuestionario.tema != null ? cuestionario.tema.asignatura.nombre : 'Personal'} - ${cuestionario.preguntas.size()} preguntas|"></span>
-                    </div>
-                    <div class="badge-difficulty" th:classappend="${cuestionario.dificultad.codigo == 'EASY' ? 'badge-difficulty-easy' : cuestionario.dificultad.codigo == 'MEDIUM' ? 'badge-difficulty-medium' : cuestionario.dificultad.codigo == 'HARD' ? 'badge-difficulty-hard' : ''}">
-                        <span th:text="${cuestionario.dificultad.nombre}"></span>
-                    </div>
-
-                    <a class="btn btn-primary" th:href="@{/cuestionarios/{slug}(slug=${cuestionario.slug})}" role="button">Empezar</a>
+            <!-- Estado vacío -->
+            <div th:if="${cuestionariosRecientesPage.empty}" class="flex flex-col items-center justify-center py-16 text-center">
+                <div class="w-16 h-16 rounded-2xl bg-surface-alt flex items-center justify-center mb-4">
+                    <i class="fa-solid fa-book-open text-2xl text-text-muted"></i>
                 </div>
+                <h3 class="font-semibold text-text">No se encontraron cuestionarios</h3>
+                <p class="text-sm text-text-muted mt-1 max-w-xs">No hay cuestionarios recientes que coincidan con los filtros seleccionados.</p>
             </div>
 
-            <div th:if="${cuestionariosRecientesPage.totalPages > 0}">
+            <!-- Tarjetas -->
+            <div th:if="${!cuestionariosRecientesPage.empty}" class="quiz__container flex flex-col gap-2 mb-4">
+                <th:block th:each="cuestionario : ${cuestionariosRecientesPage}">
+                    <div th:replace="~{components/quiz/quiz-card :: card(cuestionario=${cuestionario}, showActions=false, filterFormId='quiz-filter-form')}"></div>
+                </th:block>
+            </div>
+
+            <!-- Paginación -->
+            <div th:if="${cuestionariosRecientesPage.totalPages > 1}">
                 <div th:replace="~{components/commons/pagination :: controls(
                     page=${cuestionariosRecientesPage},
-                    filterFormId='',
-                    targetUrl='/cuestionarios/table-data',
+                    filterFormId='quiz-filter-form',
+                    targetUrl='/cuestionarios/recientes/table-data',
                     tableId='lista-cuestionarios',
                     pageParamName='page',
                     sizeOptions=${ {5, 10} }
                 )}">
-
                 </div>
             </div>
         </div>

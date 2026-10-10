@@ -312,17 +312,35 @@ public class CuestionarioService {
     }
 
 
-    public Page<Cuestionario> getCuestionariosPaginated(Pageable pageable){
-       return cuestionarioRepository.findAllByOrderByTemaNombreAsc(pageable);
+    public Page<Cuestionario> getCuestionariosPaginated(String search, Long dificultadId, Pageable pageable){
+        String cleanSearch = StringUtils.isNotBlank(search) ? search.trim() : null;
+        if (cleanSearch != null || dificultadId != null) {
+            return cuestionarioRepository.findAllByFilters(cleanSearch, dificultadId, pageable);
+        }
+        return cuestionarioRepository.findAllByOrderByTemaNombreAsc(pageable);
     }
 
-    public Page<Cuestionario> getCuestionariosRecientesPaginated(Pageable pageable, QuizlyUserDetails authUser){
+    public Page<Cuestionario> getCuestionariosPaginated(Pageable pageable){
+        return getCuestionariosPaginated(null, null, pageable);
+    }
+
+    public Page<Cuestionario> getCuestionariosRecientesPaginated(String search, Long dificultadId, Pageable pageable, QuizlyUserDetails authUser){
         List<String> intentosCuestionarioEstados = List.of(
             IntentoCuestionarioEstadoEnum.FINISHED.toString(), 
             IntentoCuestionarioEstadoEnum.ABANDONNED.toString()
         );
 
+        String cleanSearch = StringUtils.isNotBlank(search) ? search.trim() : null;
+        if (cleanSearch != null || dificultadId != null) {
+            return cuestionarioRepository.getCuestionariosRecientesByUsuarioYEstadoAndFilters(
+                authUser.getId(), intentosCuestionarioEstados, cleanSearch, dificultadId, pageable);
+        }
+
         return cuestionarioRepository.getCuestionariosRecientesByUsuarioYEstado(authUser.getId(), intentosCuestionarioEstados, pageable);
+    }
+
+    public Page<Cuestionario> getCuestionariosRecientesPaginated(Pageable pageable, QuizlyUserDetails authUser){
+        return getCuestionariosRecientesPaginated(null, null, pageable, authUser);
     }
 
     public Optional<Cuestionario> getLastVersionQuizBySlug(String slug){
@@ -508,25 +526,28 @@ public class CuestionarioService {
         return buildSummary(session, intentoCuestionario);
     }
 
-    public Page<Cuestionario> getCuestionariosPaginatedByTema(Tema tema, String titleFilter, Pageable pageable){
-        
+    public Page<Cuestionario> getCuestionariosPaginatedByTema(Tema tema, String search, Long dificultadId, Pageable pageable){
         if (tema == null) {
             return Page.empty();
         }
 
-        // Gestionar la ordenación
         Sort sort = pageable.getSort().isSorted() ? pageable.getSort() : Sort.by("titulo").ascending();
         Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
 
+        String cleanSearch = StringUtils.isNotBlank(search) ? search.trim() : null;
         Page<Cuestionario> cuestionariosPage;
 
-        if (StringUtils.isNotBlank(titleFilter)) {
-            cuestionariosPage = cuestionarioRepository.findByTituloContainingIgnoreCaseAndTemaId(titleFilter, tema.getId(), pageable);
-        } else{
+        if (cleanSearch != null || dificultadId != null) {
+            cuestionariosPage = cuestionarioRepository.findByTemaIdAndFilters(tema.getId(), cleanSearch, dificultadId, pageable);
+        } else {
             cuestionariosPage = cuestionarioRepository.findByTemaId(tema.getId(), pageable);
         }
 
         return new PageImpl<>(cuestionariosPage.getContent(), sortedPageable, cuestionariosPage.getTotalElements());
+    }
+
+    public Page<Cuestionario> getCuestionariosPaginatedByTema(Tema tema, String titleFilter, Pageable pageable){
+        return getCuestionariosPaginatedByTema(tema, titleFilter, null, pageable);
     }
 
     /**

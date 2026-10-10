@@ -45,6 +45,9 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 
+import com.quizly.app.repository.DificultadRepository;
+import org.springframework.web.bind.annotation.RequestParam;
+
 @Slf4j
 @Controller
 @RequiredArgsConstructor
@@ -55,27 +58,40 @@ public class CuestionariosController {
     private final CuestionarioService cuestionarioService;
     private final QuizSessionService quizSessionService;
     private final IntentoCuestionarioService intentoCuestionarioService;
+    private final DificultadRepository dificultadRepository;
 
 
     @GetMapping
-    public String showTodosCuestionarios(Model model, HttpServletRequest request, 
+    public String showTodosCuestionarios(
+            @RequestParam(name = "search", required = false) String search,
+            @RequestParam(name = "dificultadId", required = false) Long dificultadId,
+            Model model, HttpServletRequest request, 
             @PageableDefault(size = 5) Pageable pageable) {
         
-        Page<Cuestionario> cuestionarios = cuestionarioService.getCuestionariosPaginated(pageable);
+        Page<Cuestionario> cuestionarios = cuestionarioService.getCuestionariosPaginated(search, dificultadId, pageable);
 
         model.addAttribute("cuestionariosPage", cuestionarios);
+        model.addAttribute("dificultades", dificultadRepository.findAllByOrderByNombreAsc());
+        model.addAttribute("search", search);
+        model.addAttribute("dificultadId", dificultadId);
         model.addAttribute(Constantes.ATTR_CURRENT_URI, request.getRequestURI());
         return "cuestionarios/cuestionarios-todos";
     }
 
     @GetMapping("/recientes")
-    public String showCuestionariosRecientes(Model model, HttpServletRequest request,
-           @AuthenticationPrincipal QuizlyUserDetails authUser, 
-           @PageableDefault(size = 10) Pageable pageable) {
+    public String showCuestionariosRecientes(
+            @RequestParam(name = "search", required = false) String search,
+            @RequestParam(name = "dificultadId", required = false) Long dificultadId,
+            Model model, HttpServletRequest request,
+            @AuthenticationPrincipal QuizlyUserDetails authUser, 
+            @PageableDefault(size = 10) Pageable pageable) {
         
-        Page<Cuestionario> cuestionariosRecientes = cuestionarioService.getCuestionariosRecientesPaginated(pageable, authUser);
+        Page<Cuestionario> cuestionariosRecientes = cuestionarioService.getCuestionariosRecientesPaginated(search, dificultadId, pageable, authUser);
         
         model.addAttribute("cuestionariosRecientesPage", cuestionariosRecientes);
+        model.addAttribute("dificultades", dificultadRepository.findAllByOrderByNombreAsc());
+        model.addAttribute("search", search);
+        model.addAttribute("dificultadId", dificultadId);
         model.addAttribute(Constantes.ATTR_CURRENT_URI, request.getRequestURI());
         return "cuestionarios/cuestionarios-recientes";
     }
@@ -83,23 +99,35 @@ public class CuestionariosController {
  
     
     @GetMapping("/table-data")
-    public String getCuestionariosDatosTabla(Model model, 
-        @PageableDefault(size = 5) Pageable pageable) {
+    public String getCuestionariosDatosTabla(
+            @RequestParam(name = "search", required = false) String search,
+            @RequestParam(name = "dificultadId", required = false) Long dificultadId,
+            Model model, 
+            @PageableDefault(size = 5) Pageable pageable) {
         
-        Page<Cuestionario> cuestionarios = cuestionarioService.getCuestionariosPaginated(pageable);
+        Page<Cuestionario> cuestionarios = cuestionarioService.getCuestionariosPaginated(search, dificultadId, pageable);
 
         model.addAttribute("cuestionariosPage", cuestionarios);
+        model.addAttribute("dificultades", dificultadRepository.findAllByOrderByNombreAsc());
+        model.addAttribute("search", search);
+        model.addAttribute("dificultadId", dificultadId);
 
         return "cuestionarios/cuestionarios-todos :: lista-cuestionarios_fragment";
     }
 
     @GetMapping("/recientes/table-data")
-    public String getCuestionariosRecientesDatosTabla(Model model, @AuthenticationPrincipal QuizlyUserDetails authUser,
-        @PageableDefault(size = 10) Pageable pageable) {
+    public String getCuestionariosRecientesDatosTabla(
+            @RequestParam(name = "search", required = false) String search,
+            @RequestParam(name = "dificultadId", required = false) Long dificultadId,
+            Model model, @AuthenticationPrincipal QuizlyUserDetails authUser,
+            @PageableDefault(size = 10) Pageable pageable) {
         
-        Page<Cuestionario> cuestionariosRecientes = cuestionarioService.getCuestionariosRecientesPaginated(pageable, authUser);
+        Page<Cuestionario> cuestionariosRecientes = cuestionarioService.getCuestionariosRecientesPaginated(search, dificultadId, pageable, authUser);
 
         model.addAttribute("cuestionariosRecientesPage", cuestionariosRecientes);
+        model.addAttribute("dificultades", dificultadRepository.findAllByOrderByNombreAsc());
+        model.addAttribute("search", search);
+        model.addAttribute("dificultadId", dificultadId);
 
         return "cuestionarios/cuestionarios-recientes :: lista-cuestionarios_fragment";
     }

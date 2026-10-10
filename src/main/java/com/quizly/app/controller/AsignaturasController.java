@@ -14,6 +14,7 @@ import com.quizly.app.model.entity.Asignatura;
 import com.quizly.app.model.entity.Cuestionario;
 import com.quizly.app.model.entity.Tema;
 import com.quizly.app.security.QuizlyUserDetails;
+import com.quizly.app.repository.DificultadRepository;
 import com.quizly.app.service.AsignaturaService;
 import com.quizly.app.service.BreadcrumbService;
 import com.quizly.app.service.CuestionarioService;
@@ -44,6 +45,7 @@ public class AsignaturasController {
     private final AsignaturaService asignaturaService;
     private final TemaService temaService;
     private final CuestionarioService cuestionarioService;
+    private final DificultadRepository dificultadRepository;
     private final ToastService toastService;
     private final BreadcrumbContext breadcrumbContext;
     private final BreadcrumbService breadcrumbService;
@@ -115,6 +117,8 @@ public class AsignaturasController {
 
     @GetMapping("{slugAsig}/{slugTema}")
     public String showCuestionariosTemaAsignatura(@PathVariable String slugAsig, @PathVariable String slugTema, 
+        @RequestParam(name = "search", required = false) String search,
+        @RequestParam(name = "dificultadId", required = false) Long dificultadId,
         @AuthenticationPrincipal QuizlyUserDetails authUser, Pageable pageable, 
         Model model, RedirectAttributes ra, HttpServletRequest request) {
         
@@ -128,11 +132,14 @@ public class AsignaturasController {
             return "redirect:/asignaturas";
         }
 
-        Page<Cuestionario> cuestionariosTemaPage = cuestionarioService.getCuestionariosPaginatedByTema(tema, null, pageable);
+        Page<Cuestionario> cuestionariosTemaPage = cuestionarioService.getCuestionariosPaginatedByTema(tema, search, dificultadId, pageable);
 
         model.addAttribute("asignatura", asignatura);
         model.addAttribute("tema", tema);
         model.addAttribute("cuestionariosTemaPage", cuestionariosTemaPage);
+        model.addAttribute("dificultades", dificultadRepository.findAllByOrderByNombreAsc());
+        model.addAttribute("search", search);
+        model.addAttribute("dificultadId", dificultadId);
         model.addAttribute(Constantes.ATTR_CURRENT_URI, request.getRequestURI());
         breadcrumbContext.set(breadcrumbService.temaAsignatura(tema));
 
@@ -140,18 +147,25 @@ public class AsignaturasController {
     }
 
     @GetMapping("{slugAsig}/{slugTema}/tableData")
-    public String getCuestionariosTemaAsignaturaTableData(@PathVariable String slugAsig, @PathVariable String slugTema,
-        @AuthenticationPrincipal QuizlyUserDetails authUser, @RequestParam(required = false) String titleFilter, 
+    public String getCuestionariosTemaAsignaturaTableData(
+        @PathVariable String slugAsig, 
+        @PathVariable String slugTema,
+        @AuthenticationPrincipal QuizlyUserDetails authUser, 
+        @RequestParam(name = "search", required = false) String search,
+        @RequestParam(name = "dificultadId", required = false) Long dificultadId,
         Pageable pageable, Model model) {
         
         Asignatura asignatura = asignaturaService.getAsignatruaBySlug(slugAsig);
         Tema tema = temaService.getTemaBySlug(slugTema);
 
-        Page<Cuestionario> cuestionariosTemaPage = cuestionarioService.getCuestionariosPaginatedByTema(tema, titleFilter, pageable);
+        Page<Cuestionario> cuestionariosTemaPage = cuestionarioService.getCuestionariosPaginatedByTema(tema, search, dificultadId, pageable);
 
         model.addAttribute("asignatura", asignatura);
         model.addAttribute("tema", tema);
         model.addAttribute("cuestionariosTemaPage", cuestionariosTemaPage);
+        model.addAttribute("dificultades", dificultadRepository.findAllByOrderByNombreAsc());
+        model.addAttribute("search", search);
+        model.addAttribute("dificultadId", dificultadId);
 
         return "asignaturas/cuestionarios_tema_asignatura :: lista-cuestionarios_fragment";
     }
