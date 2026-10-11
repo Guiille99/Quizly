@@ -6,7 +6,9 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.quizly.app.model.entity.IntentoCuestionario;
@@ -33,4 +35,10 @@ public interface IntentoCuestionarioRepository extends JpaRepository<IntentoCues
     long countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
     
     boolean existsByCuestionarioId(long cuestionarioId);
+
+    boolean existsByCuestionario_IdAndUsuario_IdNot(Long cuestionarioId, Long usuarioId);
+
+    @Modifying
+    @Query("DELETE FROM IntentoCuestionario intento WHERE intento.usuario.id = :usuarioId")
+    int deleteAllByUsuarioId(@Param("usuarioId") Long usuarioId);
 }

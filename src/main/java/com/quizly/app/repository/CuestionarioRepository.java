@@ -144,4 +144,6 @@ public interface CuestionarioRepository extends JpaRepository<Cuestionario, Long
     Set<Long> findLastVersionIds(Collection<Long> ids);
 
     boolean existsBySlugAndVersionGreaterThan(String slug, Integer version);
+
+        List<Cuestionario> findByUsuario_Id(Long usuarioId);
 }

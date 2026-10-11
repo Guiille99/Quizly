@@ -93,6 +93,10 @@ public class BreadcrumbService {
         );
     }
 
+    public List<BreadcrumbItem> miPerfil() {
+        return List.of(new BreadcrumbItem("Mi perfil", null));
+    }
+
     /**
      * Ej: Cuestionarios > Mis cuestionarios > Nuevo cuestionario
      */
