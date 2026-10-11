@@ -27,6 +27,7 @@ spring:
       max-request-size: 25MB
 server:
   port: 8080
+  forward-headers-strategy: NATIVE
 ai:
   api-key: ${AI_API_KEY}
   base-url: ${AI_BASE_URL}
@@ -34,8 +35,6 @@ ai:
   timeout-seconds: 45
   max-pages: 30
   max-file-size-mb: 20
-app:
-  url: http://localhost:8080
 quiz:
   inactivity-max-duration: 1h
   activity-update-interval: 1m

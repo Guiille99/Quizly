@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.quizly.app.repository.GeneroRepository;
 import com.quizly.app.repository.UsuarioRepository;
@@ -25,6 +26,7 @@ import com.quizly.app.service.AuthService;
 import com.quizly.app.service.EmailService;
 import com.quizly.app.web.notification.ToastService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 
@@ -101,7 +103,8 @@ public class AuthController {
     
     @PostMapping("/forgot-password")
     public String processForgotPassword(@Valid @ModelAttribute("forgotPasswordForm") ForgotPasswordDto form, 
-                     BindingResult bindingResult, RedirectAttributes ra, Model model) {
+                     BindingResult bindingResult, RedirectAttributes ra, Model model,
+                     HttpServletRequest request) {
 
         if (bindingResult.hasErrors()) {
             return "auth/forgot-password";
@@ -112,10 +115,11 @@ public class AuthController {
         if (usuarioOpt.isPresent()) {
             Usuario usuario = usuarioOpt.get();
             String token = authService.createPasswordResetToken(usuario);
+            String appUrl = ServletUriComponentsBuilder.fromContextPath(request).toUriString();
 
             try {
                 log.info("Solicitud de recuperación de contraseña enviada por el usuario '{}'", usuario.getUsername());
-                emailService.sendPasswordResetEmail(usuario.getEmail(), token);
+                emailService.sendPasswordResetEmail(usuario.getEmail(), token, appUrl);
             } catch (QuizlyException e) {
                 log.error("Se ha producido un error al enviar el email de recuperación de contraseña", e);
                 toastService.error(model, e.getMessage());

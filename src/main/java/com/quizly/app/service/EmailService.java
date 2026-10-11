@@ -10,7 +10,6 @@ import org.thymeleaf.spring6.SpringTemplateEngine;
 import com.quizly.app.exception.QuizlyException;
 import com.quizly.app.logging.LogExecution;
 
-import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,11 +24,8 @@ public class EmailService {
     @Value("${spring.mail.username}")
     private String fromEmail;
 
-    @Value("${app.url}")
-    private String appUrl;
-
     @LogExecution
-    public void sendPasswordResetEmail(String userEmail, String token) throws QuizlyException{
+    public void sendPasswordResetEmail(String userEmail, String token, String appUrl) throws QuizlyException{
         String resetUrl = appUrl + "/reset-password?token=" + token;
 
         Context context = new Context();
