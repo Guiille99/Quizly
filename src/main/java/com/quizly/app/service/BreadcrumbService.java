@@ -84,7 +84,7 @@ public class BreadcrumbService {
     // =========================================================================
 
     /**
-     * Ej: Mis cuestionarios
+     * Ej: Cuestionarios > Mis cuestionarios
      */
     public List<BreadcrumbItem> misCuestionarios() {
         return List.of(
@@ -94,21 +94,23 @@ public class BreadcrumbService {
     }
 
     /**
-     * Ej: Mis cuestionarios > Nuevo cuestionario
+     * Ej: Cuestionarios > Mis cuestionarios > Nuevo cuestionario
      */
     public List<BreadcrumbItem> misCuestionariosNuevo() {
         return List.of(
+            CUESTIONARIOS,
             MIS_CUESTIONARIOS,
             new BreadcrumbItem("Nuevo cuestionario", null)
         );
     }
 
     /**
-     * Ej: Mis cuestionarios > Editar '[Título]'
+     * Ej: Cuestionarios > Mis cuestionarios > Editar '[Título]'
      */
     public List<BreadcrumbItem> misCuestionariosEditar(String titulo) {
         String label = (titulo != null && !titulo.isBlank()) ? "Editar '" + titulo + "'" : "Editar cuestionario";
         return List.of(
+            CUESTIONARIOS,
             MIS_CUESTIONARIOS,
             new BreadcrumbItem(label, null)
         );

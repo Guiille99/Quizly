@@ -92,18 +92,20 @@ class BreadcrumbServiceTest {
         assertEquals("Mis cuestionarios", list.get(1).label());
 
         List<BreadcrumbItem> nuevo = breadcrumbService.misCuestionariosNuevo();
-        assertEquals(2, nuevo.size());
-        assertEquals("Mis cuestionarios", nuevo.get(0).label());
-        assertEquals("/mis-cuestionarios", nuevo.get(0).url());
-        assertEquals("Nuevo cuestionario", nuevo.get(1).label());
-        assertNull(nuevo.get(1).url());
+        assertEquals(3, nuevo.size());
+        assertEquals("Cuestionarios", nuevo.get(0).label());
+        assertEquals("Mis cuestionarios", nuevo.get(1).label());
+        assertEquals("/mis-cuestionarios", nuevo.get(1).url());
+        assertEquals("Nuevo cuestionario", nuevo.get(2).label());
+        assertNull(nuevo.get(2).url());
 
         List<BreadcrumbItem> editar = breadcrumbService.misCuestionariosEditar("Quiz 1");
-        assertEquals(2, editar.size());
-        assertEquals("Mis cuestionarios", editar.get(0).label());
-        assertEquals("/mis-cuestionarios", editar.get(0).url());
-        assertEquals("Editar 'Quiz 1'", editar.get(1).label());
-        assertNull(editar.get(1).url());
+        assertEquals(3, editar.size());
+        assertEquals("Cuestionarios", nuevo.get(0).label());
+        assertEquals("Mis cuestionarios", editar.get(1).label());
+        assertEquals("/mis-cuestionarios", editar.get(1).url());
+        assertEquals("Editar 'Quiz 1'", editar.get(2).label());
+        assertNull(editar.get(2).url());
     }
 
     @Test
