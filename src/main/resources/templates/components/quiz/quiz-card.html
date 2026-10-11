@@ -11,7 +11,12 @@
         <div class="flex flex-col gap-1 flex-1 min-w-0">
             <span class="quiz-title truncate" th:text="${cuestionario.titulo}"></span>
             <span class="quiz-meta"
-                th:text="|${cuestionario.tema != null ? (cuestionario.tema.asignatura != null ? cuestionario.tema.asignatura.nombre + ' · ' : '') + cuestionario.tema.nombre : 'Personal'} · ${cuestionario.preguntas != null ? cuestionario.preguntas.size() : 0} preguntas|">
+                th:text="|${cuestionario.tema != null 
+                    ? (cuestionario.tema.asignatura != null ? cuestionario.tema.asignatura.nombre + ' · ' : '') 
+                        + cuestionario.tema.nombre 
+                    : 'Personal'} 
+                    · ${cuestionario.preguntas != null ? cuestionario.preguntas.size() : 0} preguntas
+                    ${cuestionario.usuario != null ? ' · ' + cuestionario.usuario.username : ''}|">
             </span>
         </div>
 
