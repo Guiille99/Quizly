@@ -1,0 +1,25 @@
+spring:
+  jpa:
+    show-sql: true
+  thymeleaf:
+    cache: false
+  mail:
+    host: ${EMAIL_HOST:sandbox.smtp.mailtrap.io}
+    port: ${EMAIL_PORT:2525}
+    username: ${EMAIL_USERNAME}
+    password: ${EMAIL_PASSWORD}
+server:
+  forward-headers-strategy: NONE
+  servlet:
+    session:
+      cookie:
+        secure: false
+logging:
+  level:
+    root: INFO
+    '[com.quizly]': DEBUG
+    '[org.springframework]': INFO
+    '[org.springframework.security]': DEBUG
+    '[org.hibernate]': WARN
+    '[org.hibernate.SQL]': DEBUG
+
