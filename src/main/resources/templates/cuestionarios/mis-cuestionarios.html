@@ -198,6 +198,24 @@
                     iaSubmitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generando preguntas con IA...';
                 });
             }
+
+
+            async function confirmDeleteQuiz(button) {
+                const result = await confirmDialog.open({
+                    title: "Eliminar cuestionario",
+                    message: "Esta acción eliminará la versión seleccionada del cuestionario. Esta acción no se podrá deshacer.",
+                    confirmBtnText: "Eliminar",
+                    cancelBtnText: "Cancelar",
+                    icon: "fa-solid fa-trash-can",
+                    type: "danger"
+                });
+
+                if (!result.isConfirmed) {
+                    return;
+                } else{
+                    htmx.trigger(button, "confirmed");
+                }
+            }
         </script>
     </main>
 </body>
