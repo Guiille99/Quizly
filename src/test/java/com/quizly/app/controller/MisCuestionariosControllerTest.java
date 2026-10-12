@@ -65,12 +65,13 @@ class MisCuestionariosControllerTest {
         when(quizFormService.getOptions(null)).thenReturn(new QuizFormOptions(
                 List.of(), List.of(), List.of(), List.of()));
 
+        ExtendedModelMap model = new ExtendedModelMap();
         String view = controller.generarQuizIa(
                 file,
                 10,
                 "MEDIUM",
                 "TRUE_FALSE",
-                new ExtendedModelMap(),
+                model,
                 mock(RedirectAttributes.class));
 
         ArgumentCaptor<PdfQuizGeneratorRequest> requestCaptor = ArgumentCaptor.forClass(PdfQuizGeneratorRequest.class);
@@ -78,6 +79,7 @@ class MisCuestionariosControllerTest {
                 eq("Texto de los apuntes"), requestCaptor.capture(), eq("apuntes.pdf"));
 
         assertEquals("admin/cuestionarios/quiz-form", view);
+        assertEquals(false, model.getAttribute("canImportQuizJson"));
         assertTrue(requestCaptor.getValue().getIndicacionesAdicionales()
                 .contains("únicamente preguntas de verdadero/falso (TRUE_FALSE)"));
         assertTrue(requestCaptor.getValue().getIndicacionesAdicionales().contains("'Verdadero' y 'Falso'"));

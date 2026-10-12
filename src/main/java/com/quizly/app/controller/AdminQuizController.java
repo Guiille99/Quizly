@@ -13,6 +13,7 @@ import com.quizly.app.repository.TemaRepository;
 import com.quizly.app.repository.TipoPreguntaRepository;
 import com.quizly.app.service.AdminQuizService;
 import com.quizly.app.service.CuestionarioService;
+import com.quizly.app.service.QuizJsonImportService;
 import com.quizly.app.service.QuizFormService;
 import com.quizly.app.web.notification.ToastService;
 
@@ -27,6 +28,7 @@ import java.util.Optional;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -37,8 +39,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.multipart.MultipartFile;
 
 
 
@@ -49,15 +51,14 @@ import org.springframework.web.bind.annotation.RequestHeader;
 @RequiredArgsConstructor
 public class AdminQuizController {
 
-    private final DificultadRepository dificultadRepository;
     private final AsignaturaRepository asignaturaRepository;
     private final TemaRepository temaRepository;
-    private final TipoPreguntaRepository tipoPreguntaRepository;
     private final CuestionarioRepository cuestionarioRepository;
 
     private final AdminQuizService adminQuizService;
     private final QuizFormService quizFormService;
     private final CuestionarioService cuestionarioService;
+    private final QuizJsonImportService quizJsonImportService;
     private final ToastService toastService;
     private final com.quizly.app.web.model.BreadcrumbContext breadcrumbContext;
     private final com.quizly.app.service.BreadcrumbService breadcrumbService;
@@ -143,6 +144,25 @@ public class AdminQuizController {
         loadFormOptions(model, quizForm);
         breadcrumbContext.set(breadcrumbService.adminCuestionarioNuevo());
 
+        return "admin/cuestionarios/quiz-form";
+    }
+
+    @PostMapping(value = "/importar-json", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public String importQuizJson(@RequestParam("jsonFile") MultipartFile jsonFile,
+            @ModelAttribute("quizForm") QuizForm form, Model model) {
+        if (form.getId() != null) {
+            toastService.error(model, "La importación JSON solo está disponible al crear un cuestionario.");
+        } else {
+            try {
+                quizJsonImportService.importIntoForm(jsonFile, form);
+                toastService.success(model, "JSON cargado. Revisa y completa el formulario antes de guardar.");
+            } catch (IllegalArgumentException exception) {
+                toastService.error(model, exception.getMessage());
+            }
+        }
+
+        loadFormOptions(model, form);
+        breadcrumbContext.set(breadcrumbService.adminCuestionarioNuevo());
         return "admin/cuestionarios/quiz-form";
     }
 
@@ -272,6 +292,7 @@ public class AdminQuizController {
     
     
     private void loadFormOptions(Model model, QuizForm quizForm){
+        model.addAttribute("canImportQuizJson", true);
         QuizFormOptions options = quizFormService.getOptions(quizForm.getAsignaturaId());
         model.addAttribute("asignaturas", options.asignaturas());
         model.addAttribute("temas", options.tema());

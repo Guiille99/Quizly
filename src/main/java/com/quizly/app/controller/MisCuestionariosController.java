@@ -389,6 +389,7 @@ public class MisCuestionariosController {
     }
 
     private void loadFormOptions(Model model, QuizForm quizForm) {
+        model.addAttribute("canImportQuizJson", false);
         QuizFormOptions options = quizFormService.getOptions(quizForm.getAsignaturaId());
         model.addAttribute("asignaturas", options.asignaturas());
         model.addAttribute("temas", options.tema());
