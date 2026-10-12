@@ -23,6 +23,7 @@
                 <div class="card-body">
                     <form th:action="@{/admin/cuestionarios/importar-json}" method="post" enctype="multipart/form-data">
                         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                        <input type="hidden" name="sinLimiteTiempo" value="true">
     
                         <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                             <fieldset class="fieldset flex-1 rounded-lg border-2 border-dashed border-primary/40 bg-base-200/50 p-4">
