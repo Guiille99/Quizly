@@ -46,7 +46,7 @@ public class AdminAsignaturaController {
     public String showAsignaturasList(@ModelAttribute AsignaturaFilterForm filters, Pageable pageable, Model model) {
         loadAsignaturasTableAttributes(filters, pageable, model);
         breadcrumbContext.set(breadcrumbService.adminAsignaturas());
-        return "/admin/asignaturas/asignaturas-list";
+        return "admin/asignaturas/asignaturas-list";
     }
 
     @GetMapping("/tableData")
