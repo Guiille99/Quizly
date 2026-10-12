@@ -71,6 +71,7 @@ class AdminQuizControllerTest {
 
         assertEquals("admin/cuestionarios/quiz-form", view);
         assertEquals(form, model.getAttribute("quizForm"));
+        assertEquals("quiz.json", model.getAttribute("jsonFilename"));
         assertEquals("/admin/cuestionarios/nuevo", model.getAttribute("formAction"));
         assertTrue((Boolean) model.getAttribute("canImportQuizJson"));
         verify(quizJsonImportService).importIntoForm(file, form);
@@ -91,6 +92,7 @@ class AdminQuizControllerTest {
 
         assertEquals("admin/cuestionarios/quiz-form", view);
         assertEquals("Título escrito antes de importar", form.getTitulo());
+        assertEquals("quiz.json", model.getAttribute("jsonFilename"));
         assertEquals("/admin/cuestionarios/nuevo", model.getAttribute("formAction"));
         verify(toastService).error(model, "El archivo no contiene un JSON válido.");
         verify(cuestionarioService, never()).createQuiz(any());

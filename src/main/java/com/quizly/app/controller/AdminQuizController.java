@@ -150,6 +150,10 @@ public class AdminQuizController {
     @PostMapping(value = "/importar-json", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public String importQuizJson(@RequestParam("jsonFile") MultipartFile jsonFile,
             @ModelAttribute("quizForm") QuizForm form, Model model) {
+        if (jsonFile != null && !jsonFile.isEmpty()) {
+            model.addAttribute("jsonFilename", jsonFile.getOriginalFilename());
+        }
+
         if (form.getId() != null) {
             toastService.error(model, "La importación JSON solo está disponible al crear un cuestionario.");
         } else {

@@ -37,6 +37,8 @@
                                 <p id="json-file-help" class="mt-2 text-sm text-text-muted">
                                     Selecciona un archivo .json (máximo 2 MB). Solo se aceptan archivos JSON válidos.
                                 </p>
+                                <p th:if="${jsonFilename != null}" class="mt-2 text-sm font-medium text-text"
+                                    th:text="'Archivo seleccionado: ' + ${jsonFilename}"></p>
                             </fieldset>
                             <button type="submit" class="btn btn-outline">
                                 <i class="fa-solid fa-file-import"></i>
