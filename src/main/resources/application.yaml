@@ -10,10 +10,6 @@ spring:
   thymeleaf:
     cache: false
   mail:
-    host: sandbox.smtp.mailtrap.io
-    port: 2525
-    username: ${EMAIL_USERNAME}
-    password: ${EMAIL_PASSWORD}
     properties:
       mail:
         smtp:
@@ -26,7 +22,7 @@ spring:
       max-file-size: 20MB
       max-request-size: 25MB
 server:
-  port: 8080
+  port: ${PORT:8080}
   forward-headers-strategy: NATIVE
 ai:
   api-key: ${AI_API_KEY}
