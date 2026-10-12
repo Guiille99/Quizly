@@ -28,7 +28,7 @@
 
                             <input type="text" class="input w-full" th:field="*{nombre}"
                                 maxlength="100"
-                                placeholder="Nombre del cuestionario"
+                                placeholder="Nombre del tema"
                                 th:classappend="${#fields.hasErrors('nombre')} ? 'input-error'"
                                 th:readonly="${!temaForm.editable}">
 
