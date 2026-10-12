@@ -16,3 +16,8 @@ INSERT INTO generos (codigo, nombre) VALUES
     ('M', 'Hombre'),
     ('F', 'Mujer'),
     ('PND', 'Prefiero no decirlo')
+
+-- Dificultades
+INSERT INTO dificultades (codigo, nombre) VALUES('EASY', 'Fácil');
+INSERT INTO dificultades (codigo, nombre) VALUES('MEDIUM', 'Intermedio');
+INSERT INTO dificultades (codigo, nombre) VALUES('HARD', 'Difícil');
