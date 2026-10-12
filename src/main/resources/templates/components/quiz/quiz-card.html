@@ -14,7 +14,7 @@
                 th:text="|${cuestionario.tema != null 
                     ? (cuestionario.tema.asignatura != null ? cuestionario.tema.asignatura.nombre + ' · ' : '') 
                         + cuestionario.tema.nombre 
-                    : 'Personal'} 
+                    : 'Sin tema'} 
                     · ${cuestionario.preguntas != null ? cuestionario.preguntas.size() : 0} preguntas
                     ${cuestionario.usuario != null ? ' · ' + cuestionario.usuario.username : ''}|">
             </span>

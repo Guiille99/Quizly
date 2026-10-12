@@ -50,7 +50,7 @@ public class QuizSessionService {
         session.setTema(intentoCuestionario.getCuestionario().getTema().getNombre());
         session.setTema(intentoCuestionario.getCuestionario().getTema() != null 
             ? intentoCuestionario.getCuestionario().getTema().getNombre() 
-            : "Personal");
+            : "Sin tema");
         session.setDificultad(intentoCuestionario.getCuestionario().getDificultad().getNombre());
         session.setSlug(intentoCuestionario.getCuestionario().getSlug());
         session.setPreguntas(questions);
