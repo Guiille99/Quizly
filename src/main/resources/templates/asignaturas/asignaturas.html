@@ -19,19 +19,23 @@
                     hx-get="/asignaturas/elementos"
                     hx-trigger="input changed delay:400ms, search"
                     hx-target="#lista-asignaturas"
+                    hx-indicator="#lista-asignaturas-loading"
                     hx-include="#form-filtros-asignaturas" />
             </fieldset>
 
             <button class="btn btn-neutral" type="button" onclick="document.getElementById('form-filtros-asignaturas').reset()"
                 hx-get="/asignaturas/elementos"
                 hx-target="#lista-asignaturas"
+                hx-indicator="#lista-asignaturas-loading"
                 hx-swap="outerHTML">
                 Limpiar
             </button>
         </form>
 
         <!-- Contenedor de asignaturas -->
-        <div id="lista-asignaturas" th:fragment="lista-asignaturas_fragment">
+        <div id="lista-asignaturas" class="relative" hx-indicator="#lista-asignaturas-loading"
+            th:fragment="lista-asignaturas_fragment">
+            <div th:replace="~{components/commons/loading-overlay :: overlay('lista-asignaturas-loading')}"></div>
             <th:block th:if="${asignaturas.totalElements > 0}">
                 <div class="grid-cards-container mb-4">
                     <div th:each="item : ${asignaturas}" class="card selectable-card progress-card">

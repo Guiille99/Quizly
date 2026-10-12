@@ -1,5 +1,8 @@
 <div th:fragment="base(tableId, page, thead, tbody, filterFormId, targetUrl, pageParamName, sizeOptions)"
-    th:id="${tableId}" class="w-full flex flex-col gap-4">
+    th:id="${tableId}" class="relative w-full flex flex-col gap-4"
+    th:attr="hx-indicator=${'#' + tableId + '-loading'}">
+
+    <div th:replace="~{components/commons/loading-overlay :: overlay(${tableId + '-loading'})}"></div>
 
     <div class="table__container">
         <table class="table table-zebra w-full">

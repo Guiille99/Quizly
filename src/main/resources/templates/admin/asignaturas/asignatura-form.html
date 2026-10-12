@@ -60,7 +60,8 @@
                 <a th:href="@{/admin/asignaturas}" class="btn btn-outline"
                     th:text="${asignaturaForm.editable ? 'Cancelar' : 'Volver'}"></a>
     
-                <button th:if="${asignaturaForm.editable}" type="submit" form="asignatura-form" class="btn btn-primary">
+                <button th:if="${asignaturaForm.editable}" type="submit" form="asignatura-form"
+                    class="btn btn-primary" data-loading-text="Guardando...">
                     <i class="fa-regular fa-floppy-disk"></i>
                     <span th:text="${asignaturaForm.id == null ? 'Crear asignatura' : 'Guardar cambios'}"></span> 
                 </button>

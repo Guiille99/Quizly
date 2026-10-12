@@ -30,7 +30,8 @@
                         hx-trigger="input changed delay:400ms"
                         hx-target="#table-usuarios"
                         hx-include="#usuario-filter-form"
-                        hx-swap="outerHTML">
+                        hx-swap="outerHTML"
+                        hx-indicator="#table-usuarios-loading">
 
                     <!-- Filtro por Rol -->
                     <select name="rol" class="select max-w-xs"
@@ -38,7 +39,8 @@
                         hx-trigger="change"
                         hx-target="#table-usuarios"
                         hx-include="#usuario-filter-form"
-                        hx-swap="outerHTML">
+                        hx-swap="outerHTML"
+                        hx-indicator="#table-usuarios-loading">
                         <option value="">Todos los roles</option>
                         <option th:each="rolOpt : ${rolesDisponibles}" 
                                 th:value="${rolOpt}" 
@@ -46,12 +48,12 @@
                                 th:selected="${filters.rol == rolOpt}">
                         </option>
                     </select>
-
                     <!-- Reset -->
                     <button name="resetFilters" class="btn btn-outline btn-error"
                         hx-get="/admin/usuarios/tableData"
                         hx-target="#table-usuarios-container"
-                        hx-swap="outerHTML">
+                        hx-swap="outerHTML"
+                        hx-indicator="#table-usuarios-loading">
                         <i class="fa-solid fa-trash-can"></i> Limpiar
                     </button>
                 </form>

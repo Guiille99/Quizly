@@ -31,14 +31,16 @@
                         hx-trigger="input changed delay:400ms"
                         hx-target="#table-temas"
                         hx-include="#tema-filter-form"
-                        hx-swap="outerHTML">
+                        hx-swap="outerHTML"
+                        hx-indicator="#table-temas-loading">
 
                     <!-- Asignatura -->
                     <select name="asignaturaId" class="select"
                         hx-get="/admin/temas/tableData"
                         hx-trigger="change"
                         hx-target="#table-temas"
-                        hx-include="#tema-filter-form">
+                        hx-include="#tema-filter-form"
+                        hx-indicator="#table-temas-loading">
                     
                         <option value="">Todas las asignaturas</option>
 
@@ -48,11 +50,11 @@
                             th:text="${asignatura.nombre}">
                         </option>
                     </select>
-
                     <button name="resetFilters" class="btn btn-outline btn-error"
                         hx-get="/admin/temas/tableData"
                         hx-target="#table-temas-container"
-                        hx-swap="outerHTML">
+                        hx-swap="outerHTML"
+                        hx-indicator="#table-temas-loading">
 
                         <i class="fa-solid fa-trash-can"></i>
                         Limpiar

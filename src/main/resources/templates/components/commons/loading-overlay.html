@@ -1,0 +1,6 @@
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="overlay(indicatorId)"
+    th:id="${indicatorId}"
+    class="htmx-overlay-indicator absolute inset-0 z-20 place-items-center rounded-[inherit] bg-base-100/70 backdrop-blur-[1px]"
+    role="status" aria-label="Cargando" aria-live="polite">
+    <span class="loading loading-spinner loading-sm text-primary" aria-hidden="true"></span>
+</div>

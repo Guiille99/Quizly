@@ -31,14 +31,16 @@
                         hx-trigger="input changed delay:400ms"
                         hx-target="#table-cuestionarios"
                         hx-include="#quiz-filter-form"
-                        hx-swap="outerHTML">
+                        hx-swap="outerHTML"
+                        hx-indicator="#table-cuestionarios-loading">
 
                     <!-- Asignatura -->
                     <select name="asignaturaId" class="select"
                         hx-get="/admin/cuestionarios/tableData"
                         hx-trigger="change"
                         hx-target="#table-cuestionarios"
-                        hx-include="#quiz-filter-form">
+                        hx-include="#quiz-filter-form"
+                        hx-indicator="#table-cuestionarios-loading">
                     
                         <option value="">Todas las asignaturas</option>
 
@@ -61,6 +63,7 @@
                             hx-trigger="change"
                             hx-target="#table-cuestionarios"
                             hx-include="#quiz-filter-form"
+                            hx-indicator="#table-cuestionarios-loading"
                             th:fragment="opciones-temas-filtro_fragment">
     
                             <option value="" selected>Todos los temas</option>
@@ -76,7 +79,8 @@
                     <button name="resetFilters" class="btn btn-outline btn-error"
                         hx-get="/admin/cuestionarios/tableData"
                         hx-target="#table-cuestionarios-container"
-                        hx-swap="outerHTML">
+                        hx-swap="outerHTML"
+                        hx-indicator="#table-cuestionarios-loading">
 
                         <i class="fa-solid fa-trash-can"></i>
                         Limpiar

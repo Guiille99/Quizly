@@ -10,7 +10,9 @@
 
         <div th:replace="~{components/quiz/quiz-filters :: filters(formId='quiz-filter-form', targetUrl='/favoritos/table-data', targetId='#lista-cuestionarios')}"></div>
 
-        <div id="lista-cuestionarios" th:fragment="lista-cuestionarios_fragment">
+        <div id="lista-cuestionarios" class="relative" hx-indicator="#lista-cuestionarios-loading"
+            th:fragment="lista-cuestionarios_fragment">
+            <div th:replace="~{components/commons/loading-overlay :: overlay('lista-cuestionarios-loading')}"></div>
             <div th:if="${favoritesPage.empty}" class="flex flex-col items-center justify-center py-16 text-center">
                 <div class="w-16 h-16 rounded-2xl bg-surface-alt flex items-center justify-center mb-4">
                     <i class="fa-regular fa-star text-2xl text-text-muted"></i>

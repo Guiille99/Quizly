@@ -31,12 +31,14 @@
                         hx-trigger="input changed delay:400ms"
                         hx-target="#table-asignaturas"
                         hx-include="#asignatura-filter-form"
-                        hx-swap="outerHTML">
+                        hx-swap="outerHTML"
+                        hx-indicator="#table-asignaturas-loading">
 
                     <button name="resetFilters" class="btn btn-outline btn-error"
                         hx-get="/admin/asignaturas/tableData"
                         hx-target="#table-asignaturas-container"
-                        hx-swap="outerHTML">
+                        hx-swap="outerHTML"
+                        hx-indicator="#table-asignaturas-loading">
                         <i class="fa-solid fa-trash-can"></i>
                         Limpiar
                     </button>

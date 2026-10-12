@@ -1,0 +1,9 @@
+.htmx-overlay-indicator {
+  display: none;
+}
+
+.htmx-request .htmx-overlay-indicator,
+.htmx-overlay-indicator.htmx-request {
+  display: grid;
+}
+

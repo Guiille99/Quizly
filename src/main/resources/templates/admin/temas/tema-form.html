@@ -103,7 +103,8 @@
                 <a th:href="@{/admin/temas}" class="btn btn-outline"
                     th:text="${temaForm.editable ? 'Cancelar' : 'Volver'}"></a>
     
-                <button th:if="${temaForm.editable}" type="submit" form="tema-form" class="btn btn-primary">
+                <button th:if="${temaForm.editable}" type="submit" form="tema-form"
+                    class="btn btn-primary" data-loading-text="Guardando...">
                     <i class="fa-regular fa-floppy-disk"></i>
                     <span th:text="${temaForm.id == null ? 'Crear tema' : 'Guardar cambios'}"></span> 
                 </button>

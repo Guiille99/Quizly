@@ -18,6 +18,7 @@
                     th:hx-get="@{/asignaturas/{slug}/tableData(slug=${asignatura.slug})}"
                     hx-trigger="input changed delay:400ms, search"
                     hx-target="#lista-temas"
+                    hx-indicator="#lista-temas-loading"
                     hx-swap="outerHTML"
                     hx-include="#form-filtros-temas" />
             </fieldset>
@@ -25,6 +26,7 @@
             <button class="btn btn-neutral" type="button" onclick="document.getElementById('form-filtros-temas').reset()"
                 th:hx-get="@{/asignaturas/{slug}/tableData(slug=${asignatura.slug})}"
                 hx-target="#lista-temas"
+                hx-indicator="#lista-temas-loading"
                 hx-swap="outerHTML">
                 Limpiar
             </button>
@@ -32,7 +34,9 @@
 
 
         <!-- Contenedor de temas de la asignatura -->
-        <div id="lista-temas" th:fragment="lista-temas_fragment">
+        <div id="lista-temas" class="relative" hx-indicator="#lista-temas-loading"
+            th:fragment="lista-temas_fragment">
+            <div th:replace="~{components/commons/loading-overlay :: overlay('lista-temas-loading')}"></div>
             <th:block th:if="${temasAsignatura.totalElements > 0}">
                 <div class="grid-cards-container mb-4">
                     <div th:each="temaProgreso : ${temasAsignatura}" class="card selectable-card progress-card">

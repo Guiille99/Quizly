@@ -20,7 +20,9 @@
         <div th:replace="~{components/quiz/quiz-filters :: filters(formId='quiz-filter-form', targetUrl='/mis-cuestionarios/tableData', targetId='#lista-cuestionarios')}"></div>
 
         <!-- Listado de cuestionarios -->
-        <div id="lista-cuestionarios" th:fragment="lista-cuestionarios_fragment">
+        <div id="lista-cuestionarios" class="relative" hx-indicator="#lista-cuestionarios-loading"
+            th:fragment="lista-cuestionarios_fragment">
+            <div th:replace="~{components/commons/loading-overlay :: overlay('lista-cuestionarios-loading')}"></div>
             <!-- Estado vacío -->
             <div th:if="${cuestionariosPage.empty}" class="flex flex-col items-center justify-center py-16 text-center">
                 <div class="w-16 h-16 rounded-2xl bg-surface-alt flex items-center justify-center mb-4">
@@ -158,7 +160,8 @@
                         </div>
                     </div>
 
-                    <button id="ia-submit-btn" type="submit" class="btn btn-primary w-full">
+                    <button id="ia-submit-btn" type="submit" class="btn btn-primary w-full"
+                        data-loading-text="Generando preguntas con IA..." aria-live="polite">
                         <i class="fa-solid fa-wand-magic-sparkles"></i>
                         Generar cuestionario
                     </button>
@@ -189,18 +192,6 @@
                     }
                 });
             }
-
-            // Estado de carga durante la generación con IA
-            const iaForm = document.getElementById('ia-generator-form');
-            const iaSubmitBtn = document.getElementById('ia-submit-btn');
-
-            if (iaForm && iaSubmitBtn) {
-                iaForm.addEventListener('submit', function() {
-                    iaSubmitBtn.disabled = true;
-                    iaSubmitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generando preguntas con IA...';
-                });
-            }
-
 
             async function confirmDeleteQuiz(button) {
                 const result = await confirmDialog.open({

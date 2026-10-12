@@ -57,6 +57,7 @@
                                     th:attr="hx-get=${opcionesTemaUrl != null ? opcionesTemaUrl : '/admin/cuestionarios/opcionesTema'}"
                                     hx-trigger="change"
                                     hx-target="#temaId"
+                                    hx-indicator="#tema-options-indicator"
                                     hx-swap="innerHTML"
                                     hx-include="this"
                                     th:classappend="${#fields.hasErrors('asignaturaId')} ? 'input-error'"
@@ -73,7 +74,7 @@
                              </fieldset>
     
                              <!-- Tema -->
-                             <fieldset class="fieldset p-0">
+                             <fieldset class="fieldset p-0 relative">
                                 <label class="label" for="temaId">
                                     <span>
                                         Tema
@@ -363,7 +364,8 @@
                 <a th:href="${cancelUrl}" class="btn btn-outline"
                     th:text="${quizForm.editable ? 'Cancelar' : 'Volver'}"></a>
     
-                <button th:if="${quizForm.editable}" type="submit" form="quiz-form" class="btn btn-primary">
+                <button th:if="${quizForm.editable}" type="submit" form="quiz-form"
+                    class="btn btn-primary" data-loading-text="Guardando...">
                     <i class="fa-regular fa-floppy-disk"></i>
                     <span th:text="${quizForm.id == null ? 'Crear cuestionario' : 'Guardar cambios'}"></span> 
                 </button>
