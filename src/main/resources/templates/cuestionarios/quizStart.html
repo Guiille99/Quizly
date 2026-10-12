@@ -15,6 +15,9 @@
                 </div>
 
                 <h2 class="text-2xl font-bold text-center" th:text="${quiz.titulo}"></h2>
+                <div class="flex justify-center">
+                    <div th:replace="~{components/quiz/favorite-button :: button(cuestionario=${quiz}, isFavorite=${isFavorite}, favoriteListPage=false)}"></div>
+                </div>
                 <p class="text-sm text-text-muted text-center">
                     <span th:text="${quiz.descripcion}"></span>
                 </p>

@@ -13,6 +13,7 @@ import com.quizly.app.model.entity.Cuestionario;
 import com.quizly.app.model.entity.Genero;
 import com.quizly.app.model.entity.Usuario;
 import com.quizly.app.repository.CuestionarioRepository;
+import com.quizly.app.repository.CuestionarioSerieRepository;
 import com.quizly.app.repository.GeneroRepository;
 import com.quizly.app.repository.IntentoCuestionarioRepository;
 import com.quizly.app.repository.OpcionRespuestaRepository;
@@ -32,6 +33,7 @@ public class UsuarioService {
     private final GeneroRepository generoRepository;
     private final PasswordEncoder passwordEncoder;
     private final CuestionarioRepository cuestionarioRepository;
+    private final CuestionarioSerieRepository cuestionarioSerieRepository;
     private final IntentoCuestionarioRepository intentoCuestionarioRepository;
     private final RespuestaUsuarioRepository respuestaUsuarioRepository;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
@@ -143,6 +145,8 @@ public class UsuarioService {
             preguntaRepository.deleteAllByCuestionarioId(cuestionario.getId());
             cuestionarioRepository.delete(cuestionario);
         }
+
+        cuestionarioSerieRepository.deleteOrphanedSeries();
 
         usuarioRepository.delete(usuario);
     }

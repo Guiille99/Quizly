@@ -122,7 +122,7 @@ public class IntentoCuestionarioRepositoryImpl implements IntentoCuestionarioRep
         TypedQuery<IntentoCuestionario> query = entityManager.createQuery("""
             SELECT i FROM IntentoCuestionario i 
             WHERE i.usuario.id = :usuarioId
-                AND i.cuestionario.slug = :slug 
+                AND i.cuestionario.serie.slug = :slug
                 AND i.estado.codigo = :estadoIntento
             ORDER BY i.fechaInicio DESC
         """, IntentoCuestionario.class);

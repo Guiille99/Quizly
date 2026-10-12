@@ -6,6 +6,7 @@ import com.quizly.app.util.Utils;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -21,7 +22,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "cuestionarios", uniqueConstraints = {@UniqueConstraint(columnNames = {"slug", "version"})})
+@Table(name = "cuestionarios", uniqueConstraints = {
+    @UniqueConstraint(name = "uk_cuestionarios_serie_version", columnNames = {"serie_id", "version"})
+})
 @Getter
 @Setter
 @NoArgsConstructor
@@ -43,9 +46,6 @@ public class Cuestionario extends AuditableEntity {
     @Column(name = "tiempo_limite")
     private Integer tiempoLimite;
 
-    @Column(name = "slug", nullable = false)
-    private String slug;
-
     @Column(name = "version", nullable = false)
     private Integer version;
 
@@ -64,6 +64,10 @@ public class Cuestionario extends AuditableEntity {
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "serie_id", nullable = false)
+    private CuestionarioSerie serie;
+
     @OneToMany(mappedBy = "cuestionario")
     private List<Pregunta> preguntas;
 
@@ -74,6 +78,10 @@ public class Cuestionario extends AuditableEntity {
             return null;
         }
         return Utils.formatNaturalDuration(tiempoLimite);
+    }
+
+    public String getSlug() {
+        return serie != null ? serie.getSlug() : null;
     }
 
 }

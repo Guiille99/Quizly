@@ -1,0 +1,28 @@
+<th:block xmlns:th="http://www.thymeleaf.org" th:fragment="button(cuestionario, isFavorite, favoriteListPage)">
+    <button th:if="${isFavorite and favoriteListPage}" type="button" class="btn btn-ghost btn-square btn-sm text-warning"
+        th:hx-delete="@{/favoritos/{slug}(slug=${cuestionario.slug}, page=${favoritesPage.number}, size=${favoritesPage.size}, search=${search}, dificultadId=${dificultadId})}"
+        hx-target="#lista-cuestionarios" hx-swap="outerHTML" aria-pressed="true" title="Quitar de favoritos"
+        aria-label="Quitar de favoritos">
+        <i class="fa-solid fa-star" aria-hidden="true"></i>
+    </button>
+    <button th:if="${isFavorite and !favoriteListPage}" type="button" class="btn btn-ghost btn-square btn-sm text-warning"
+        th:hx-delete="@{/favoritos/{slug}(slug=${cuestionario.slug})}"
+        hx-target="this" hx-swap="outerHTML" aria-pressed="true" title="Quitar de favoritos"
+        aria-label="Quitar de favoritos">
+        <i class="fa-solid fa-star" aria-hidden="true"></i>
+    </button>
+    <button th:unless="${isFavorite}" type="button" class="btn btn-ghost btn-square btn-sm"
+        th:hx-put="@{/favoritos/{slug}(slug=${cuestionario.slug})}"
+        hx-target="this" hx-swap="outerHTML" aria-pressed="false"
+        title="Añadir a favoritos" aria-label="Añadir a favoritos">
+        <i class="fa-regular fa-star" aria-hidden="true"></i>
+    </button>
+</th:block>
+
+<th:block xmlns:th="http://www.thymeleaf.org" th:fragment="response">
+    <th:block th:replace="~{components/quiz/favorite-button :: button(
+        cuestionario=${cuestionario},
+        isFavorite=${isFavorite},
+        favoriteListPage=${favoriteListPage}
+    )}"></th:block>
+</th:block>

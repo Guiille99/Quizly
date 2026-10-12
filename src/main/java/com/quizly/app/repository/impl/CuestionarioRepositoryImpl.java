@@ -54,7 +54,7 @@ public class CuestionarioRepositoryImpl implements CuestionarioRepositoryCustom 
     @Override
     public boolean existsBySlug(String slug) {
         Long count = entityManager.createQuery(
-            "SELECT COUNT(c) FROM Cuestionario c WHERE c.slug = :slug", Long.class)
+            "SELECT COUNT(c) FROM Cuestionario c WHERE c.serie.slug = :slug", Long.class)
             .setParameter("slug", slug)
             .getSingleResult();
         return count > 0;
@@ -63,7 +63,7 @@ public class CuestionarioRepositoryImpl implements CuestionarioRepositoryCustom 
     @Override
     public Optional<Cuestionario> findLastVersionBySlug(String slug) {
         TypedQuery<Cuestionario> query = entityManager.createQuery("""
-            SELECT c FROM Cuestionario c WHERE c.slug = :slug ORDER BY c.version DESC
+            SELECT c FROM Cuestionario c WHERE c.serie.slug = :slug ORDER BY c.version DESC
         """, Cuestionario.class);
 
         query.setParameter("slug", slug);

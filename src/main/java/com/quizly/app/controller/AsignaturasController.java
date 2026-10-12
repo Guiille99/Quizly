@@ -18,6 +18,7 @@ import com.quizly.app.repository.DificultadRepository;
 import com.quizly.app.service.AsignaturaService;
 import com.quizly.app.service.BreadcrumbService;
 import com.quizly.app.service.CuestionarioService;
+import com.quizly.app.service.FavoritoService;
 import com.quizly.app.service.TemaService;
 
 import lombok.RequiredArgsConstructor;
@@ -45,6 +46,7 @@ public class AsignaturasController {
     private final AsignaturaService asignaturaService;
     private final TemaService temaService;
     private final CuestionarioService cuestionarioService;
+    private final FavoritoService favoritoService;
     private final DificultadRepository dificultadRepository;
     private final ToastService toastService;
     private final BreadcrumbContext breadcrumbContext;
@@ -137,6 +139,7 @@ public class AsignaturasController {
         model.addAttribute("asignatura", asignatura);
         model.addAttribute("tema", tema);
         model.addAttribute("cuestionariosTemaPage", cuestionariosTemaPage);
+        model.addAttribute("favoriteSerieIds", favoritoService.getFavoriteSerieIds(authUser.getId(), cuestionariosTemaPage.getContent()));
         model.addAttribute("dificultades", dificultadRepository.findAllByOrderByNombreAsc());
         model.addAttribute("search", search);
         model.addAttribute("dificultadId", dificultadId);
@@ -163,6 +166,7 @@ public class AsignaturasController {
         model.addAttribute("asignatura", asignatura);
         model.addAttribute("tema", tema);
         model.addAttribute("cuestionariosTemaPage", cuestionariosTemaPage);
+        model.addAttribute("favoriteSerieIds", favoritoService.getFavoriteSerieIds(authUser.getId(), cuestionariosTemaPage.getContent()));
         model.addAttribute("dificultades", dificultadRepository.findAllByOrderByNombreAsc());
         model.addAttribute("search", search);
         model.addAttribute("dificultadId", dificultadId);

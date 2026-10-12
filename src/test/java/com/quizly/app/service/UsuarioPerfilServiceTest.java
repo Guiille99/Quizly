@@ -20,6 +20,7 @@ import com.quizly.app.dto.form.PerfilForm;
 import com.quizly.app.model.entity.Cuestionario;
 import com.quizly.app.model.entity.Usuario;
 import com.quizly.app.repository.CuestionarioRepository;
+import com.quizly.app.repository.CuestionarioSerieRepository;
 import com.quizly.app.repository.GeneroRepository;
 import com.quizly.app.repository.IntentoCuestionarioRepository;
 import com.quizly.app.repository.OpcionRespuestaRepository;
@@ -34,6 +35,7 @@ class UsuarioPerfilServiceTest {
     private UsuarioRepository usuarioRepository;
     private PasswordEncoder passwordEncoder;
     private CuestionarioRepository cuestionarioRepository;
+    private CuestionarioSerieRepository cuestionarioSerieRepository;
     private IntentoCuestionarioRepository intentoRepository;
     private RespuestaUsuarioRepository respuestaRepository;
     private PasswordResetTokenRepository tokenRepository;
@@ -46,6 +48,7 @@ class UsuarioPerfilServiceTest {
         usuarioRepository = mock(UsuarioRepository.class);
         passwordEncoder = mock(PasswordEncoder.class);
         cuestionarioRepository = mock(CuestionarioRepository.class);
+        cuestionarioSerieRepository = mock(CuestionarioSerieRepository.class);
         intentoRepository = mock(IntentoCuestionarioRepository.class);
         respuestaRepository = mock(RespuestaUsuarioRepository.class);
         tokenRepository = mock(PasswordResetTokenRepository.class);
@@ -56,6 +59,7 @@ class UsuarioPerfilServiceTest {
             mock(GeneroRepository.class),
             passwordEncoder,
             cuestionarioRepository,
+            cuestionarioSerieRepository,
             intentoRepository,
             respuestaRepository,
             tokenRepository,
@@ -163,6 +167,7 @@ class UsuarioPerfilServiceTest {
         verify(preguntaRepository).deleteAllByCuestionarioId(11L);
         verify(cuestionarioRepository).delete(privateQuiz);
         verify(cuestionarioRepository, never()).delete(sharedQuiz);
+        verify(cuestionarioSerieRepository).deleteOrphanedSeries();
         verify(usuarioRepository).delete(usuario);
     }
 

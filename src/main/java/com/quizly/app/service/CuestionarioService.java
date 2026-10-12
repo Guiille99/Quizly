@@ -30,6 +30,7 @@ import com.quizly.app.exception.QuizlyException;
 import com.quizly.app.logging.LogExecution;
 import com.quizly.app.model.entity.Asignatura;
 import com.quizly.app.model.entity.Cuestionario;
+import com.quizly.app.model.entity.CuestionarioSerie;
 import com.quizly.app.model.entity.Dificultad;
 import com.quizly.app.model.entity.IntentoCuestionario;
 import com.quizly.app.model.entity.OpcionRespuesta;
@@ -47,6 +48,7 @@ import com.quizly.app.model.view.quiz.QuestionSummary;
 import com.quizly.app.model.view.quiz.QuizSummary;
 import com.quizly.app.repository.AsignaturaRepository;
 import com.quizly.app.repository.CuestionarioRepository;
+import com.quizly.app.repository.CuestionarioSerieRepository;
 import com.quizly.app.repository.DificultadRepository;
 import com.quizly.app.repository.IntentoCuestionarioRepository;
 import com.quizly.app.repository.OpcionRespuestaRepository;
@@ -74,6 +76,7 @@ public class CuestionarioService {
 
     private final IntentoCuestionarioEstadoRepository intentoCuestionarioEstadoRepository;
     private final CuestionarioRepository cuestionarioRepository;
+    private final CuestionarioSerieRepository cuestionarioSerieRepository;
     private final UsuarioRepository usuarioRepository;
     private final IntentoCuestionarioRepository intentoCuestionarioRepository;
     private final OpcionRespuestaRepository opcionRespuestaRepository;
@@ -119,7 +122,9 @@ public class CuestionarioService {
         cuestionario.setTema(tema);
         cuestionario.setDificultad(dificultad);
         cuestionario.setUsuario(usuario);
-        cuestionario.setSlug(resolveUniqueSlug(form.getTitulo()));
+        CuestionarioSerie serie = new CuestionarioSerie();
+        serie.setSlug(resolveUniqueSlug(form.getTitulo()));
+        cuestionario.setSerie(cuestionarioSerieRepository.save(serie));
         cuestionario.setVersion(1);
         cuestionario.setTiempoLimite(calculateTiempoLimite(form));
         cuestionario.setPreguntasAleatorias(form.isPreguntasAleatorias());
@@ -160,7 +165,7 @@ public class CuestionarioService {
         nuevaVersCuestionario.setDificultad(dificultad);
         nuevaVersCuestionario.setUsuario(cuestionarioActual.getUsuario());
 
-        nuevaVersCuestionario.setSlug(cuestionarioActual.getSlug());
+        nuevaVersCuestionario.setSerie(cuestionarioActual.getSerie());
         nuevaVersCuestionario.setVersion(cuestionarioActual.getVersion() + 1);
 
         nuevaVersCuestionario.setTiempoLimite(calculateTiempoLimite(form));
@@ -193,7 +198,11 @@ public class CuestionarioService {
         preguntaRepository.deleteByCuestionarioId(id);
         
         // Eliminamos el cuestionario
+        Long serieId = cuestionario.getSerie().getId();
         cuestionarioRepository.delete(cuestionario);
+        if (!cuestionarioRepository.existsBySerie_Id(serieId)) {
+            cuestionarioSerieRepository.deleteById(serieId);
+        }
     }
 
     /**
@@ -298,7 +307,7 @@ public class CuestionarioService {
 
     private String resolveUniqueSlug(String titulo) {
         String baseSlug = slugService.generateSlug(titulo);
-        if (!cuestionarioRepository.existsBySlug(baseSlug)) {
+        if (!cuestionarioSerieRepository.existsBySlug(baseSlug)) {
             return baseSlug;
         }
 
@@ -306,7 +315,7 @@ public class CuestionarioService {
         String candidate;
         do {
             candidate = baseSlug + "-" + suffix++;
-        } while (cuestionarioRepository.existsBySlug(candidate));
+        } while (cuestionarioSerieRepository.existsBySlug(candidate));
 
         return candidate;
     }

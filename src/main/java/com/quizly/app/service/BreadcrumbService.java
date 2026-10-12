@@ -79,6 +79,13 @@ public class BreadcrumbService {
         );
     }
 
+    public List<BreadcrumbItem> cuestionariosFavoritos() {
+        return List.of(
+            CUESTIONARIOS,
+            new BreadcrumbItem("Favoritos", null)
+        );
+    }
+
     // =========================================================================
     // Zona Estudiante: Mis Cuestionarios
     // =========================================================================

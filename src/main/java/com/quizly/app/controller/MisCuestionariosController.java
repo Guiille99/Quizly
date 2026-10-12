@@ -15,6 +15,7 @@ import com.quizly.app.repository.TemaRepository;
 import com.quizly.app.security.QuizlyUserDetails;
 import com.quizly.app.service.AiQuizGeneratorService;
 import com.quizly.app.service.CuestionarioService;
+import com.quizly.app.service.FavoritoService;
 import com.quizly.app.service.PdfExtractorService;
 import com.quizly.app.service.QuizFormService;
 import com.quizly.app.web.notification.ToastService;
@@ -55,6 +56,7 @@ public class MisCuestionariosController {
     private int maxFileSizeMb;
 
     private final CuestionarioService cuestionarioService;
+    private final FavoritoService favoritoService;
     private final QuizFormService quizFormService;
     private final PdfExtractorService pdfExtractorService;
     private final AiQuizGeneratorService aiQuizGeneratorService;
@@ -375,6 +377,7 @@ public class MisCuestionariosController {
                 cuestionarioService.getCuestionariosByUsuario(usuarioId, search, dificultadId, pageable);
 
         model.addAttribute("cuestionariosPage", cuestionariosPage);
+        model.addAttribute("favoriteSerieIds", favoritoService.getFavoriteSerieIds(usuarioId, cuestionariosPage.getContent()));
         model.addAttribute("dificultades", dificultadRepository.findAllByOrderByNombreAsc());
         model.addAttribute("search", search);
         model.addAttribute("dificultadId", dificultadId);

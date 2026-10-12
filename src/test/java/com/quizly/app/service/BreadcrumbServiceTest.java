@@ -81,6 +81,12 @@ class BreadcrumbServiceTest {
         assertEquals("/cuestionarios", recientes.get(0).url());
         assertEquals("Recientes", recientes.get(1).label());
         assertNull(recientes.get(1).url());
+
+        List<BreadcrumbItem> favoritos = breadcrumbService.cuestionariosFavoritos();
+        assertEquals(2, favoritos.size());
+        assertEquals("Cuestionarios", favoritos.get(0).label());
+        assertEquals("Favoritos", favoritos.get(1).label());
+        assertNull(favoritos.get(1).url());
     }
 
     @Test

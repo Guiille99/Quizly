@@ -10,6 +10,7 @@ import com.quizly.app.model.session.UserQuizSession;
 import com.quizly.app.repository.CuestionarioRepository;
 import com.quizly.app.security.QuizlyUserDetails;
 import com.quizly.app.service.CuestionarioService;
+import com.quizly.app.service.FavoritoService;
 import com.quizly.app.service.IntentoCuestionarioService;
 import com.quizly.app.service.QuizSessionService;
 import com.quizly.app.service.RespuestaUsuarioService;
@@ -56,6 +57,7 @@ public class CuestionariosController {
 
     private final ToastService toastService;
     private final CuestionarioService cuestionarioService;
+    private final FavoritoService favoritoService;
     private final QuizSessionService quizSessionService;
     private final IntentoCuestionarioService intentoCuestionarioService;
     private final DificultadRepository dificultadRepository;
@@ -67,12 +69,14 @@ public class CuestionariosController {
     public String showTodosCuestionarios(
             @RequestParam(name = "search", required = false) String search,
             @RequestParam(name = "dificultadId", required = false) Long dificultadId,
+            @AuthenticationPrincipal QuizlyUserDetails authUser,
             Model model, HttpServletRequest request, 
             @PageableDefault(size = 5) Pageable pageable) {
         
         Page<Cuestionario> cuestionarios = cuestionarioService.getCuestionariosPaginated(search, dificultadId, pageable);
 
         model.addAttribute("cuestionariosPage", cuestionarios);
+        model.addAttribute("favoriteSerieIds", favoritoService.getFavoriteSerieIds(authUser.getId(), cuestionarios.getContent()));
         model.addAttribute("dificultades", dificultadRepository.findAllByOrderByNombreAsc());
         model.addAttribute("search", search);
         model.addAttribute("dificultadId", dificultadId);
@@ -92,6 +96,7 @@ public class CuestionariosController {
         Page<Cuestionario> cuestionariosRecientes = cuestionarioService.getCuestionariosRecientesPaginated(search, dificultadId, pageable, authUser);
         
         model.addAttribute("cuestionariosRecientesPage", cuestionariosRecientes);
+        model.addAttribute("favoriteSerieIds", favoritoService.getFavoriteSerieIds(authUser.getId(), cuestionariosRecientes.getContent()));
         model.addAttribute("dificultades", dificultadRepository.findAllByOrderByNombreAsc());
         model.addAttribute("search", search);
         model.addAttribute("dificultadId", dificultadId);
@@ -106,12 +111,14 @@ public class CuestionariosController {
     public String getCuestionariosDatosTabla(
             @RequestParam(name = "search", required = false) String search,
             @RequestParam(name = "dificultadId", required = false) Long dificultadId,
+            @AuthenticationPrincipal QuizlyUserDetails authUser,
             Model model, 
             @PageableDefault(size = 5) Pageable pageable) {
         
         Page<Cuestionario> cuestionarios = cuestionarioService.getCuestionariosPaginated(search, dificultadId, pageable);
 
         model.addAttribute("cuestionariosPage", cuestionarios);
+        model.addAttribute("favoriteSerieIds", favoritoService.getFavoriteSerieIds(authUser.getId(), cuestionarios.getContent()));
         model.addAttribute("dificultades", dificultadRepository.findAllByOrderByNombreAsc());
         model.addAttribute("search", search);
         model.addAttribute("dificultadId", dificultadId);
@@ -129,6 +136,7 @@ public class CuestionariosController {
         Page<Cuestionario> cuestionariosRecientes = cuestionarioService.getCuestionariosRecientesPaginated(search, dificultadId, pageable, authUser);
 
         model.addAttribute("cuestionariosRecientesPage", cuestionariosRecientes);
+        model.addAttribute("favoriteSerieIds", favoritoService.getFavoriteSerieIds(authUser.getId(), cuestionariosRecientes.getContent()));
         model.addAttribute("dificultades", dificultadRepository.findAllByOrderByNombreAsc());
         model.addAttribute("search", search);
         model.addAttribute("dificultadId", dificultadId);
@@ -146,6 +154,7 @@ public class CuestionariosController {
                 authUser.getId(), cuestionario.get().getSlug());
 
             model.addAttribute("quiz", cuestionario.get());
+            model.addAttribute("isFavorite", favoritoService.isFavorite(authUser.getId(), slug));
 
             if (intento.isPresent()) {
                 IntentoCuestionario intentoReanudable = intento.get();

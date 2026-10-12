@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es" th:replace="~{layout/base_layout :: layout(~{::main})}">
+<head th:replace="~{fragments/head :: head('Quizly - Favoritos')}"></head>
+<body>
+    <main th:fragment="main" class="w-full px-6 py-8">
+        <div class="mb-5">
+            <h1 class="text-xl font-semibold tracking-tight text-text">Mis favoritos</h1>
+            <p class="mt-1 text-sm text-text-muted">Cuestionarios que has guardado para repasar más tarde.</p>
+        </div>
+
+        <div th:replace="~{components/quiz/quiz-filters :: filters(formId='quiz-filter-form', targetUrl='/favoritos/table-data', targetId='#lista-cuestionarios')}"></div>
+
+        <div id="lista-cuestionarios" th:fragment="lista-cuestionarios_fragment">
+            <div th:if="${favoritesPage.empty}" class="flex flex-col items-center justify-center py-16 text-center">
+                <div class="w-16 h-16 rounded-2xl bg-surface-alt flex items-center justify-center mb-4">
+                    <i class="fa-regular fa-star text-2xl text-text-muted"></i>
+                </div>
+                <h3 class="font-semibold text-text">Todavía no tienes favoritos</h3>
+                <p class="text-sm text-text-muted mt-1 max-w-xs">Guarda un cuestionario con la estrella para encontrarlo aquí.</p>
+                <a th:href="@{/cuestionarios}" class="btn btn-primary mt-4">Explorar cuestionarios</a>
+            </div>
+
+            <div th:if="${!favoritesPage.empty}" class="quiz__container flex flex-col gap-2 mb-4">
+                <th:block th:each="cuestionario : ${favoritesPage}">
+                    <div th:replace="~{components/quiz/quiz-card :: card(cuestionario=${cuestionario}, showActions=false, filterFormId='quiz-filter-form')}"></div>
+                </th:block>
+            </div>
+
+            <div th:if="${favoritesPage.totalPages > 1}">
+                <div th:replace="~{components/commons/pagination :: controls(
+                    page=${favoritesPage},
+                    filterFormId='quiz-filter-form',
+                    targetUrl='/favoritos/table-data',
+                    tableId='lista-cuestionarios',
+                    pageParamName='page',
+                    sizeOptions=${ {5, 10, 15, 20} }
+                )}"></div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

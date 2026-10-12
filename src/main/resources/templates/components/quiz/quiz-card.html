@@ -21,6 +21,11 @@
         </div>
 
         <div class="flex items-center gap-2 shrink-0">
+            <div th:replace="~{components/quiz/favorite-button :: button(
+                cuestionario=${cuestionario},
+                isFavorite=${favoriteListPage == true or (favoriteSerieIds != null and favoriteSerieIds.contains(cuestionario.serie.id))},
+                favoriteListPage=${favoriteListPage ?: false}
+            )}"></div>
             <div class="badge-difficulty"
                 th:classappend="${cuestionario.dificultad != null ? (cuestionario.dificultad.codigo == 'EASY' ? 'badge-difficulty-easy' :
                                  cuestionario.dificultad.codigo == 'MEDIUM' ? 'badge-difficulty-medium' :
