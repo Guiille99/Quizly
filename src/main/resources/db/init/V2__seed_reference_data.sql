@@ -2,7 +2,7 @@
 
 -- Tipos de pregunta
 INSERT INTO tipo_preguntas (codigo, nombre) VALUES
-    ('SINGLE_CHOICE', 'Opción única'),
+    ('SINGLE_CHOICE', 'Opción múltiple'),
     ('TRUE_FALSE',    'Verdadero o falso');
 
 -- Estados de intento de cuestionario
