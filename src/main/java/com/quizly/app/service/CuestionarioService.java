@@ -509,7 +509,7 @@ public class CuestionarioService {
                 response.correcta(),
                 selectedOption.text(),
                 correctOption.text(),
-                correctOption.explanation()
+                selectedOption.explanation()
             ));
         }
 
