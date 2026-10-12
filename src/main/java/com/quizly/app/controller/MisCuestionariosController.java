@@ -136,9 +136,14 @@ public class MisCuestionariosController {
             Dificultad dificultad = resolveDificultad(dificultadParam);
 
             // 3. Preparar petición de generación
-            String indicaciones = "VARIADAS".equalsIgnoreCase(tipoPreguntas)
-                    ? "Genera una combinación equilibrada de preguntas de opción múltiple (SINGLE_CHOICE) y verdadero/falso (TRUE_FALSE)."
-                    : "Genera únicamente preguntas de opción múltiple con respuesta única (SINGLE_CHOICE).";
+            String indicaciones;
+            if ("VARIADAS".equalsIgnoreCase(tipoPreguntas)) {
+                indicaciones = "Genera una combinación equilibrada de preguntas de opción múltiple (SINGLE_CHOICE) y verdadero/falso (TRUE_FALSE).";
+            } else if ("TRUE_FALSE".equalsIgnoreCase(tipoPreguntas)) {
+                indicaciones = "Genera únicamente preguntas de verdadero/falso (TRUE_FALSE), con exactamente dos opciones: 'Verdadero' y 'Falso'.";
+            } else {
+                indicaciones = "Genera únicamente preguntas de opción múltiple con respuesta única (SINGLE_CHOICE).";
+            }
 
             PdfQuizGeneratorRequest request = PdfQuizGeneratorRequest.builder()
                     .pdfFile(file)
