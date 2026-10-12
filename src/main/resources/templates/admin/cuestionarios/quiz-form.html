@@ -18,33 +18,32 @@
             Este cuestionario no puede modificarse porque existen versiones posteriores.
         </div>
 
-        <form id="quiz-form" class="form-stack" enctype="multipart/form-data"
-            th:action="${formAction}" 
-            method="post" th:object="${quizForm}">
-            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-
+        <div class="form-stack">
             <section th:if="${quizForm.id == null and canImportQuizJson}" class="card">
                 <div class="card-body">
-                    <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-                        <fieldset class="fieldset flex-1 rounded-lg border-2 border-dashed border-primary/40 bg-base-200/50 p-4">
-                            <label class="label flex items-center gap-2 text-base font-semibold" for="jsonFile">
-                                <i class="fa-solid fa-file-arrow-up text-primary" aria-hidden="true"></i>
-                                Importar cuestionario desde JSON
-                            </label>
-                            <input id="jsonFile" name="jsonFile" type="file"
-                                class="file-input file-input-bordered file-input-primary min-h-12 w-full bg-base-100"
-                                accept=".json,application/json" aria-describedby="json-file-help">
-                            <p id="json-file-help" class="mt-2 text-sm text-text-muted">
-                                Selecciona un archivo .json (máximo 2 MB). Solo se aceptan archivos JSON válidos.
-                            </p>
-                        </fieldset>
-                        <button type="submit" class="btn btn-outline"
-                            formaction="/admin/cuestionarios/importar-json" formmethod="post">
-                            <i class="fa-solid fa-file-import"></i>
-                            Cargar JSON
-                        </button>
-                    </div>
-
+                    <form th:action="@{/admin/cuestionarios/importar-json}" method="post" enctype="multipart/form-data">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+    
+                        <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                            <fieldset class="fieldset flex-1 rounded-lg border-2 border-dashed border-primary/40 bg-base-200/50 p-4">
+                                <label class="label flex items-center gap-2 text-base font-semibold" for="jsonFile">
+                                    <i class="fa-solid fa-file-arrow-up text-primary" aria-hidden="true"></i>
+                                    Importar cuestionario desde JSON
+                                </label>
+                                <input id="jsonFile" name="jsonFile" type="file"
+                                    class="file-input file-input-bordered file-input-primary min-h-12 w-full bg-base-100"
+                                    accept=".json,application/json" aria-describedby="json-file-help">
+                                <p id="json-file-help" class="mt-2 text-sm text-text-muted">
+                                    Selecciona un archivo .json (máximo 2 MB). Solo se aceptan archivos JSON válidos.
+                                </p>
+                            </fieldset>
+                            <button type="submit" class="btn btn-outline">
+                                <i class="fa-solid fa-file-import"></i>
+                                Cargar JSON
+                            </button>
+                        </div>
+                    </form>
+    
                     <details class="mt-2">
                         <summary class="cursor-pointer text-sm font-medium">Ver estructura JSON requerida</summary>
                         <p class="mt-2 text-sm text-text-muted">
@@ -53,9 +52,9 @@
                             Cada pregunta debe tener exactamente una respuesta correcta.
                         </p>
                         <pre class="mt-3 overflow-x-auto rounded-lg bg-base-200 p-4 text-xs"><code>{
-  "titulo": "Cuestionario de ejemplo",
-  "descripcion": "Descripción opcional",
-  "preguntas": [
+    "titulo": "Cuestionario de ejemplo",
+    "descripcion": "Descripción opcional",
+    "preguntas": [
     {
       "enunciado": "¿Cuál es la respuesta correcta?",
       "tipoPreguntaCodigo": "SINGLE_CHOICE",
@@ -64,363 +63,370 @@
         {"texto": "Opción B", "correcta": false}
       ]
     }
-  ]
-}</code></pre>
+    ]
+    }</code></pre>
                         <p class="mt-2 text-xs text-text-muted">
                             Límites: título 100, descripción 255, enunciado y opción 255, retroalimentación 500 caracteres. Archivo máximo: 2 MB.
                         </p>
                     </details>
                 </div>
             </section>
-
-            <!-- Información general -->
-            <section class="card">          
-                <div class="card-body">
-                    <h1 class="card-title">Información general</h1>
     
-                    <div class="form-stack">
-                        <!-- Título -->
-                        <fieldset class="fieldset p-0">
-                            <label class="label" for="titulo">
-                                <span>
-                                    Título
-                                    <span class="text-error" aria-hidden="true">*</span>
-                                </span>
-                            </label>
-                            <input type="text" class="input w-full" th:field="*{titulo}" 
-                                placeholder="Título del cuestionario" 
-                                th:classappend="${#fields.hasErrors('titulo')} ? 'input-error'"
-                                th:readonly="${!quizForm.editable}">
-                            <p th:if="${#fields.hasErrors('titulo')}" th:errors="*{titulo}" class="text-error"></p>
-                        </fieldset>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            <!-- Asignatura -->
-                             <fieldset class="fieldset p-0">
-                                <label class="label" for="asignaturaId">
-                                    <span>
-                                        Asignatura
-                                        <span class="text-error" aria-hidden="true">*</span>
-                                    </span>
-                                </label>
-                                <select class="select w-full md:w-auto" th:field="*{asignaturaId}" 
-                                    th:attr="hx-get=${opcionesTemaUrl != null ? opcionesTemaUrl : '/admin/cuestionarios/opcionesTema'}"
-                                    hx-trigger="change"
-                                    hx-target="#temaId"
-                                    hx-indicator="#tema-options-indicator"
-                                    hx-swap="innerHTML"
-                                    hx-include="this"
-                                    th:classappend="${#fields.hasErrors('asignaturaId')} ? 'input-error'"
-                                    th:disabled="${!quizForm.editable}">
+            <form id="quiz-form" class="form-stack"
+                th:action="${formAction}" 
+                method="post" th:object="${quizForm}">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
     
-                                    <option value="">Selecciona una asignatura</option>
-
-                                    <option th:each="asignatura : ${asignaturas}"
-                                        th:value="${asignatura.id}"
-                                        th:text="${asignatura.nombre}">
-                                    </option>
-                                </select>
-                                <p th:if="${#fields.hasErrors('asignaturaId')}" th:errors="*{asignaturaId}" class="text-error"></p>
-                             </fieldset>
-    
-                             <!-- Tema -->
-                             <fieldset class="fieldset p-0 relative">
-                                <label class="label" for="temaId">
-                                    <span>
-                                        Tema
-                                        <span class="text-error" aria-hidden="true">*</span>
-                                    </span>
-                                </label>
-                                <select id="temaId" class="select w-full md:w-auto" th:field="*{temaId}"
-                                    th:classappend="${#fields.hasErrors('temaId')} ? 'input-error'"
-                                    th:disabled="${!quizForm.editable}">
-    
-                                    <th:block th:fragment="temas-options">
-                                        <option value="">Selecciona un tema</option>
-                                        
-                                        <option th:each="tema : ${temas}"
-                                            th:value="${tema.id}"
-                                            th:text="${tema.nombre}">
-                                        </option>
-                                    </th:block>
-                                </select>
-                                <p th:if="${#fields.hasErrors('temaId')}" th:errors="*{temaId}" class="text-error"></p>
-                             </fieldset>
-
-                             <!-- Dificultad -->
-                             <fieldset class="fieldset p-0">
-                                <label class="label" for="dificultad">
-                                    <span>
-                                        Dificultad
-                                        <span class="text-error" aria-hidden="true">*</span>
-                                    </span>
-                                </label>
-                                <select class="select w-full md:w-auto" th:field="*{dificultadId}" 
-                                    th:classappend="${#fields.hasErrors('dificultadId')} ? 'input-error'"
-                                    th:disabled="${!quizForm.editable}">
-    
-                                    <option value="">Selecciona una dificultad</option>
-
-                                    <option th:each="dificultad : ${dificultades}"
-                                        th:value="${dificultad.id}"
-                                        th:text="${dificultad.nombre}">
-                                    </option>
-                                </select>
-                                <p th:if="${#fields.hasErrors('dificultadId')}" th:errors="*{dificultadId}" class="text-error"></p>
-                             </fieldset>
-                        </div>
-
-                        <!-- Tiempo límite -->
-                        <fieldset class="fieldset p-0">
-                            <label class="label">
-                                <span>Tiempo límite</span>
-                            </label>
-
-                            <div class="flex items-center gap-3">
-                                <input id="tiempoLimite" class="input w-3/12 lg:w-1/12" type="number" 
-                                    name="tiempoLimite" th:field="*{tiempoLimite}"
-                                    min="1"
-                                    th:readonly="${!quizForm.editable}">
-
-                                <!-- Unidad de tiempo -->
-                                <select id="unidadTiempo" class="select w-32" 
-                                    name="unidadTiempo" th:field="*{unidadTiempo}"
-                                    th:disabled="${!quizForm.editable}">
-
-                                    <option th:each="unidad : ${T(com.quizly.app.model.enums.UnidadTiempo).values()}"
-                                        th:value="${unidad}" th:text="${unidad.nombre}"></option>
-                                </select>
-
-                                <label class="label cursor-pointer">
-                                    <input id="sinLimite" type="checkbox" name="sinLimite" class="checkbox checkbox-primary"
-                                        th:field="*{sinLimiteTiempo}"
-                                        data-toggle-disabled="#tiempoLimite, #unidadTiempo"
-                                        th:disabled="${!quizForm.editable}">
-                                    <span>Sin límite de tiempo</span>
-                                </label>
-                            </div>
-                        </fieldset>
-
-                        <!-- Descripción -->
-                        <fieldset class="fieldset p-0">
-                            <label class="label" for="descripcion">
-                                <span>Descripción</span>
-                            </label>
-
-                            <textarea class="textarea w-full" name="descripcion" 
-                                placeholder="Breve descripción del cuestionario (opcional)"
-                                th:field="*{descripcion}" 
-                                th:classappend="${#fields.hasErrors('descripcion')} ? 'input-error'"
-                                maxlength="255"
-                                th:readonly="${!quizForm.editable}">
-                            </textarea>
-
-                            <p th:if="${#fields.hasErrors('descripcion')}" th:errors="*{descripcion}" class="text-error"></p>
-                        </fieldset>
-                    </div>
-
-                </div>     
-            </section>
-
-            <!-- Preguntas -->
-             <section class="card">
-                <div class="card-body">
-                    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                        <h1 class="card-title">Preguntas</h1>
-    
-                        <button th:if="${quizForm.editable}" type="button" class="btn btn-primary" onclick="openQuestionDialog()">
-                            <i class="fa-solid fa-plus"></i>
-                            Añadir pregunta
-                        </button>
-                    </div>
-
-                    <!-- Estado vacío -->
-                    <div id="questions-empty-state" 
-                        class="border border-dashed border-border rounded-lg">
-                    
-                        <div class="flex flex-col items-center justify-center text-center py-12 px-6">
-                            <th:block th:if="${quizForm.editable}">
-                                <div class="icon__container bg-accent-muted text-primary w-20! h-20! rounded-xl mb-4">
-                                    <i class="fa-solid fa-circle-plus text-2xl"></i>
-                                </div>
-    
-                                <h3 class="font-semibold text-text">Este cuestionario aún no tiene preguntas</h3>
-                                <p class="text-sm text-text-muted mt-1">Añade tu primera pregunta para comenzar.</p>
-    
-                                <button type="button" class="btn btn-primary mt-5" onclick="openQuestionDialog()">
-                                    <i class="fa-solid fa-plus"></i>
-                                    Añadir primera pregunta
-                                </button>
-                            </th:block>
-
-                            <th:block th:unless="${quizForm.editable}">
-                                <div class="icon__container bg-accent-muted text-primary w-20! h-20! rounded-xl mb-4">
-                                    <i class="fa-solid fa-circle-question text-2xl"></i>
-                                </div>
-    
-                                <h3 class="font-semibold text-text">
-                                    Esta versión del cuestionario no tiene preguntas asociadas.
-                                </h3>
-                            </th:block>
-                        </div>
-                    </div>
-
-                    <!-- Lista de preguntas -->
-                     <div id="questions-list" 
-                        class="table__container hidden">
-
-                        <table class="table table-zebra w-full">
-                            <thead>
-                                <tr>
-                                    <th class="w-12">#</th>
-                                    <th>Enunciado</th>
-                                    <th>Tipo</th>
-                                    <th>Opciones</th>
-                                    <th>Respuesta correcta</th>
-                                    <th th:if="${quizForm.editable}" class="w-32 text-center">Acciones</th>
-                                </tr>
-                            </thead>
-
-                            <tbody id="questions-list-body"></tbody>
-                        </table>
-                     </div>
-                </div>
-             </section>
-
-             <!-- Ajustes avanzados -->
-            <section class="card">
-                <details>
-                    <summary class="card-body cursor-pointer list-none mb-4">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <h2 class="card-title">Ajustes avanzados</h2>
-
-                                <p class="text-sm text-text-muted mt-1">
-                                    Opciones adicionales para personalizar el comportamiendo del cuestionario.
-                                </p>
-                            </div>
-
-                            <i class="fa-solid fa-chevron-down text-text-muted"></i>
-                        </div>
-                    </summary>
-
+                <!-- Información general -->
+                <section class="card">          
                     <div class="card-body">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                            <label class="flex items-center justify-between gap-4 border border-border 
-                                rounded-lg p-4 cursor-pointer">
-                                <div>
-                                    <p class="font-medium">Aleatorizar preguntas</p>
-                                    <p class="text-xs text-text-muted mt-1">Mostrar las preguntas en un orden diferente en cada intento.</p>
+                        <h1 class="card-title">Información general</h1>
+        
+                        <div class="form-stack">
+                            <!-- Título -->
+                            <fieldset class="fieldset p-0">
+                                <label class="label" for="titulo">
+                                    <span>
+                                        Título
+                                        <span class="text-error" aria-hidden="true">*</span>
+                                    </span>
+                                </label>
+                                <input type="text" class="input w-full" th:field="*{titulo}" 
+                                    placeholder="Título del cuestionario" 
+                                    th:classappend="${#fields.hasErrors('titulo')} ? 'input-error'"
+                                    th:readonly="${!quizForm.editable}">
+                                <p th:if="${#fields.hasErrors('titulo')}" th:errors="*{titulo}" class="text-error"></p>
+                            </fieldset>
+    
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                <!-- Asignatura -->
+                                 <fieldset class="fieldset p-0">
+                                    <label class="label" for="asignaturaId">
+                                        <span>
+                                            Asignatura
+                                            <span class="text-error" aria-hidden="true">*</span>
+                                        </span>
+                                    </label>
+                                    <select class="select w-full md:w-auto" th:field="*{asignaturaId}" 
+                                        th:attr="hx-get=${opcionesTemaUrl != null ? opcionesTemaUrl : '/admin/cuestionarios/opcionesTema'}"
+                                        hx-trigger="change"
+                                        hx-target="#temaId"
+                                        hx-indicator="#tema-options-indicator"
+                                        hx-swap="innerHTML"
+                                        hx-include="this"
+                                        th:classappend="${#fields.hasErrors('asignaturaId')} ? 'input-error'"
+                                        th:disabled="${!quizForm.editable}">
+        
+                                        <option value="">Selecciona una asignatura</option>
+    
+                                        <option th:each="asignatura : ${asignaturas}"
+                                            th:value="${asignatura.id}"
+                                            th:text="${asignatura.nombre}">
+                                        </option>
+                                    </select>
+                                    <p th:if="${#fields.hasErrors('asignaturaId')}" th:errors="*{asignaturaId}" class="text-error"></p>
+                                 </fieldset>
+        
+                                 <!-- Tema -->
+                                 <fieldset class="fieldset p-0 relative">
+                                    <label class="label" for="temaId">
+                                        <span>
+                                            Tema
+                                            <span class="text-error" aria-hidden="true">*</span>
+                                        </span>
+                                    </label>
+                                    <select id="temaId" class="select w-full md:w-auto" th:field="*{temaId}"
+                                        th:classappend="${#fields.hasErrors('temaId')} ? 'input-error'"
+                                        th:disabled="${!quizForm.editable}">
+        
+                                        <th:block th:fragment="temas-options">
+                                            <option value="">Selecciona un tema</option>
+                                            
+                                            <option th:each="tema : ${temas}"
+                                                th:value="${tema.id}"
+                                                th:text="${tema.nombre}">
+                                            </option>
+                                        </th:block>
+                                    </select>
+                                    <p th:if="${#fields.hasErrors('temaId')}" th:errors="*{temaId}" class="text-error"></p>
+                                 </fieldset>
+    
+                                 <!-- Dificultad -->
+                                 <fieldset class="fieldset p-0">
+                                    <label class="label" for="dificultad">
+                                        <span>
+                                            Dificultad
+                                            <span class="text-error" aria-hidden="true">*</span>
+                                        </span>
+                                    </label>
+                                    <select class="select w-full md:w-auto" th:field="*{dificultadId}" 
+                                        th:classappend="${#fields.hasErrors('dificultadId')} ? 'input-error'"
+                                        th:disabled="${!quizForm.editable}">
+        
+                                        <option value="">Selecciona una dificultad</option>
+    
+                                        <option th:each="dificultad : ${dificultades}"
+                                            th:value="${dificultad.id}"
+                                            th:text="${dificultad.nombre}">
+                                        </option>
+                                    </select>
+                                    <p th:if="${#fields.hasErrors('dificultadId')}" th:errors="*{dificultadId}" class="text-error"></p>
+                                 </fieldset>
+                            </div>
+    
+                            <!-- Tiempo límite -->
+                            <fieldset class="fieldset p-0">
+                                <label class="label">
+                                    <span>Tiempo límite</span>
+                                </label>
+    
+                                <div class="flex items-center gap-3">
+                                    <input id="tiempoLimite" class="input w-3/12 lg:w-1/12" type="number" 
+                                        name="tiempoLimite" th:field="*{tiempoLimite}"
+                                        min="1"
+                                        th:readonly="${!quizForm.editable}">
+    
+                                    <!-- Unidad de tiempo -->
+                                    <select id="unidadTiempo" class="select w-32" 
+                                        name="unidadTiempo" th:field="*{unidadTiempo}"
+                                        th:disabled="${!quizForm.editable}">
+    
+                                        <option th:each="unidad : ${T(com.quizly.app.model.enums.UnidadTiempo).values()}"
+                                            th:value="${unidad}" th:text="${unidad.nombre}"></option>
+                                    </select>
+    
+                                    <label class="label cursor-pointer">
+                                        <input id="sinLimite" type="checkbox" name="sinLimite" class="checkbox checkbox-primary"
+                                            th:field="*{sinLimiteTiempo}"
+                                            data-toggle-disabled="#tiempoLimite, #unidadTiempo"
+                                            th:disabled="${!quizForm.editable}">
+                                        <span>Sin límite de tiempo</span>
+                                    </label>
                                 </div>
-
-                                <input type="checkbox" class="toggle toggle-primary" th:field="*{preguntasAleatorias}"
-                                    th:disabled="${!quizForm.editable}">
-                            </label>
+                            </fieldset>
+    
+                            <!-- Descripción -->
+                            <fieldset class="fieldset p-0">
+                                <label class="label" for="descripcion">
+                                    <span>Descripción</span>
+                                </label>
+    
+                                <textarea class="textarea w-full" name="descripcion" 
+                                    placeholder="Breve descripción del cuestionario (opcional)"
+                                    th:field="*{descripcion}" 
+                                    th:classappend="${#fields.hasErrors('descripcion')} ? 'input-error'"
+                                    maxlength="255"
+                                    th:readonly="${!quizForm.editable}">
+                                </textarea>
+    
+                                <p th:if="${#fields.hasErrors('descripcion')}" th:errors="*{descripcion}" class="text-error"></p>
+                            </fieldset>
+                        </div>
+    
+                    </div>     
+                </section>
+    
+                <!-- Preguntas -->
+                 <section class="card">
+                    <div class="card-body">
+                        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                            <h1 class="card-title">Preguntas</h1>
+        
+                            <button th:if="${quizForm.editable}" type="button" class="btn btn-primary" onclick="openQuestionDialog()">
+                                <i class="fa-solid fa-plus"></i>
+                                Añadir pregunta
+                            </button>
+                        </div>
+    
+                        <!-- Estado vacío -->
+                        <div id="questions-empty-state" 
+                            class="border border-dashed border-border rounded-lg">
+                        
+                            <div class="flex flex-col items-center justify-center text-center py-12 px-6">
+                                <th:block th:if="${quizForm.editable}">
+                                    <div class="icon__container bg-accent-muted text-primary w-20! h-20! rounded-xl mb-4">
+                                        <i class="fa-solid fa-circle-plus text-2xl"></i>
+                                    </div>
+        
+                                    <h3 class="font-semibold text-text">Este cuestionario aún no tiene preguntas</h3>
+                                    <p class="text-sm text-text-muted mt-1">Añade tu primera pregunta para comenzar.</p>
+        
+                                    <button type="button" class="btn btn-primary mt-5" onclick="openQuestionDialog()">
+                                        <i class="fa-solid fa-plus"></i>
+                                        Añadir primera pregunta
+                                    </button>
+                                </th:block>
+    
+                                <th:block th:unless="${quizForm.editable}">
+                                    <div class="icon__container bg-accent-muted text-primary w-20! h-20! rounded-xl mb-4">
+                                        <i class="fa-solid fa-circle-question text-2xl"></i>
+                                    </div>
+        
+                                    <h3 class="font-semibold text-text">
+                                        Esta versión del cuestionario no tiene preguntas asociadas.
+                                    </h3>
+                                </th:block>
+                            </div>
+                        </div>
+    
+                        <!-- Lista de preguntas -->
+                         <div id="questions-list" 
+                            class="table__container hidden">
+    
+                            <table class="table table-zebra w-full">
+                                <thead>
+                                    <tr>
+                                        <th class="w-12">#</th>
+                                        <th>Enunciado</th>
+                                        <th>Tipo</th>
+                                        <th>Opciones</th>
+                                        <th>Respuesta correcta</th>
+                                        <th th:if="${quizForm.editable}" class="w-32 text-center">Acciones</th>
+                                    </tr>
+                                </thead>
+    
+                                <tbody id="questions-list-body"></tbody>
+                            </table>
+                         </div>
+                    </div>
+                 </section>
+    
+                 <!-- Ajustes avanzados -->
+                <section class="card">
+                    <details>
+                        <summary class="card-body cursor-pointer list-none mb-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h2 class="card-title">Ajustes avanzados</h2>
+    
+                                    <p class="text-sm text-text-muted mt-1">
+                                        Opciones adicionales para personalizar el comportamiendo del cuestionario.
+                                    </p>
+                                </div>
+    
+                                <i class="fa-solid fa-chevron-down text-text-muted"></i>
+                            </div>
+                        </summary>
+    
+                        <div class="card-body">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                <label class="flex items-center justify-between gap-4 border border-border 
+                                    rounded-lg p-4 cursor-pointer">
+                                    <div>
+                                        <p class="font-medium">Aleatorizar preguntas</p>
+                                        <p class="text-xs text-text-muted mt-1">Mostrar las preguntas en un orden diferente en cada intento.</p>
+                                    </div>
+    
+                                    <input type="checkbox" class="toggle toggle-primary" th:field="*{preguntasAleatorias}"
+                                        th:disabled="${!quizForm.editable}">
+                                </label>
+                            </div>
+                        </div>
+                    </details>
+                </section>
+    
+                <!-- Modal de preguntas -->
+                <dialog id="questionDialog" class="modal modal-middle" data-question-index="">
+                    <div class="modal-box w-11/12 max-w-5xl">
+                        <!-- Cabecera -->
+                        <div>
+                            <button type="button" 
+                                onclick="document.getElementById('questionDialog').close()" 
+                                class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">X</button>
+                            
+                            <h2 class="text-lg font-semibold">Añadir pregunta</h2>
+                        </div>
+    
+                        <!-- Contenido -->
+                        <div class="px-6 py-5 space-y-6">
+                            <!-- Enunciado -->
+                            <fieldset class="fieldset">
+                                <label class="label" for="question-text">
+                                    <span>Enunciado de la pregunta</span>
+                                    <span class="text-error">*</span>
+                                </label>
+    
+                                <textarea id="question-text" name="question-text" class="textarea w-full"
+                                    placeholder="Escribe el enunciado de la pregunta...">
+                                </textarea>
+    
+                                <p id="question-text-error" class="text-sm text-error hidden"></p>
+                            </fieldset>
+    
+                            <!-- Tipo de pregunta -->
+                            <fieldset class="fieldset">
+                                <label class="label" for="question-type">
+                                    <span>Tipo de pregunta</span>
+                                    <span class="text-error">*</span>
+                                </label>
+    
+                                <select id="question-type" name="question-type" class="select w-full">
+                                    <option th:each="tipo : ${tiposPregunta}"
+                                        th:value="${tipo.codigo}"
+                                        th:text="${tipo.nombre}">
+                                    </option>
+                                    <!-- <option value="SINGLE_CHOICE" selected>Simple (una única respuesta correcta)</option> -->
+                                </select>
+                            </fieldset>
+    
+                            <!-- Respuestas -->
+                            <fieldset class="fieldset">
+                                <label class="label">
+                                    <span>Respuestas</span>
+                                    <span class="text-error">*</span>
+                                </label>
+    
+                                <div id="answers-container" class="space-y-3"></div>
+    
+                                <p id="answers-error" class="text-sm text-error hidden"></p>
+    
+                                <!-- Añadir respuesta -->
+                                <div class="flex items-center justify-between mt-2">
+                                    <button id="add-answer-btn" type="button"
+                                        class="btn btn-outline btn-sm">
+    
+                                        <i class="fa-solid fa-plus"></i>
+                                        Añadir opción
+                                    </button>
+    
+                                    <span class="text-xs text-text-muted">Selecciona la respuesta correcta</span>
+                                </div>
+                            </fieldset>
+                        </div>
+    
+                        <!-- Footer -->
+                        <div class="flex items-center justify-end gap-2">
+                            <button type="button" class="btn btn-outline" 
+                                onclick="document.getElementById('questionDialog').close()">
+    
+                                Cancelar
+                            </button>
+    
+                            <button id="save-question-btn" type="button"
+                                class="btn btn-primary">
+    
+                                <i class="fa-solid fa-plus"></i>
+                                Añadir pregunta
+                            </button>
                         </div>
                     </div>
-                </details>
-            </section>
-
-            <!-- Modal de preguntas -->
-            <dialog id="questionDialog" class="modal modal-middle" data-question-index="">
-                <div class="modal-box w-11/12 max-w-5xl">
-                    <!-- Cabecera -->
-                    <div>
-                        <button type="button" 
-                            onclick="document.getElementById('questionDialog').close()" 
-                            class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">X</button>
-                        
-                        <h2 class="text-lg font-semibold">Añadir pregunta</h2>
-                    </div>
-
-                    <!-- Contenido -->
-                    <div class="px-6 py-5 space-y-6">
-                        <!-- Enunciado -->
-                        <fieldset class="fieldset">
-                            <label class="label" for="question-text">
-                                <span>Enunciado de la pregunta</span>
-                                <span class="text-error">*</span>
-                            </label>
-
-                            <textarea id="question-text" name="question-text" class="textarea w-full"
-                                placeholder="Escribe el enunciado de la pregunta...">
-                            </textarea>
-
-                            <p id="question-text-error" class="text-sm text-error hidden"></p>
-                        </fieldset>
-
-                        <!-- Tipo de pregunta -->
-                        <fieldset class="fieldset">
-                            <label class="label" for="question-type">
-                                <span>Tipo de pregunta</span>
-                                <span class="text-error">*</span>
-                            </label>
-
-                            <select id="question-type" name="question-type" class="select w-full">
-                                <option th:each="tipo : ${tiposPregunta}"
-                                    th:value="${tipo.codigo}"
-                                    th:text="${tipo.nombre}">
-                                </option>
-                                <!-- <option value="SINGLE_CHOICE" selected>Simple (una única respuesta correcta)</option> -->
-                            </select>
-                        </fieldset>
-
-                        <!-- Respuestas -->
-                        <fieldset class="fieldset">
-                            <label class="label">
-                                <span>Respuestas</span>
-                                <span class="text-error">*</span>
-                            </label>
-
-                            <div id="answers-container" class="space-y-3"></div>
-
-                            <p id="answers-error" class="text-sm text-error hidden"></p>
-
-                            <!-- Añadir respuesta -->
-                            <div class="flex items-center justify-between mt-2">
-                                <button id="add-answer-btn" type="button"
-                                    class="btn btn-outline btn-sm">
-
-                                    <i class="fa-solid fa-plus"></i>
-                                    Añadir opción
-                                </button>
-
-                                <span class="text-xs text-text-muted">Selecciona la respuesta correcta</span>
-                            </div>
-                        </fieldset>
-                    </div>
-
-                    <!-- Footer -->
-                    <div class="flex items-center justify-end gap-2">
-                        <button type="button" class="btn btn-outline" 
-                            onclick="document.getElementById('questionDialog').close()">
-
-                            Cancelar
-                        </button>
-
-                        <button id="save-question-btn" type="button"
-                            class="btn btn-primary">
-
-                            <i class="fa-solid fa-plus"></i>
-                            Añadir pregunta
-                        </button>
-                    </div>
-                </div>
-            </dialog>
-
-            <div id="questions-form-data"></div>
-
-            <div class="flex items-center justify-end gap-2 mt-6">
-                <a th:href="${cancelUrl}" class="btn btn-outline"
-                    th:text="${quizForm.editable ? 'Cancelar' : 'Volver'}"></a>
+                </dialog>
     
-                <button th:if="${quizForm.editable}" type="submit" form="quiz-form"
-                    class="btn btn-primary" data-loading-text="Guardando...">
-                    <i class="fa-regular fa-floppy-disk"></i>
-                    <span th:text="${quizForm.id == null ? 'Crear cuestionario' : 'Guardar cambios'}"></span> 
-                </button>
-            </div>
-        </form>
+                <div id="questions-form-data"></div>
+    
+                <div class="flex items-center justify-end gap-2 mt-6">
+                    <a th:href="${cancelUrl}" class="btn btn-outline"
+                        th:text="${quizForm.editable ? 'Cancelar' : 'Volver'}"></a>
+        
+                    <button th:if="${quizForm.editable}" type="submit" form="quiz-form"
+                        class="btn btn-primary" data-loading-text="Guardando...">
+                        <i class="fa-regular fa-floppy-disk"></i>
+                        <span th:text="${quizForm.id == null ? 'Crear cuestionario' : 'Guardar cambios'}"></span> 
+                    </button>
+                </div>
+            </form>
+
+        </div>
 
         <script th:inline="javascript">
             const quizFormData = {
