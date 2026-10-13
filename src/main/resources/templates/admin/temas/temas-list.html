@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="es" th:replace="~{layout/base_layout :: layout(~{::main})}">
 <head th:replace="~{fragments/head :: head('Quizly')}"></head>
 <body>
-    <main th:fragment="main" class="w-full px-6 py-8">
+    <main th:fragment="main" class="admin-list-page w-full px-6 py-8">
         <!-- Cabecera -->
         <div class="flex flex-wrap gap-3 lg:gap-0 items-start justify-between mb-5">
             <div>
@@ -23,7 +23,7 @@
          <div class="card mt-6">
             <div id="table-temas-container" class="card-body" th:fragment="table-temas-container_fragment">
                 <!-- Filtros -->
-                <form id="tema-filter-form" class="flex gap-2">
+                <form id="tema-filter-form" class="admin-filter-form flex gap-2">
                     <!-- Buscador -->
                     <input type="text" name="search" th:value="${filters.search}"
                         placeholder="Nombre del tema" class="input"

@@ -4,3 +4,26 @@
     flex-direction: column;
     gap: 0.875rem;
 }
+
+@media (max-width: 640px) {
+    .admin-list-page {
+        padding: 1rem 0.75rem;
+    }
+
+    .admin-filter-form {
+        flex-wrap: wrap;
+        align-items: stretch;
+    }
+
+    .admin-filter-form > .input {
+        flex: 1 1 100%;
+        min-width: 0;
+    }
+
+    .admin-filter-form .select {
+        flex: 1 1 9rem;
+        min-width: 0;
+        width: 100%;
+    }
+
+}

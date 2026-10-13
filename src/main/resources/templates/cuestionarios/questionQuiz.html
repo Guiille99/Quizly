@@ -9,10 +9,8 @@
             <!-- Cabecera -->
             <div class="mb-8">
                 <div class="card bg-accent-blue-muted! flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
-                    <div>
-                        <!-- <h1 class="text-3xl font-bold" th:text="${quizSession.titulo}"></h1> -->
-    
-                        <div class="mt-4 flex flex-wrap gap-10">
+                    <div>    
+                        <div class="mt-4 flex flex-wrap justify-between md:justify-normal md:gap-10">
                             <div>
                                 <i class="fa-solid fa-brain text-blue-500"></i>
                                 <span class="font-bold">Tema:</span>
@@ -42,7 +40,7 @@
             <div id="question-card" th:fragment="question-card" class="card bg-base-100 shadow-xl border border-base-300">
             
                 <div class="card-body p-0">
-                    <h2 class="text-2xl font-semibold leading-relaxed" th:text="${question.statement}"></h2>
+                    <h2 class="text-lg font-semibold leading-relaxed" th:text="${question.statement}"></h2>
             
                     <form id="answer-form" th:action="@{/cuestionarios/{slug}/answer(slug=${quizSession.slug})}"
                         th:hx-post="@{/cuestionarios/{slug}/answer(slug=${quizSession.slug})}" hx-trigger="change"

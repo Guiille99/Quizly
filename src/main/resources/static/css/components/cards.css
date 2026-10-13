@@ -250,6 +250,26 @@
     }
 }
 
+@media (max-width: 640px) {
+    .quiz-card {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .quiz-card .quiz-title {
+        overflow: visible;
+        overflow-wrap: anywhere;
+        text-overflow: clip;
+        white-space: normal;
+    }
+
+    .quiz-card > :last-child {
+        align-self: stretch;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+}
+
 #quiz-start__card{
     #quiz-start__info{
         display: grid;
