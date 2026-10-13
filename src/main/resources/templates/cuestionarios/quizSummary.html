@@ -73,12 +73,10 @@
             <h2 class="text-2xl font-bold mb-5">Desglose de preguntas</h2>
 
             <div class="space-y-4">
-                <div th:each="question,iter : ${summary.questions}" class="collapse collapse-arrow animate-on-load shadow-sm"
+                <details th:each="question,iter : ${summary.questions}" class="collapse collapse-arrow animate-on-load shadow-sm"
                     th:classappend="${question.correct ? 'bg-accent-green-muted' : 'bg-accent-red-muted'}">
-                    <input type="checkbox" />
-
                     <!-- Cabecera -->
-                     <div class="collapse-title">
+                     <summary class="collapse-title">
                         <div class="grid md:grid-cols-12 gap-4 items-center">
                             <!-- Número -->
                             <div class="md:col-span-1">
@@ -105,7 +103,7 @@
                               </div>
 
                         </div>
-                     </div>
+                     </summary>
 
                      <!-- Contenido -->
                       <div class="collapse-content pt-4">
@@ -121,7 +119,7 @@
                             </div>
                         </div>
                       </div>
-                </div>
+                </details>
             </div>
          </section>
 
