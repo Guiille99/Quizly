@@ -23,6 +23,9 @@ spring:
       max-request-size: 25MB
 server:
   port: ${PORT:8080}
+  servlet:
+    session:
+      timeout: 1h
   forward-headers-strategy: NATIVE
 ai:
   api-key: ${AI_API_KEY}
