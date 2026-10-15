@@ -117,12 +117,11 @@ function updateAnswerLetters() {
 function createAnswer() {
     const answer = document.createElement('div');
 
-    answer.className = 'flex items-start gap-2 bg-base-200 rounded p-4';
+    answer.className = 'grid grid-cols-[2rem_minmax(0,1fr)] items-start gap-2 rounded bg-base-200 p-3 sm:grid-cols-[2rem_minmax(0,1fr)_auto] sm:p-4';
     answer.dataset.answer = '';
 
     answer.innerHTML = `
-        <div class="answer-letter flex items-center justify-center
-                    w-8 h-8 shrink-0
+        <div class="answer-letter col-start-1 row-start-1 flex h-8 w-8 shrink-0 items-center justify-center
                     rounded-md
                     bg-primary/10
                     text-primary
@@ -130,7 +129,7 @@ function createAnswer() {
             A
         </div>
 
-        <div class="flex-1 min-w-0">
+        <div class="col-span-2 row-start-2 min-w-0 sm:col-span-1 sm:col-start-2 sm:row-start-1">
             <input type="text"
                 class="input w-full"
                 data-answer-text
@@ -144,7 +143,7 @@ function createAnswer() {
                 placeholder="Retroalimentación opcional..."></textarea>
         </div>
 
-        <div class="flex items-center gap-1 self-start mt-1">
+        <div class="col-start-2 row-start-1 flex items-center justify-end gap-1 sm:col-start-3">
             <label class="cursor-pointer"
                 title="Marcar como respuesta correcta">
 
