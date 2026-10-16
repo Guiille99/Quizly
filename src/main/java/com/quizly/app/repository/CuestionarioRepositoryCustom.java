@@ -17,7 +17,7 @@ public interface CuestionarioRepositoryCustom {
 
     boolean existsBySlug(String slug);
 
-    Optional<Cuestionario> findLastVersionBySlug(String slug);
+    Optional<Cuestionario> findLastAccessibleVersionBySlug(String slug, Long usuarioId);
 
     /**
      * Devuelve los últimos cuestionarios modificados

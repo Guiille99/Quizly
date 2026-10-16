@@ -27,7 +27,9 @@ public interface IntentoCuestionarioRepository extends JpaRepository<IntentoCues
     @Query("""
             SELECT ic FROM IntentoCuestionario ic
             JOIN ic.estado e
+            JOIN ic.cuestionario c
             WHERE ic.usuario.id = :usuarioId AND e.codigo = :codigoEstadoIntento
+            AND (c.usuario IS NULL OR c.usuario.id = :usuarioId)
             ORDER BY ic.fechaFin DESC
             """)
     Page<IntentoCuestionario> getIntentosCuestionariosByUsuarioYEstado(Long usuarioId, String codigoEstadoIntento, Pageable pageable);

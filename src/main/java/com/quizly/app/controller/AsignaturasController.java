@@ -134,7 +134,7 @@ public class AsignaturasController {
             return "redirect:/asignaturas";
         }
 
-        Page<Cuestionario> cuestionariosTemaPage = cuestionarioService.getCuestionariosPaginatedByTema(tema, search, dificultadId, pageable);
+        Page<Cuestionario> cuestionariosTemaPage = cuestionarioService.getCuestionariosPaginatedByTema(tema, search, dificultadId, authUser.getId(), pageable);
 
         model.addAttribute("asignatura", asignatura);
         model.addAttribute("tema", tema);
@@ -161,7 +161,7 @@ public class AsignaturasController {
         Asignatura asignatura = asignaturaService.getAsignatruaBySlug(slugAsig);
         Tema tema = temaService.getTemaBySlug(slugTema);
 
-        Page<Cuestionario> cuestionariosTemaPage = cuestionarioService.getCuestionariosPaginatedByTema(tema, search, dificultadId, pageable);
+        Page<Cuestionario> cuestionariosTemaPage = cuestionarioService.getCuestionariosPaginatedByTema(tema, search, dificultadId, authUser.getId(), pageable);
 
         model.addAttribute("asignatura", asignatura);
         model.addAttribute("tema", tema);

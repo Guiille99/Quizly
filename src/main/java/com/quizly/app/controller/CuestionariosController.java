@@ -1,6 +1,7 @@
 package com.quizly.app.controller;
 
 import com.quizly.app.exception.QuizNotResumableException;
+import com.quizly.app.exception.QuizNotFoundException;
 import com.quizly.app.exception.QuizlyException;
 import com.quizly.app.model.entity.Cuestionario;
 import com.quizly.app.model.entity.IntentoCuestionario;
@@ -45,6 +46,7 @@ import jakarta.servlet.http.HttpSession;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.quizly.app.repository.DificultadRepository;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -73,7 +75,7 @@ public class CuestionariosController {
             Model model, HttpServletRequest request, 
             @PageableDefault(size = 5) Pageable pageable) {
         
-        Page<Cuestionario> cuestionarios = cuestionarioService.getCuestionariosPaginated(search, dificultadId, pageable);
+        Page<Cuestionario> cuestionarios = cuestionarioService.getCuestionariosPaginated(search, dificultadId, authUser.getId(), pageable);
 
         model.addAttribute("cuestionariosPage", cuestionarios);
         model.addAttribute("favoriteSerieIds", favoritoService.getFavoriteSerieIds(authUser.getId(), cuestionarios.getContent()));
@@ -115,7 +117,7 @@ public class CuestionariosController {
             Model model, 
             @PageableDefault(size = 5) Pageable pageable) {
         
-        Page<Cuestionario> cuestionarios = cuestionarioService.getCuestionariosPaginated(search, dificultadId, pageable);
+        Page<Cuestionario> cuestionarios = cuestionarioService.getCuestionariosPaginated(search, dificultadId, authUser.getId(), pageable);
 
         model.addAttribute("cuestionariosPage", cuestionarios);
         model.addAttribute("favoriteSerieIds", favoritoService.getFavoriteSerieIds(authUser.getId(), cuestionarios.getContent()));
@@ -147,25 +149,20 @@ public class CuestionariosController {
 
     @GetMapping("/{slug}")
     public String showStart(@PathVariable String slug, Model model, @AuthenticationPrincipal QuizlyUserDetails authUser) {
-        Optional<Cuestionario> cuestionario = cuestionarioService.getLastVersionQuizBySlug(slug);
+        Cuestionario cuestionario = cuestionarioService.getLastAccessibleVersionQuizBySlug(slug, authUser.getId())
+            .orElseThrow(QuizNotFoundException::new);
+        Optional<IntentoCuestionario> intento = intentoCuestionarioService.getIntentoReanudable(
+            authUser.getId(), cuestionario.getSlug());
 
-        if (cuestionario.isPresent()) {
-            Optional<IntentoCuestionario> intento = intentoCuestionarioService.getIntentoReanudable(
-                authUser.getId(), cuestionario.get().getSlug());
+        model.addAttribute("quiz", cuestionario);
+        model.addAttribute("isFavorite", favoritoService.isFavorite(authUser.getId(), slug));
 
-            model.addAttribute("quiz", cuestionario.get());
-            model.addAttribute("isFavorite", favoritoService.isFavorite(authUser.getId(), slug));
-
-            if (intento.isPresent()) {
-                IntentoCuestionario intentoReanudable = intento.get();
-                model.addAttribute("intentoReanudable", intentoReanudable);
-                model.addAttribute("isPreviousVersion", !intentoReanudable.perteneceAVersion(cuestionario.get()));
-            }
-
-        } else{
-            log.warn("Solicitud de cuestionario inexistente. Slug='{}'", slug);
+        if (intento.isPresent()) {
+            IntentoCuestionario intentoReanudable = intento.get();
+            model.addAttribute("intentoReanudable", intentoReanudable);
+            model.addAttribute("isPreviousVersion", !intentoReanudable.perteneceAVersion(cuestionario));
         }
-        
+
         return "cuestionarios/quizStart";
     }
 
@@ -192,9 +189,10 @@ public class CuestionariosController {
     
     
     @GetMapping("/{slug}/question")
-    public String showQuizQuestion(@PathVariable String slug, HttpSession session, Model model, RedirectAttributes ra) {
+    public String showQuizQuestion(@PathVariable String slug, @AuthenticationPrincipal QuizlyUserDetails user,
+            HttpSession session, Model model, RedirectAttributes ra) {
 
-        UserQuizSession quizSession = quizSessionService.getRequired(session);
+        UserQuizSession quizSession = cuestionarioService.requireAccessibleQuizSession(slug, user.getId(), session);
 
         IntentoCuestionario intento = intentoCuestionarioService.getIntentoActivo(quizSession.getIntentoCuestionarioId());
 
@@ -223,8 +221,9 @@ public class CuestionariosController {
     
     @PostMapping("/{slug}/answer")
     public String answerQuizQuestion(@PathVariable String slug, @ModelAttribute AnswerRequest request,
-        HttpSession session, HttpServletResponse response, Model model) {
+        @AuthenticationPrincipal QuizlyUserDetails user, HttpSession session, HttpServletResponse response, Model model) {
 
+        cuestionarioService.requireAccessibleQuizSession(slug, user.getId(), session);
         cuestionarioService.answerQuestion(request.optionId(), session);
         UserQuizSession quiz = quizSessionService.getRequired(session);
 
@@ -247,8 +246,9 @@ public class CuestionariosController {
     }
 
     @PostMapping("/{slug}/timeout")
-    public ResponseEntity<Void> timeoutQuiz(@PathVariable String slug, HttpSession session, HttpServletResponse response) {
-        UserQuizSession quizSession = quizSessionService.getRequired(session);
+    public ResponseEntity<Void> timeoutQuiz(@PathVariable String slug, @AuthenticationPrincipal QuizlyUserDetails user,
+            HttpSession session, HttpServletResponse response) {
+        UserQuizSession quizSession = cuestionarioService.requireAccessibleQuizSession(slug, user.getId(), session);
 
         if (!quizSession.isFinished()) {
             cuestionarioService.finishQuiz(session);
@@ -262,8 +262,9 @@ public class CuestionariosController {
     
 
     @GetMapping("/{slug}/summary")
-    public String showQuestionSummary(@PathVariable String slug, HttpSession session, Model model, RedirectAttributes ra) {
-        UserQuizSession quiz = quizSessionService.getRequired(session);
+    public String showQuestionSummary(@PathVariable String slug, @AuthenticationPrincipal QuizlyUserDetails user,
+            HttpSession session, Model model, RedirectAttributes ra) {
+        UserQuizSession quiz = cuestionarioService.requireAccessibleQuizSession(slug, user.getId(), session);
 
         if (!quiz.isFinished()) {
             toastService.info(ra, "No puede acceder al resumen antes de acabar el cuestionario.");
@@ -273,5 +274,11 @@ public class CuestionariosController {
         model.addAttribute("summary", cuestionarioService.getSummary(quiz));
 
         return "cuestionarios/quizSummary";
+    }
+
+    @org.springframework.web.bind.annotation.ExceptionHandler(QuizNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public String handleInaccessibleQuiz() {
+        return "error/404";
     }
 }

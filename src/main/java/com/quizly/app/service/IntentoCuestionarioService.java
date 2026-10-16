@@ -83,6 +83,11 @@ public class IntentoCuestionarioService {
             return Optional.empty();
         }
 
+        Cuestionario cuestionario = intento.get().getCuestionario();
+        if (cuestionario.getUsuario() != null && !userId.equals(cuestionario.getUsuario().getId())) {
+            return Optional.empty();
+        }
+
         if (!intento.get().puedeReanudarse(quizProperties.getInactivityMaxDuration())) {
             abandonarIntento(intento.get());
             return Optional.empty();

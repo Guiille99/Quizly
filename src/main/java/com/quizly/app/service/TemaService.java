@@ -34,6 +34,7 @@ import com.quizly.app.model.entity.Cuestionario;
 import com.quizly.app.model.entity.Tema;
 import com.quizly.app.model.entity.Usuario;
 import com.quizly.app.model.enums.IntentoCuestionarioEstadoEnum;
+import com.quizly.app.repository.CuestionarioRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -44,6 +45,7 @@ public class TemaService {
     private final TemaRepository temaRepository;
     private final IntentoCuestionarioRepository intentoCuestionarioRepository;
     private final AsignaturaRepository asignaturaRepository;
+    private final CuestionarioRepository cuestionarioRepository;
 
     private final SlugService slugService;
 
@@ -173,6 +175,14 @@ public class TemaService {
             temasPage = temaRepository.findByAsignaturaId(asignatura.getId(), pageable);
         }
 
+        Set<Long> idsCuestionariosTema = temasPage.stream()
+            .flatMap(tema -> tema.getCuestionarios().stream())
+            .map(Cuestionario::getId)
+            .collect(Collectors.toSet());
+        Set<Long> idsUltimaVersion = idsCuestionariosTema.isEmpty()
+            ? Set.of()
+            : cuestionarioRepository.findLastVersionIds(idsCuestionariosTema);
+
         // Almacenamos los IDs de los cuestionarios completados por el usuario
         Set<Long> idsCuestionariosCompletadosAux = Set.of();
         if (usuario != null) {
@@ -185,15 +195,19 @@ public class TemaService {
         final Set<Long> idsCuestionariosCompletados = idsCuestionariosCompletadosAux;
 
         List<TemaProgresoDto> temasProgreso = temasPage.stream().map(tema -> {
-            List<Cuestionario> cuestionarios = tema.getCuestionarios();
-            int totalCuestionarios = cuestionarios.size();
-            long nCuestionariosCompletados = cuestionarios.stream()
+            List<Cuestionario> cuestionariosAccesibles = tema.getCuestionarios().stream()
+                .filter(c -> idsUltimaVersion.contains(c.getId()))
+                .filter(c -> c.getUsuario() == null || (usuario != null
+                    && usuario.getId().equals(c.getUsuario().getId())))
+                .toList();
+            int totalCuestionarios = cuestionariosAccesibles.size();
+            long nCuestionariosCompletados = cuestionariosAccesibles.stream()
                 .filter(c -> idsCuestionariosCompletados.contains(c.getId()))
                 .count();
 
             int porcentaje = totalCuestionarios > 0 ? (int) (nCuestionariosCompletados * 100 / totalCuestionarios) : 0;
 
-            return new TemaProgresoDto(tema, porcentaje);
+            return new TemaProgresoDto(tema, totalCuestionarios, porcentaje);
         }).toList();
 
         return new PageImpl<>(temasProgreso, sortedPageable, temasPage.getTotalElements());

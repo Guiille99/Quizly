@@ -38,11 +38,12 @@ class FavoritoServiceTest {
         serie.setId(17L);
         Cuestionario quiz = new Cuestionario();
         quiz.setSerie(serie);
-        when(cuestionarioRepository.findLastVersionBySlug("algebra-basica")).thenReturn(Optional.of(quiz));
+        when(cuestionarioRepository.findLastAccessibleVersionBySlug("algebra-basica", 42L)).thenReturn(Optional.of(quiz));
         when(favoritoRepository.insertIfAbsent(42L, 17L)).thenReturn(1);
 
         assertTrue(favoritoService.addFavorite(42L, "algebra-basica"));
 
+        verify(cuestionarioRepository).findLastAccessibleVersionBySlug("algebra-basica", 42L);
         verify(favoritoRepository).insertIfAbsent(42L, 17L);
     }
 
@@ -52,7 +53,7 @@ class FavoritoServiceTest {
         serie.setId(17L);
         Cuestionario quiz = new Cuestionario();
         quiz.setSerie(serie);
-        when(cuestionarioRepository.findLastVersionBySlug("algebra-basica")).thenReturn(Optional.of(quiz));
+        when(cuestionarioRepository.findLastAccessibleVersionBySlug("algebra-basica", 42L)).thenReturn(Optional.of(quiz));
         when(favoritoRepository.insertIfAbsent(42L, 17L)).thenReturn(0);
 
         assertFalse(favoritoService.addFavorite(42L, "algebra-basica"));
@@ -60,7 +61,7 @@ class FavoritoServiceTest {
 
     @Test
     void addFavoriteRejectsMissingQuizBeforeWriting() {
-        when(cuestionarioRepository.findLastVersionBySlug("missing")).thenReturn(Optional.empty());
+        when(cuestionarioRepository.findLastAccessibleVersionBySlug("missing", 42L)).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class, () -> favoritoService.addFavorite(42L, "missing"));
 

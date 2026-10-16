@@ -26,6 +26,7 @@ import com.quizly.app.dto.form.OpcionRespuestaForm;
 import com.quizly.app.dto.form.PreguntaForm;
 import com.quizly.app.dto.form.QuizForm;
 import com.quizly.app.exception.QuizNotResumableException;
+import com.quizly.app.exception.QuizNotFoundException;
 import com.quizly.app.exception.QuizlyException;
 import com.quizly.app.logging.LogExecution;
 import com.quizly.app.model.entity.Asignatura;
@@ -321,16 +322,12 @@ public class CuestionarioService {
     }
 
 
-    public Page<Cuestionario> getCuestionariosPaginated(String search, Long dificultadId, Pageable pageable){
+    public Page<Cuestionario> getCuestionariosPaginated(String search, Long dificultadId, Long usuarioId, Pageable pageable){
         String cleanSearch = StringUtils.isNotBlank(search) ? search.trim() : null;
         if (cleanSearch != null || dificultadId != null) {
-            return cuestionarioRepository.findAllByFilters(cleanSearch, dificultadId, pageable);
+            return cuestionarioRepository.findAllByFilters(cleanSearch, dificultadId, usuarioId, pageable);
         }
-        return cuestionarioRepository.findAllByOrderByTemaNombreAsc(pageable);
-    }
-
-    public Page<Cuestionario> getCuestionariosPaginated(Pageable pageable){
-        return getCuestionariosPaginated(null, null, pageable);
+        return cuestionarioRepository.findAllByOrderByTemaNombreAsc(usuarioId, pageable);
     }
 
     public Page<Cuestionario> getCuestionariosRecientesPaginated(String search, Long dificultadId, Pageable pageable, QuizlyUserDetails authUser){
@@ -352,17 +349,34 @@ public class CuestionarioService {
         return getCuestionariosRecientesPaginated(null, null, pageable, authUser);
     }
 
-    public Optional<Cuestionario> getLastVersionQuizBySlug(String slug){
-        return cuestionarioRepository.findLastVersionBySlug(slug);
+    public Optional<Cuestionario> getLastAccessibleVersionQuizBySlug(String slug, Long usuarioId){
+        return cuestionarioRepository.findLastAccessibleVersionBySlug(slug, usuarioId);
+    }
+
+    public UserQuizSession requireAccessibleQuizSession(String slug, Long usuarioId, HttpSession httpSession) {
+        UserQuizSession quizSession = quizSessionService.getRequired(httpSession);
+        IntentoCuestionario intento = intentoCuestionarioService.getIntentoActivo(quizSession.getIntentoCuestionarioId());
+
+        boolean belongsToUser = intento.getUsuario().getId().equals(usuarioId);
+        boolean matchesSlug = intento.getCuestionario().getSlug().equals(slug);
+        Usuario quizOwner = intento.getCuestionario().getUsuario();
+        boolean attemptQuizIsAccessible = quizOwner == null || quizOwner.getId().equals(usuarioId);
+        boolean quizIsAccessible = getLastAccessibleVersionQuizBySlug(slug, usuarioId).isPresent();
+        if (!belongsToUser || !matchesSlug || !attemptQuizIsAccessible || !quizIsAccessible) {
+            throw new QuizNotFoundException();
+        }
+
+        return quizSession;
     }
 
     @LogExecution
     @Transactional
     public void startQuiz(String slug, Long userId, HttpSession session){
-        
+
+        Cuestionario cuestionario = getLastAccessibleVersionQuizBySlug(slug, userId)
+            .orElseThrow(QuizNotFoundException::new);
+
         quizSessionService.clear(session);
-        Cuestionario cuestionario = cuestionarioRepository.findLastVersionBySlug(slug)
-            .orElseThrow(() -> new EntityNotFoundException("No existe el cuestionario."));
         
         // Obtenemos el intento abierto del usuario para este cuestionario
         Optional<IntentoCuestionario> intentoAbierto = intentoCuestionarioRepository.findIntentoAbiertoByUsuarioYSlug(
@@ -395,6 +409,9 @@ public class CuestionarioService {
     public void resumeQuiz(String slug, Long userId, HttpSession session) throws QuizNotResumableException{
         // Limpiamos cualquier sesión anterior
         quizSessionService.clear(session);
+
+        getLastAccessibleVersionQuizBySlug(slug, userId)
+            .orElseThrow(QuizNotFoundException::new);
 
         IntentoCuestionario intento = intentoCuestionarioService
             .getIntentoReanudable(userId, slug)
@@ -535,7 +552,7 @@ public class CuestionarioService {
         return buildSummary(session, intentoCuestionario);
     }
 
-    public Page<Cuestionario> getCuestionariosPaginatedByTema(Tema tema, String search, Long dificultadId, Pageable pageable){
+    public Page<Cuestionario> getCuestionariosPaginatedByTema(Tema tema, String search, Long dificultadId, Long usuarioId, Pageable pageable){
         if (tema == null) {
             return Page.empty();
         }
@@ -547,16 +564,16 @@ public class CuestionarioService {
         Page<Cuestionario> cuestionariosPage;
 
         if (cleanSearch != null || dificultadId != null) {
-            cuestionariosPage = cuestionarioRepository.findByTemaIdAndFilters(tema.getId(), cleanSearch, dificultadId, pageable);
+            cuestionariosPage = cuestionarioRepository.findByTemaIdAndFilters(tema.getId(), cleanSearch, dificultadId, usuarioId, pageable);
         } else {
-            cuestionariosPage = cuestionarioRepository.findByTemaId(tema.getId(), pageable);
+            cuestionariosPage = cuestionarioRepository.findByTemaId(tema.getId(), usuarioId, pageable);
         }
 
         return new PageImpl<>(cuestionariosPage.getContent(), sortedPageable, cuestionariosPage.getTotalElements());
     }
 
-    public Page<Cuestionario> getCuestionariosPaginatedByTema(Tema tema, String titleFilter, Pageable pageable){
-        return getCuestionariosPaginatedByTema(tema, titleFilter, null, pageable);
+    public Page<Cuestionario> getCuestionariosPaginatedByTema(Tema tema, String titleFilter, Long usuarioId, Pageable pageable){
+        return getCuestionariosPaginatedByTema(tema, titleFilter, null, usuarioId, pageable);
     }
 
     /**

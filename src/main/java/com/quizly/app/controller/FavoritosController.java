@@ -80,7 +80,7 @@ public class FavoritosController {
             Model model,
             HttpServletResponse response) {
 
-        Cuestionario cuestionario = getLastVersion(slug);
+        Cuestionario cuestionario = getLastVersion(slug, authUser.getId());
         boolean added = favoritoService.addFavorite(authUser.getId(), slug);
         toastService.success(response, added ? "Cuestionario añadido a favoritos." : "El cuestionario ya estaba en favoritos.");
         return favoriteButton(cuestionario, true, model);
@@ -97,7 +97,7 @@ public class FavoritosController {
             Model model,
             HttpServletResponse response) {
 
-        Cuestionario cuestionario = getLastVersion(slug);
+        Cuestionario cuestionario = getLastVersion(slug, authUser.getId());
         favoritoService.removeFavorite(authUser.getId(), slug);
         toastService.success(response, "Cuestionario eliminado de favoritos.");
 
@@ -109,8 +109,8 @@ public class FavoritosController {
         return favoriteButton(cuestionario, false, model);
     }
 
-    private Cuestionario getLastVersion(String slug) {
-        return cuestionarioService.getLastVersionQuizBySlug(slug)
+    private Cuestionario getLastVersion(String slug, Long usuarioId) {
+        return cuestionarioService.getLastAccessibleVersionQuizBySlug(slug, usuarioId)
                 .orElseThrow(() -> new EntityNotFoundException("No se ha encontrado el cuestionario."));
     }
 

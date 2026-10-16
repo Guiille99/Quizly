@@ -19,9 +19,10 @@ public interface CuestionarioRepository extends JpaRepository<Cuestionario, Long
             SELECT c FROM Cuestionario c
             LEFT JOIN c.tema t
             WHERE c.version = (SELECT MAX(c2.version) FROM Cuestionario c2 WHERE c2.serie.id = c.serie.id)
+            AND (c.usuario IS NULL OR c.usuario.id = :usuarioId)
             ORDER BY t.nombre ASC NULLS LAST, c.titulo ASC
             """)
-    Page<Cuestionario> findAllByOrderByTemaNombreAsc(Pageable pageable);
+    Page<Cuestionario> findAllByOrderByTemaNombreAsc(Long usuarioId, Pageable pageable);
 
     @Query("""
             SELECT c FROM Cuestionario c
@@ -29,9 +30,10 @@ public interface CuestionarioRepository extends JpaRepository<Cuestionario, Long
             WHERE (:search IS NULL OR :search = '' OR LOWER(c.titulo) LIKE LOWER(CONCAT('%', :search, '%')))
             AND (:dificultadId IS NULL OR c.dificultad.id = :dificultadId)
             AND c.version = (SELECT MAX(c2.version) FROM Cuestionario c2 WHERE c2.serie.id = c.serie.id)
+            AND (c.usuario IS NULL OR c.usuario.id = :usuarioId)
             ORDER BY t.nombre ASC NULLS LAST, c.titulo ASC
             """)
-    Page<Cuestionario> findAllByFilters(String search, Long dificultadId, Pageable pageable);
+    Page<Cuestionario> findAllByFilters(String search, Long dificultadId, Long usuarioId, Pageable pageable);
 
     @Query("""
             SELECT c FROM Cuestionario c
@@ -65,6 +67,8 @@ public interface CuestionarioRepository extends JpaRepository<Cuestionario, Long
             JOIN ic.cuestionario c
             JOIN ic.estado e
             WHERE ic.usuario.id = :usuarioId AND e.codigo IN :listIntentosCuestionarioEstado
+            AND (c.usuario IS NULL OR c.usuario.id = :usuarioId)
+            AND c.version = (SELECT MAX(c2.version) FROM Cuestionario c2 WHERE c2.serie.id = c.serie.id)
             GROUP BY c
             ORDER BY MAX(ic.fechaFin) DESC
             """)
@@ -75,6 +79,8 @@ public interface CuestionarioRepository extends JpaRepository<Cuestionario, Long
             JOIN ic.cuestionario c
             JOIN ic.estado e
             WHERE ic.usuario.id = :usuarioId AND e.codigo IN :listIntentosCuestionarioEstado
+            AND (c.usuario IS NULL OR c.usuario.id = :usuarioId)
+            AND c.version = (SELECT MAX(c2.version) FROM Cuestionario c2 WHERE c2.serie.id = c.serie.id)
             AND (:search IS NULL OR :search = '' OR LOWER(c.titulo) LIKE LOWER(CONCAT('%', :search, '%')))
             AND (:dificultadId IS NULL OR c.dificultad.id = :dificultadId)
             GROUP BY c
@@ -96,9 +102,10 @@ public interface CuestionarioRepository extends JpaRepository<Cuestionario, Long
     @Query("""
             SELECT c FROM Cuestionario c
             WHERE c.tema.id = :temaId
+            AND (c.usuario IS NULL OR c.usuario.id = :usuarioId)
             AND c.version = (SELECT MAX(c2.version) FROM Cuestionario c2 WHERE c2.serie.id = c.serie.id)
             """)
-    Page<Cuestionario> findByTemaId(Long temaId, Pageable pageable);
+    Page<Cuestionario> findByTemaId(Long temaId, Long usuarioId, Pageable pageable);
 
     @Query("""
             SELECT c FROM Cuestionario c
@@ -111,12 +118,13 @@ public interface CuestionarioRepository extends JpaRepository<Cuestionario, Long
     @Query("""
             SELECT c FROM Cuestionario c
             WHERE c.tema.id = :temaId
+            AND (c.usuario IS NULL OR c.usuario.id = :usuarioId)
             AND (:search IS NULL OR :search = '' OR LOWER(c.titulo) LIKE LOWER(CONCAT('%', :search, '%')))
             AND (:dificultadId IS NULL OR c.dificultad.id = :dificultadId)
             AND c.version = (SELECT MAX(c2.version) FROM Cuestionario c2 WHERE c2.serie.id = c.serie.id)
             ORDER BY c.titulo ASC
             """)
-    Page<Cuestionario> findByTemaIdAndFilters(Long temaId, String search, Long dificultadId, Pageable pageable);
+        Page<Cuestionario> findByTemaIdAndFilters(Long temaId, String search, Long dificultadId, Long usuarioId, Pageable pageable);
 
     long countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
 

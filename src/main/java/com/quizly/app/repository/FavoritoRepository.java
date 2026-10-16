@@ -37,6 +37,7 @@ public interface FavoritoRepository extends JpaRepository<Favorito, Long> {
             SELECT c FROM Favorito f
             JOIN Cuestionario c ON c.serie = f.serie
             WHERE f.usuario.id = :usuarioId
+            AND (c.usuario IS NULL OR c.usuario.id = :usuarioId)
             AND (:search IS NULL OR :search = '' OR LOWER(c.titulo) LIKE LOWER(CONCAT('%', :search, '%')))
             AND (:dificultadId IS NULL OR c.dificultad.id = :dificultadId)
             AND c.version = (
@@ -47,6 +48,7 @@ public interface FavoritoRepository extends JpaRepository<Favorito, Long> {
             SELECT COUNT(f) FROM Favorito f
             JOIN Cuestionario c ON c.serie = f.serie
             WHERE f.usuario.id = :usuarioId
+            AND (c.usuario IS NULL OR c.usuario.id = :usuarioId)
             AND (:search IS NULL OR :search = '' OR LOWER(c.titulo) LIKE LOWER(CONCAT('%', :search, '%')))
             AND (:dificultadId IS NULL OR c.dificultad.id = :dificultadId)
             AND c.version = (

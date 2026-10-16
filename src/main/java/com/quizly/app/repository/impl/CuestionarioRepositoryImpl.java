@@ -61,12 +61,18 @@ public class CuestionarioRepositoryImpl implements CuestionarioRepositoryCustom 
     }
 
     @Override
-    public Optional<Cuestionario> findLastVersionBySlug(String slug) {
+    public Optional<Cuestionario> findLastAccessibleVersionBySlug(String slug, Long usuarioId) {
         TypedQuery<Cuestionario> query = entityManager.createQuery("""
-            SELECT c FROM Cuestionario c WHERE c.serie.slug = :slug ORDER BY c.version DESC
+            SELECT c FROM Cuestionario c
+            WHERE c.serie.slug = :slug
+            AND c.version = (
+                SELECT MAX(c2.version) FROM Cuestionario c2 WHERE c2.serie.id = c.serie.id
+            )
+            AND (c.usuario IS NULL OR c.usuario.id = :usuarioId)
         """, Cuestionario.class);
 
         query.setParameter("slug", slug);
+        query.setParameter("usuarioId", usuarioId);
         return query.getResultStream().findFirst();
     }
 

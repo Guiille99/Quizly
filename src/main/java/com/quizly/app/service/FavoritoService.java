@@ -25,7 +25,7 @@ public class FavoritoService {
 
     @Transactional
     public boolean addFavorite(Long usuarioId, String slug) {
-        Cuestionario cuestionario = cuestionarioRepository.findLastVersionBySlug(slug)
+        Cuestionario cuestionario = cuestionarioRepository.findLastAccessibleVersionBySlug(slug, usuarioId)
                 .orElseThrow(() -> new EntityNotFoundException("No se ha encontrado el cuestionario."));
         return favoritoRepository.insertIfAbsent(usuarioId, cuestionario.getSerie().getId()) > 0;
     }

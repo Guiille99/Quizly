@@ -22,7 +22,9 @@ public class IntentoCuestionarioRepositoryImpl implements IntentoCuestionarioRep
     @Override
     public List<IntentoCuestionario> findByUsuarioId(Long usuarioId) {
         TypedQuery<IntentoCuestionario> query = entityManager.createQuery(
-            "SELECT i FROM IntentoCuestionario i WHERE i.usuario.id = :usuarioId", IntentoCuestionario.class);
+            "SELECT i FROM IntentoCuestionario i WHERE i.usuario.id = :usuarioId " +
+            "AND (i.cuestionario.usuario IS NULL OR i.cuestionario.usuario.id = :usuarioId)",
+            IntentoCuestionario.class);
         query.setParameter("usuarioId", usuarioId);
         return query.getResultList();
     }
@@ -76,6 +78,7 @@ public class IntentoCuestionarioRepositoryImpl implements IntentoCuestionarioRep
             """
             SELECT i FROM IntentoCuestionario i WHERE i.usuario.id = :usuarioId 
             AND i.estado.codigo IN :intentosEstadoCodigos
+            AND (i.cuestionario.usuario IS NULL OR i.cuestionario.usuario.id = :usuarioId)
             ORDER BY i.updatedAt DESC
             """, 
             IntentoCuestionario.class);
