@@ -55,6 +55,7 @@ public class QuizSessionService {
         session.setSlug(intentoCuestionario.getCuestionario().getSlug());
         session.setPreguntas(questions);
         session.setCurrentQuestionIndex(0);
+        session.setMaxReachedQuestionIndex(0);
         session.setScore(0);
         session.setStartedAt(Instant.now());
         session.setResponses(new ArrayList<>());
@@ -111,7 +112,9 @@ public class QuizSessionService {
         session.setPreguntas(questions);
 
         // La siguiente pregunta será la inmediatamente posterior a las ya respondidas
-        session.setCurrentQuestionIndex(responses.size());
+        int nextIndex = Math.min(responses.size(), Math.max(0, questions.size() - 1));
+        session.setCurrentQuestionIndex(nextIndex);
+        session.setMaxReachedQuestionIndex(nextIndex);
 
         session.setScore(score);
 

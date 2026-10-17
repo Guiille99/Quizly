@@ -1,5 +1,7 @@
 package com.quizly.app.repository;
 
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -13,4 +15,6 @@ public interface RespuestaUsuarioRepository extends JpaRepository<RespuestaUsuar
 	@Modifying
 	@Query("DELETE FROM RespuestaUsuario respuesta WHERE respuesta.intento.usuario.id = :usuarioId")
 	int deleteAllByIntentoUsuarioId(@Param("usuarioId") Long usuarioId);
+
+	Optional<RespuestaUsuario> findByIntentoIdAndPreguntaId(Long intentoId, Long preguntaId);
 }

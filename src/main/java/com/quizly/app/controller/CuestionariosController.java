@@ -2,20 +2,16 @@ package com.quizly.app.controller;
 
 import com.quizly.app.exception.QuizNotResumableException;
 import com.quizly.app.exception.QuizNotFoundException;
-import com.quizly.app.exception.QuizlyException;
 import com.quizly.app.model.entity.Cuestionario;
 import com.quizly.app.model.entity.IntentoCuestionario;
 import com.quizly.app.model.enums.IntentoCuestionarioEstadoEnum;
 import com.quizly.app.model.session.AnswerRequest;
 import com.quizly.app.model.session.UserQuizSession;
-import com.quizly.app.repository.CuestionarioRepository;
 import com.quizly.app.security.QuizlyUserDetails;
 import com.quizly.app.service.CuestionarioService;
 import com.quizly.app.service.FavoritoService;
 import com.quizly.app.service.IntentoCuestionarioService;
 import com.quizly.app.service.QuizSessionService;
-import com.quizly.app.service.RespuestaUsuarioService;
-
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -37,7 +33,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.quizly.app.util.Constantes;
-import com.quizly.app.web.model.Toast;
 import com.quizly.app.web.notification.ToastService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -45,7 +40,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.quizly.app.repository.DificultadRepository;
@@ -215,6 +209,7 @@ public class CuestionariosController {
 
         model.addAttribute("quizSession", quizSession);
         model.addAttribute("question", quizSession.getCurrentQuestion());
+        model.addAttribute("selectedOptionId", quizSession.getSelectedOptionIdForQuestion(quizSession.getCurrentQuestion().id()));
 
        return "cuestionarios/questionQuiz";
     }
@@ -235,6 +230,28 @@ public class CuestionariosController {
 
         model.addAttribute("quizSession", quiz);
         model.addAttribute("question", quiz.getCurrentQuestion());
+        model.addAttribute("selectedOptionId", quiz.getSelectedOptionIdForQuestion(quiz.getCurrentQuestion().id()));
+
+        // Dispara el evento para sincronizar el contador con HTMX
+        response.setHeader("HX-Trigger",
+            "{\"quizTimerSync\":{\"seconds\":"
+            + quiz.getSegundosRestantes()
+            + "}}");
+
+        return "cuestionarios/questionQuiz :: quiz-content";
+    }
+
+    @PostMapping("/{slug}/navigate")
+    public String navigateQuizQuestion(@PathVariable String slug, @RequestParam("targetIndex") int targetIndex,
+        @AuthenticationPrincipal QuizlyUserDetails user, HttpSession session, HttpServletResponse response, Model model) {
+
+        cuestionarioService.requireAccessibleQuizSession(slug, user.getId(), session);
+        cuestionarioService.navigateToQuestion(targetIndex, session);
+        UserQuizSession quiz = quizSessionService.getRequired(session);
+
+        model.addAttribute("quizSession", quiz);
+        model.addAttribute("question", quiz.getCurrentQuestion());
+        model.addAttribute("selectedOptionId", quiz.getSelectedOptionIdForQuestion(quiz.getCurrentQuestion().id()));
 
         // Dispara el evento para sincronizar el contador con HTMX
         response.setHeader("HX-Trigger",

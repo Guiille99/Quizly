@@ -40,7 +40,6 @@ import com.quizly.app.model.entity.Tema;
 import com.quizly.app.model.entity.TipoPregunta;
 import com.quizly.app.model.entity.Usuario;
 import com.quizly.app.model.enums.IntentoCuestionarioEstadoEnum;
-import com.quizly.app.model.enums.TipoPreguntaEnum;
 import com.quizly.app.model.session.OptionQuizRecord;
 import com.quizly.app.model.session.QuestionQuizRecord;
 import com.quizly.app.model.session.UserQuizResponse;
@@ -482,31 +481,53 @@ public class CuestionarioService {
         OptionQuizRecord selected = question.options().stream()
             .filter(option -> option.id().equals(optionId))
             .findFirst()
-            .get();
+            .orElseThrow(() -> new IllegalArgumentException("Opción no válida para la pregunta actual"));
 
         boolean correct = selected.correct();
 
-        quizSession.addResponse(new UserQuizResponse(
+        quizSession.recordResponse(new UserQuizResponse(
             question.id(),
             selected.id(),
             selected.text(),
             correct
         ));
 
-        if (correct) {
-            quizSession.increaseScore();
-        }
-
         IntentoCuestionario intento = intentoCuestionarioService.getIntentoActivo(quizSession.getIntentoCuestionarioId());
-        OpcionRespuesta opcion = opcionRespuestaRepository.findById(optionId).get();
+        OpcionRespuesta opcion = opcionRespuestaRepository.findById(optionId).orElseThrow();
 
-        // Persistimos la respuesta
+        // Persistimos o actualizamos la respuesta
         respuestaUsuarioService.guardarRespuesta(intento, opcion.getPregunta(), opcion);
 
-        quizSession.nextQuestion();
+        int currentIndex = quizSession.getCurrentQuestionIndex();
+        int maxReached = quizSession.getMaxReachedQuestionIndex();
+        int totalQuestions = quizSession.getPreguntas().size();
+
+        if (currentIndex == maxReached) {
+            if (currentIndex == totalQuestions - 1) {
+                quizSession.nextQuestion();
+            } else {
+                quizSession.setCurrentQuestionIndex(currentIndex + 1);
+                quizSession.setMaxReachedQuestionIndex(currentIndex + 1);
+            }
+        } else {
+            quizSession.setCurrentQuestionIndex(currentIndex + 1);
+        }
 
         intentoCuestionarioService.actualizarFechaUltimaActividad(quizSession);
+    }
 
+    @Transactional
+    public void navigateToQuestion(int targetIndex, HttpSession httpSession){
+        UserQuizSession quizSession = quizSessionService.getRequired(httpSession);
+
+        if (!quizSession.canNavigateTo(targetIndex)) {
+            log.warn("Intento no permitido de navegar al índice {} (máximo permitido: {}, total preguntas: {})",
+                targetIndex, quizSession.getMaxReachedQuestionIndex(), quizSession.getPreguntas().size());
+            return;
+        }
+
+        quizSession.setCurrentQuestionIndex(targetIndex);
+        intentoCuestionarioService.actualizarFechaUltimaActividad(quizSession);
     }
 
     public QuizSummary buildSummary(UserQuizSession session, IntentoCuestionario intentoCuestionario){

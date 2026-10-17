@@ -100,7 +100,49 @@ class CuestionarioServiceTest {
 
         assertThrows(QuizNotFoundException.class,
             () -> cuestionarioService.requireAccessibleQuizSession("compartido", 42L, httpSession));
-        }
+    }
+
+    @Test
+    void navigateToQuestionUpdatesCurrentIndexWhenTargetIsValid() {
+        HttpSession httpSession = mock(HttpSession.class);
+        UserQuizSession quizSession = new UserQuizSession();
+        quizSession.setPreguntas(java.util.List.of(
+            new com.quizly.app.model.session.QuestionQuizRecord(1L, "P1", java.util.List.of()),
+            new com.quizly.app.model.session.QuestionQuizRecord(2L, "P2", java.util.List.of()),
+            new com.quizly.app.model.session.QuestionQuizRecord(3L, "P3", java.util.List.of())
+        ));
+        quizSession.setCurrentQuestionIndex(2);
+        quizSession.setMaxReachedQuestionIndex(2);
+
+        when(quizSessionService.getRequired(httpSession)).thenReturn(quizSession);
+
+        cuestionarioService.navigateToQuestion(0, httpSession);
+
+        org.junit.jupiter.api.Assertions.assertEquals(0, quizSession.getCurrentQuestionIndex());
+        org.mockito.Mockito.verify(intentoCuestionarioService).actualizarFechaUltimaActividad(quizSession);
+    }
+
+    @Test
+    void navigateToQuestionIgnoresTargetWhenExceedsMaxReached() {
+        HttpSession httpSession = mock(HttpSession.class);
+        UserQuizSession quizSession = new UserQuizSession();
+        quizSession.setPreguntas(java.util.List.of(
+            new com.quizly.app.model.session.QuestionQuizRecord(1L, "P1", java.util.List.of()),
+            new com.quizly.app.model.session.QuestionQuizRecord(2L, "P2", java.util.List.of()),
+            new com.quizly.app.model.session.QuestionQuizRecord(3L, "P3", java.util.List.of())
+        ));
+        quizSession.setCurrentQuestionIndex(0);
+        quizSession.setMaxReachedQuestionIndex(0);
+
+        when(quizSessionService.getRequired(httpSession)).thenReturn(quizSession);
+
+        // Intenta saltar a la pregunta 2 (índice 2) cuando solo tiene desbloqueada la 0
+        cuestionarioService.navigateToQuestion(2, httpSession);
+
+        org.junit.jupiter.api.Assertions.assertEquals(0, quizSession.getCurrentQuestionIndex());
+        org.mockito.Mockito.verify(intentoCuestionarioService, org.mockito.Mockito.never())
+            .actualizarFechaUltimaActividad(quizSession);
+    }
 
     private static Cuestionario createQuiz(String slug, Long ownerId) {
         CuestionarioSerie serie = new CuestionarioSerie();

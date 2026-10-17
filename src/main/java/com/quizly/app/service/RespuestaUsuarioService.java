@@ -43,10 +43,15 @@ public class RespuestaUsuarioService {
 
     @Transactional
     public void guardarRespuesta(IntentoCuestionario intento, Pregunta pregunta, OpcionRespuesta opcionSeleccionada){
-        RespuestaUsuario respuesta = new RespuestaUsuario();
+        RespuestaUsuario respuesta = respuestaUsuarioRepository
+            .findByIntentoIdAndPreguntaId(intento.getId(), pregunta.getId())
+            .orElseGet(() -> {
+                RespuestaUsuario nueva = new RespuestaUsuario();
+                nueva.setIntento(intento);
+                nueva.setPregunta(pregunta);
+                return nueva;
+            });
 
-        respuesta.setIntento(intento);
-        respuesta.setPregunta(pregunta);
         respuesta.setOpcionSeleccionada(opcionSeleccionada);
         respuesta.setCorrecta(opcionSeleccionada.getCorrecta());
 
