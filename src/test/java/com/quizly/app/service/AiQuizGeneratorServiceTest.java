@@ -150,7 +150,38 @@ class AiQuizGeneratorServiceTest {
         assertThrows(AiHighDemandException.class,
             () -> service.generateQuizFromText("Texto fuente completo", request("SINGLE_CHOICE", 3), "apuntes.pdf"));
         server.verify();
-        }
+    }
+
+    @Test
+    void conmutaAModeloAlternativoYGeneraCuestionarioCuandoElPrimerModeloDevuelve429() throws Exception {
+        ObjectMapper objectMapper = JsonMapper.builder().build();
+        RestClient.Builder builder = RestClient.builder().baseUrl("https://generativelanguage.googleapis.com");
+        MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
+
+        // Primer modelo (gemini-3.8-flash) devuelve 429 Quota Exceeded
+        server.expect(requestTo(CHAT_URL))
+                .andExpect(method(HttpMethod.POST))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("gemini-3.8-flash")))
+                .andRespond(org.springframework.test.web.client.response.MockRestResponseCreators
+                        .withStatus(org.springframework.http.HttpStatus.TOO_MANY_REQUESTS)
+                        .body("{\"error\":{\"code\":429,\"status\":\"RESOURCE_EXHAUSTED\"}}")
+                        .contentType(MediaType.APPLICATION_JSON));
+
+        // Segundo modelo (gemini-3.7-flash) responde con éxito
+        server.expect(requestTo(CHAT_URL))
+                .andExpect(method(HttpMethod.POST))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("gemini-3.7-flash")))
+                .andRespond(withSuccess(quizCompletion(objectMapper, 3, "SINGLE_CHOICE"), MediaType.APPLICATION_JSON));
+
+        AiQuizGeneratorService service = createServiceWithModels(
+                builder, objectMapper, List.of("gemini-3.8-flash", "gemini-3.7-flash"), (model, system, prompt) -> 100);
+
+        QuizForm result = service.generateQuizFromText(
+                "Texto fuente completo", request("SINGLE_CHOICE", 3), "apuntes.pdf");
+
+        assertEquals(3, result.getPreguntas().size());
+        server.verify();
+    }
 
         @Test
         void subdivideUnaPaginaQuePorSiSolaExcedeElContextoSinPerderSusExtremos() throws Exception {
@@ -235,6 +266,17 @@ class AiQuizGeneratorServiceTest {
         GeminiApiClient geminiApiClient = new GeminiApiClient(
             builder.build(), "gemini-test", tokenCounter, retryMaxAttempts, retryInitialBackoffMs);
         AiContextPlanner contextPlanner = new AiContextPlanner(geminiApiClient, contextWindowTokens, 100, 0.1);
+        return new AiQuizGeneratorService(geminiApiClient, contextPlanner, new AiQuizResponseParser(objectMapper));
+    }
+
+    private AiQuizGeneratorService createServiceWithModels(
+            RestClient.Builder builder,
+            ObjectMapper objectMapper,
+            List<String> models,
+            AiTokenCounter tokenCounter) {
+        GeminiApiClient geminiApiClient = new GeminiApiClient(
+                builder.build(), models, tokenCounter, 3, 0, 60);
+        AiContextPlanner contextPlanner = new AiContextPlanner(geminiApiClient, 1000, 100, 0.1);
         return new AiQuizGeneratorService(geminiApiClient, contextPlanner, new AiQuizResponseParser(objectMapper));
     }
 

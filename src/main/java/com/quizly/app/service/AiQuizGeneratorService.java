@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestClientResponseException;
 
 import com.quizly.app.dto.ai.PdfQuizGeneratorRequest;
@@ -57,13 +58,10 @@ public class AiQuizGeneratorService {
             String response = geminiApiClient.generate(
                     systemInstruction, finalPrompt, contextPlanner.finalOutputTokens());
             return responseParser.parseQuiz(response, filename, request);
-        } catch (RestClientResponseException e) {
-            log.error("Error HTTP del proveedor IA [{}] Body: {}", e.getStatusCode(), e.getResponseBodyAsString());
+        } catch (RestClientException e) {
+            log.error("Error del proveedor IA: {}", e.getMessage());
 
-            int statusCode = e.getStatusCode().value();
-            String responseBody = e.getResponseBodyAsString() != null ? e.getResponseBodyAsString() : "";
-            if (statusCode == 429 || statusCode == 503
-                    || responseBody.contains("RESOURCE_EXHAUSTED") || responseBody.contains("UNAVAILABLE")) {
+            if (isHighDemandOrTimeout(e)) {
                 throw new AiHighDemandException("El modelo de IA está experimentando una alta demanda en este momento");
             }
 
@@ -74,6 +72,30 @@ public class AiQuizGeneratorService {
             log.error("Error al comunicarse con el proveedor de IA", e);
             throw new AiGenerationException(e.getMessage());
         }
+    }
+
+    private boolean isHighDemandOrTimeout(RestClientException e) {
+        if (e instanceof RestClientResponseException respEx) {
+            int statusCode = respEx.getStatusCode().value();
+            String responseBody = respEx.getResponseBodyAsString() != null ? respEx.getResponseBodyAsString() : "";
+            if (statusCode == 429 || statusCode == 503
+                    || responseBody.contains("RESOURCE_EXHAUSTED") || responseBody.contains("UNAVAILABLE")) {
+                return true;
+            }
+        }
+        Throwable current = e;
+        while (current != null) {
+            if (current instanceof java.net.SocketTimeoutException
+                    || current instanceof java.util.concurrent.TimeoutException) {
+                return true;
+            }
+            String msg = current.getMessage();
+            if (msg != null && (msg.toLowerCase().contains("timed out") || msg.toLowerCase().contains("timeout"))) {
+                return true;
+            }
+            current = current.getCause();
+        }
+        return false;
     }
 
     private String consolidateSummaries(
