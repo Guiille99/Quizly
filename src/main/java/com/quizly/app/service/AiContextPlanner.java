@@ -21,7 +21,7 @@ public class AiContextPlanner {
     public AiContextPlanner(
             GeminiApiClient geminiApiClient,
             @Value("${ai.context-window-tokens:1000000}") int contextWindowTokens,
-            @Value("${ai.output-token-reserve:8192}") int outputTokenReserve,
+            @Value("${ai.output-token-reserve:16384}") int outputTokenReserve,
             @Value("${ai.context-safety-margin:0.02}") double contextSafetyMargin) {
         this.geminiApiClient = geminiApiClient;
         this.contextWindowTokens = contextWindowTokens;

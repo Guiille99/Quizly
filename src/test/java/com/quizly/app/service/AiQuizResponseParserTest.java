@@ -63,6 +63,21 @@ class AiQuizResponseParserTest {
                 () -> parser.parseQuiz(completion(quiz), "unidad.pdf", request("SINGLE_CHOICE", 3)));
     }
 
+    @Test
+    void rechazaRespuestasTruncadasPorLimiteDeTokens() throws Exception {
+        String truncatedCompletion = objectMapper.writeValueAsString(Map.of(
+                "choices", List.of(Map.of(
+                        "finish_reason", "length",
+                        "message", Map.of("content", "{\"titulo\": \"Incompleto\"")))));
+
+        AiGenerationException ex = assertThrows(AiGenerationException.class,
+                () -> parser.parseQuiz(truncatedCompletion, "unidad.pdf", request("SINGLE_CHOICE", 3)));
+
+        assertEquals(
+                "La respuesta de la IA excedió el límite máximo de tokens y quedó incompleta. Pruebe a solicitar menos preguntas o aumente el límite de tokens.",
+                ex.getMessage());
+    }
+
     private PdfQuizGeneratorRequest request(String type, int questionCount) {
         return PdfQuizGeneratorRequest.builder()
                 .pdfFile(new MockMultipartFile("file", "unidad.pdf", "application/pdf", new byte[] { 1 }))

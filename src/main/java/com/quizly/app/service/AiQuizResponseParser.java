@@ -109,7 +109,14 @@ public class AiQuizResponseParser {
             throw new AiGenerationException("La respuesta de la IA no contiene opciones válidas.");
         }
 
-        String content = choices.get(0).path("message").path("content").asText();
+        JsonNode firstChoice = choices.get(0);
+        String finishReason = firstChoice.path("finish_reason").asText("");
+        if ("length".equalsIgnoreCase(finishReason)) {
+            throw new AiGenerationException(
+                    "La respuesta de la IA excedió el límite máximo de tokens y quedó incompleta. Pruebe a solicitar menos preguntas o aumente el límite de tokens.");
+        }
+
+        String content = firstChoice.path("message").path("content").asText();
         if (StringUtils.isBlank(content)) {
             throw new AiGenerationException("La IA devolvió un contenido de respuesta vacío.");
         }

@@ -156,7 +156,7 @@ public class AiQuizGeneratorService {
                 2. Para 'SINGLE_CHOICE', incluye entre 3 y 4 opciones de respuesta. EXACTAMENTE 1 opción debe tener 'correcta': true.
                 3. Para 'TRUE_FALSE', incluye exactamente 2 opciones ('Verdadero' y 'Falso'). EXACTAMENTE 1 debe tener 'correcta': true.
                 4. Todas las preguntas y opciones deben estar redactadas en español y basarse únicamente en la información del texto proporcionado.
-                5. Proporciona una retroalimentación concisa y formativa para cada opción.
+                5. Proporciona una retroalimentación concisa (máximo 1 o 2 frases) para cada opción.
                 6. Responde ÚNICAMENTE con el objeto JSON válido. No incluyas bloques markdown ni explicaciones adicionales fuera del JSON.
                 """;
     }
