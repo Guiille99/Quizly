@@ -106,11 +106,14 @@ public class GeminiApiClient {
 
             return with503Retries(currentModel, () -> {
                 log.info("Enviando petición al proveedor de IA (Modelo: {}).", currentModel);
-                return restClient.post()
+                String response = restClient.post()
                         .uri("/v1beta/openai/chat/completions")
                         .body(requestBody)
                         .retrieve()
                         .body(String.class);
+
+                log.info("Petición procesada con éxito (Modelo: {})", currentModel);
+                return response;
             });
         });
     }
