@@ -581,7 +581,6 @@ function createFixedAnswer(text, feedback = null) {
                 class="input w-full"
                 data-answer-text
                 maxlength="255"
-                value="${escapeHtml(text)}"
                 readonly>
         
             <textarea 
@@ -589,8 +588,6 @@ function createFixedAnswer(text, feedback = null) {
                 data-answer-feedback
                 maxlength="500" 
                 placeholder="Retroalimentación opcional...">
-                
-                ${escapeHtml(feedback ?? '')}
             </textarea>
         </div>
 
@@ -604,6 +601,9 @@ function createFixedAnswer(text, feedback = null) {
 
         </label>
     `;
+
+    answer.querySelector('[data-answer-text]').value = text;
+    answer.querySelector('[data-answer-feedback]').value = feedback ?? '';
 
     return answer;
 }
