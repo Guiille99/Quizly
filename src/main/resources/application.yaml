@@ -31,9 +31,14 @@ ai:
   api-key: ${AI_API_KEY}
   base-url: ${AI_BASE_URL}
   model: ${AI_MODEL}
-  timeout-seconds: 45
-  max-pages: 30
+  timeout-seconds: 55
   max-file-size-mb: 20
+  context-window-tokens: ${AI_CONTEXT_WINDOW_TOKENS:1000000}
+  output-token-reserve: ${AI_OUTPUT_TOKEN_RESERVE:8192}
+  context-safety-margin: ${AI_CONTEXT_SAFETY_MARGIN:0.02}
+  retry:
+    max-attempts: ${AI_RETRY_MAX_ATTEMPTS:3}
+    initial-backoff-ms: ${AI_RETRY_INITIAL_BACKOFF_MS:500}
 quiz:
   inactivity-max-duration: 1h
   activity-update-interval: 1m

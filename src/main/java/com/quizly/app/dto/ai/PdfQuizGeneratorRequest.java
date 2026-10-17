@@ -30,4 +30,6 @@ public class PdfQuizGeneratorRequest {
     private Long dificultadId;
 
     private String indicacionesAdicionales;
+
+    private String tipoPreguntas;
 }

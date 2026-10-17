@@ -80,6 +80,7 @@ class MisCuestionariosControllerTest {
 
         assertEquals("admin/cuestionarios/quiz-form", view);
         assertEquals(false, model.getAttribute("canImportQuizJson"));
+        assertEquals("TRUE_FALSE", requestCaptor.getValue().getTipoPreguntas());
         assertTrue(requestCaptor.getValue().getIndicacionesAdicionales()
                 .contains("únicamente preguntas de verdadero/falso (TRUE_FALSE)"));
         assertTrue(requestCaptor.getValue().getIndicacionesAdicionales().contains("'Verdadero' y 'Falso'"));

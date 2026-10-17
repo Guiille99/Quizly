@@ -17,13 +17,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j 
 @Service 
 public class PdfExtractorService {
-    private final int maxPages;
     private final long maxFileSizeBytes;
 
-    public PdfExtractorService(@Value("${ai.max-pages:30}") int maxPages, 
-        @Value("${ai.max-file-size-mb:10}") int maxFileSizeMb){
-        
-        this.maxPages = maxPages;
+    public PdfExtractorService(@Value("${ai.max-file-size-mb:20}") int maxFileSizeMb){
         this.maxFileSizeBytes = maxFileSizeMb * 1024L * 1024L;
     }
 
@@ -45,8 +41,8 @@ public class PdfExtractorService {
             throw new PdfProcessingException("No se pudo leer el archivo por proporcionado.");
         }
 
-        try (InputStream is = file.getInputStream()) {
-            PDDocument document = Loader.loadPDF(is.readAllBytes());
+        try (InputStream is = file.getInputStream();
+            PDDocument document = Loader.loadPDF(is.readAllBytes())) {
 
             if (document.isEncrypted()) {
                 throw new PdfProcessingException("El archivo PDF está protegido y no se puede procesar.");
@@ -61,19 +57,19 @@ public class PdfExtractorService {
             log.info("Procesando PDF '{}' de '{}' páginas.", file.getOriginalFilename(), totalPages);
 
             PDFTextStripper textStripper = new PDFTextStripper();
-            textStripper.setStartPage(1);
-            textStripper.setEndPage(Math.min(totalPages, maxPages));
+            textStripper.setPageEnd("\f");
 
             String text = textStripper.getText(document).trim();
 
             // Detección de PDF escaneado o sin texto reconocible
-            if (text.isEmpty() || text.length() < 100) {
+            String recognizableText = text.replace("\f", "").trim();
+            if (recognizableText.length() < 100) {
                 throw new PdfProcessingException("El PDF no contiene texto suficiente o es un documento escaneado (imagen). " 
                 + "Por favor, sube un PDF con texto reconocible.");
             }
 
             // Sanitización básica de caracteres de control
-            String sanitizedText = text.replaceAll("[\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F]", "");
+            String sanitizedText = text.replaceAll("[\\x00-\\x08\\x0B\\x0E-\\x1F]", "");
 
             log.info("Texto extraído con éxito ({}) caracteres.", sanitizedText.length());
             return sanitizedText;

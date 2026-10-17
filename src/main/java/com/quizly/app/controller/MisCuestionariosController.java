@@ -137,11 +137,15 @@ public class MisCuestionariosController {
 
             // 3. Preparar petición de generación
             String indicaciones;
+            String tipoPreguntasNormalizado;
             if ("VARIADAS".equalsIgnoreCase(tipoPreguntas)) {
+                tipoPreguntasNormalizado = "VARIADAS";
                 indicaciones = "Genera una combinación equilibrada de preguntas de opción múltiple (SINGLE_CHOICE) y verdadero/falso (TRUE_FALSE).";
             } else if ("TRUE_FALSE".equalsIgnoreCase(tipoPreguntas)) {
+                tipoPreguntasNormalizado = "TRUE_FALSE";
                 indicaciones = "Genera únicamente preguntas de verdadero/falso (TRUE_FALSE), con exactamente dos opciones: 'Verdadero' y 'Falso'.";
             } else {
+                tipoPreguntasNormalizado = "SINGLE_CHOICE";
                 indicaciones = "Genera únicamente preguntas de opción múltiple con respuesta única (SINGLE_CHOICE).";
             }
 
@@ -150,6 +154,7 @@ public class MisCuestionariosController {
                     .numPreguntas(numPreguntas)
                     .dificultadId(dificultad != null ? dificultad.getId() : null)
                     .indicacionesAdicionales(indicaciones)
+                    .tipoPreguntas(tipoPreguntasNormalizado)
                     .build();
 
             // 4. Llamar a la IA (Gemini)
