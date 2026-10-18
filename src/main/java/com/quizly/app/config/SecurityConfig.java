@@ -34,7 +34,8 @@ public class SecurityConfig {
                                 "/js/**",
                                 "/img/**",
                                 "/webfonts/**",
-                                "/webjars/**")
+                                "/webjars/**",
+                                "/ping")
                         .permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
