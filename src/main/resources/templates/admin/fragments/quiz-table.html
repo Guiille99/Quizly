@@ -24,7 +24,7 @@
                 <!-- Título -->
                 <td th:text="${quiz.titulo}"></td>
                 <!-- Tema -->
-                <td th:text="${quiz.tema}"></td>
+                <td th:text="${quiz.tema ?: '-'}"></td>
                 <!-- Dificultad -->
                 <td>
                     <span class="badge-difficulty" th:classappend="${quiz.dificultad.codigo == 'EASY'}

@@ -143,9 +143,9 @@
                             <!-- Título -->
                             <td th:text="${cuestionario.titulo}"></td>
                             <!-- Asignatura -->
-                            <td th:text="${cuestionario.asignatura}"></td>
+                            <td th:text="${cuestionario.asignatura ?: '-'}"></td>
                             <!-- Tema -->
-                            <td th:text="${cuestionario.tema}"></td>
+                            <td th:text="${cuestionario.tema ?: '-'}"></td>
                             <!-- Preguntas -->
                             <td th:text="${cuestionario.numeroPreguntas}"></td>
                             <!-- Dificultad -->

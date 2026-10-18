@@ -21,18 +21,46 @@ import com.quizly.app.model.entity.Usuario;
 import com.quizly.app.model.session.UserQuizSession;
 import com.quizly.app.repository.CuestionarioRepository;
 
+import com.quizly.app.model.entity.Dificultad;
+import com.quizly.app.model.entity.Tema;
+import com.quizly.app.model.entity.Asignatura;
+import com.quizly.app.dto.form.QuizForm;
+import com.quizly.app.repository.*;
+
 import jakarta.servlet.http.HttpSession;
 
 @ExtendWith(MockitoExtension.class)
 class CuestionarioServiceTest {
     @Mock
+    private PreguntaRepository preguntaRepository;
+    @Mock
+    private TipoPreguntaRepository tipoPreguntaRepository;
+    @Mock
+    private RespuestaUsuarioService respuestaUsuarioService;
+    @Mock
     private QuizSessionService quizSessionService;
-
     @Mock
     private IntentoCuestionarioService intentoCuestionarioService;
-
+    @Mock
+    private SlugService slugService;
+    @Mock
+    private IntentoCuestionarioEstadoRepository intentoCuestionarioEstadoRepository;
     @Mock
     private CuestionarioRepository cuestionarioRepository;
+    @Mock
+    private CuestionarioSerieRepository cuestionarioSerieRepository;
+    @Mock
+    private UsuarioRepository usuarioRepository;
+    @Mock
+    private IntentoCuestionarioRepository intentoCuestionarioRepository;
+    @Mock
+    private OpcionRespuestaRepository opcionRespuestaRepository;
+    @Mock
+    private TemaRepository temaRepository;
+    @Mock
+    private AsignaturaRepository asignaturaRepository;
+    @Mock
+    private DificultadRepository dificultadRepository;
 
     @InjectMocks
     private CuestionarioService cuestionarioService;
@@ -142,6 +170,119 @@ class CuestionarioServiceTest {
         org.junit.jupiter.api.Assertions.assertEquals(0, quizSession.getCurrentQuestionIndex());
         org.mockito.Mockito.verify(intentoCuestionarioService, org.mockito.Mockito.never())
             .actualizarFechaUltimaActividad(quizSession);
+    }
+
+    @Test
+    void createQuizWithoutTemaAndAsignaturaSucceedsForAdmin() {
+        QuizForm form = new QuizForm();
+        form.setTitulo("Quiz General");
+        form.setDificultadId(1L);
+        form.setTemaId(null);
+        form.setAsignaturaId(null);
+        form.setPreguntas(java.util.List.of());
+
+        Dificultad dificultad = new Dificultad();
+        dificultad.setId(1L);
+
+        when(dificultadRepository.findById(1L)).thenReturn(Optional.of(dificultad));
+        when(slugService.generateSlug("Quiz General")).thenReturn("quiz-general");
+        when(cuestionarioSerieRepository.existsBySlug("quiz-general")).thenReturn(false);
+        when(cuestionarioSerieRepository.save(org.mockito.ArgumentMatchers.any(CuestionarioSerie.class)))
+                .thenAnswer(inv -> inv.getArgument(0));
+        when(cuestionarioRepository.save(org.mockito.ArgumentMatchers.any(Cuestionario.class)))
+                .thenAnswer(inv -> inv.getArgument(0));
+
+        Cuestionario result = cuestionarioService.createQuiz(form);
+
+        org.junit.jupiter.api.Assertions.assertNotNull(result);
+        org.junit.jupiter.api.Assertions.assertNull(result.getTema());
+        org.junit.jupiter.api.Assertions.assertNull(result.getUsuario());
+        org.junit.jupiter.api.Assertions.assertEquals("Quiz General", result.getTitulo());
+    }
+
+    @Test
+    void createQuizWithoutTemaAndAsignaturaSucceedsForStudent() {
+        QuizForm form = new QuizForm();
+        form.setTitulo("Quiz de Estudiante");
+        form.setDificultadId(2L);
+        form.setTemaId(null);
+        form.setAsignaturaId(null);
+        form.setPreguntas(java.util.List.of());
+
+        Usuario estudiante = new Usuario();
+        estudiante.setId(10L);
+
+        Dificultad dificultad = new Dificultad();
+        dificultad.setId(2L);
+
+        when(dificultadRepository.findById(2L)).thenReturn(Optional.of(dificultad));
+        when(slugService.generateSlug("Quiz de Estudiante")).thenReturn("quiz-de-estudiante");
+        when(cuestionarioSerieRepository.existsBySlug("quiz-de-estudiante")).thenReturn(false);
+        when(cuestionarioSerieRepository.save(org.mockito.ArgumentMatchers.any(CuestionarioSerie.class)))
+                .thenAnswer(inv -> inv.getArgument(0));
+        when(cuestionarioRepository.save(org.mockito.ArgumentMatchers.any(Cuestionario.class)))
+                .thenAnswer(inv -> inv.getArgument(0));
+
+        Cuestionario result = cuestionarioService.createQuiz(form, estudiante);
+
+        org.junit.jupiter.api.Assertions.assertNotNull(result);
+        org.junit.jupiter.api.Assertions.assertNull(result.getTema());
+        org.junit.jupiter.api.Assertions.assertSame(estudiante, result.getUsuario());
+    }
+
+    @Test
+    void createQuizWithMismatchedTemaAndAsignaturaThrowsException() {
+        QuizForm form = new QuizForm();
+        form.setTitulo("Quiz Incoherente");
+        form.setDificultadId(1L);
+        form.setTemaId(5L);
+        form.setAsignaturaId(99L);
+
+        Asignatura asignaturaReal = new Asignatura();
+        asignaturaReal.setId(1L);
+
+        Tema tema = new Tema();
+        tema.setId(5L);
+        tema.setAsignatura(asignaturaReal);
+
+        Asignatura asignaturaForm = new Asignatura();
+        asignaturaForm.setId(99L);
+
+        when(temaRepository.findById(5L)).thenReturn(Optional.of(tema));
+        when(asignaturaRepository.findById(99L)).thenReturn(Optional.of(asignaturaForm));
+
+        org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class,
+                () -> cuestionarioService.createQuiz(form));
+    }
+
+    @Test
+    void updateQuizWithoutTemaAndAsignaturaSucceeds() {
+        Cuestionario actual = createQuiz("quiz-general", null);
+        actual.setId(1L);
+        actual.setVersion(1);
+
+        QuizForm form = new QuizForm();
+        form.setTitulo("Quiz Actualizado");
+        form.setDificultadId(1L);
+        form.setTemaId(null);
+        form.setAsignaturaId(null);
+        form.setPreguntas(java.util.List.of());
+
+        Dificultad dificultad = new Dificultad();
+        dificultad.setId(1L);
+
+        when(cuestionarioRepository.findById(1L)).thenReturn(Optional.of(actual));
+        when(cuestionarioRepository.existsBySlugAndVersionGreaterThan("quiz-general", 1)).thenReturn(false);
+        when(dificultadRepository.findById(1L)).thenReturn(Optional.of(dificultad));
+        when(cuestionarioRepository.save(org.mockito.ArgumentMatchers.any(Cuestionario.class)))
+                .thenAnswer(inv -> inv.getArgument(0));
+
+        Cuestionario result = cuestionarioService.updateQuiz(1L, form);
+
+        org.junit.jupiter.api.Assertions.assertNotNull(result);
+        org.junit.jupiter.api.Assertions.assertNull(result.getTema());
+        org.junit.jupiter.api.Assertions.assertEquals(2, result.getVersion());
+        org.junit.jupiter.api.Assertions.assertEquals("Quiz Actualizado", result.getTitulo());
     }
 
     private static Cuestionario createQuiz(String slug, Long ownerId) {

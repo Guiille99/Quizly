@@ -63,7 +63,8 @@ public class QuizFormService {
         form.setId(cuestionario.getId());
         form.setTitulo(cuestionario.getTitulo());
         form.setTemaId(cuestionario.getTema() != null ? cuestionario.getTema().getId() : null);
-        form.setAsignaturaId(cuestionario.getTema() != null ? cuestionario.getTema().getAsignatura().getId() : null);
+        form.setAsignaturaId(cuestionario.getTema() != null && cuestionario.getTema().getAsignatura() != null 
+                ? cuestionario.getTema().getAsignatura().getId() : null);
         form.setDificultadId(cuestionario.getDificultad().getId());
         form.setDescripcion(cuestionario.getDescripcion());
         mapTiempoLimite(cuestionario, form);

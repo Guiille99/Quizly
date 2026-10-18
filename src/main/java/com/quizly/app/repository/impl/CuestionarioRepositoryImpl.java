@@ -24,6 +24,7 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Order;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
@@ -177,8 +178,8 @@ public class CuestionarioRepositoryImpl implements CuestionarioRepositoryCustom 
 
                 case "asignatura":
                     if (asignatura == null) {
-                        tema = root.join("tema");
-                        asignatura = tema.join("asignatura");
+                        tema = root.join("tema", JoinType.LEFT);
+                        asignatura = tema.join("asignatura", JoinType.LEFT);
                     }
 
                     expression = asignatura.get("nombre");
@@ -187,7 +188,7 @@ public class CuestionarioRepositoryImpl implements CuestionarioRepositoryCustom 
                 
                 case "tema":
                     if (tema == null) {
-                        tema = root.join("tema");
+                        tema = root.join("tema", JoinType.LEFT);
                     }
                     
                     expression = tema.get("nombre");
@@ -195,7 +196,7 @@ public class CuestionarioRepositoryImpl implements CuestionarioRepositoryCustom 
 
                 case "dificultad":
                     if (dificultad == null) {
-                        dificultad = root.join("dificultad");
+                        dificultad = root.join("dificultad", JoinType.LEFT);
                     }
                     
                     expression = dificultad.get("nombre");

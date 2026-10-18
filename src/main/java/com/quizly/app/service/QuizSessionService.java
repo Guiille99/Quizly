@@ -47,10 +47,9 @@ public class QuizSessionService {
         session.setIntentoCuestionarioId(intentoCuestionario.getId());
         session.setCuestionarioId(intentoCuestionario.getCuestionario().getId());
         session.setTitulo(intentoCuestionario.getCuestionario().getTitulo());
-        session.setTema(intentoCuestionario.getCuestionario().getTema().getNombre());
         session.setTema(intentoCuestionario.getCuestionario().getTema() != null 
             ? intentoCuestionario.getCuestionario().getTema().getNombre() 
-            : "Sin tema");
+            : null);
         session.setDificultad(intentoCuestionario.getCuestionario().getDificultad().getNombre());
         session.setSlug(intentoCuestionario.getCuestionario().getSlug());
         session.setPreguntas(questions);
@@ -106,7 +105,9 @@ public class QuizSessionService {
         session.setIntentoCuestionarioId(intentoCuestionario.getId());
         session.setCuestionarioId(intentoCuestionario.getCuestionario().getId());
         session.setTitulo(intentoCuestionario.getCuestionario().getTitulo());
-        session.setTema(intentoCuestionario.getCuestionario().getTema().getNombre());
+        session.setTema(intentoCuestionario.getCuestionario().getTema() != null 
+            ? intentoCuestionario.getCuestionario().getTema().getNombre() 
+            : null);
         session.setDificultad(intentoCuestionario.getCuestionario().getDificultad().getNombre());
         session.setSlug(intentoCuestionario.getCuestionario().getSlug());
         session.setPreguntas(questions);

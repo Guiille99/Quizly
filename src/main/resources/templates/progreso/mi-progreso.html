@@ -56,7 +56,7 @@
                     <tr th:each="intentoCuestionario : ${historialCuestionariosPage.content}">
                         <td th:text="${intentoCuestionario.cuestionario.titulo}"></td>
     
-                        <td th:text="${intentoCuestionario.cuestionario.tema.asignatura.nombre}"></td>
+                        <td th:text="${intentoCuestionario.cuestionario.tema != null and intentoCuestionario.cuestionario.tema.asignatura != null ? intentoCuestionario.cuestionario.tema.asignatura.nombre : '-'}"></td>
                         <td>
                             <div class="badge-difficulty" th:classappend="${intentoCuestionario.cuestionario.dificultad.codigo == 'EASY' ? 'badge-difficulty-easy' 
                                 : intentoCuestionario.cuestionario.dificultad.codigo == 'MEDIUM' ? 'badge-difficulty-medium' 

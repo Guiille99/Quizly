@@ -152,6 +152,12 @@ public class CuestionarioService {
         if (form.getTemaId() != null) {
             tema = temaRepository.findById(form.getTemaId())
                 .orElseThrow(() -> new EntityNotFoundException("No se ha encontrado el tema seleccionado."));
+
+            if (form.getAsignaturaId() != null) {
+                Asignatura asignatura = asignaturaRepository.findById(form.getAsignaturaId())
+                    .orElseThrow(() -> new EntityNotFoundException("No se ha encontrado la asignatura seleccionada"));
+                validarTemaDeAsignatura(tema, asignatura);
+            }
         }
 
         Dificultad dificultad = dificultadRepository.findById(form.getDificultadId())

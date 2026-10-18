@@ -22,8 +22,9 @@ public class QuizViewMapper {
                 .id(cuestionario.getId())
                 .slug(cuestionario.getSlug())
                 .titulo(cuestionario.getTitulo())
-                .tema(cuestionario.getTema().getNombre())
-                .asignatura(cuestionario.getTema().getAsignatura().getNombre())
+                .tema(cuestionario.getTema() != null ? cuestionario.getTema().getNombre() : null)
+                .asignatura(cuestionario.getTema() != null && cuestionario.getTema().getAsignatura() != null 
+                        ? cuestionario.getTema().getAsignatura().getNombre() : null)
                 .dificultad(cuestionario.getDificultad())
                 .numeroPreguntas(cuestionario.getPreguntas().size())
                 .tiempoLimite(cuestionario.getTiempoLimiteNatural())

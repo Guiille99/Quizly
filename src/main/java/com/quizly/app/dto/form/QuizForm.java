@@ -36,10 +36,8 @@ public class QuizForm {
      */
     private boolean sinLimiteTiempo;
 
-    @NotNull(message = "La asignatura es obligatoria")
     private Long asignaturaId;
 
-    @NotNull(message = "El tema es obligatorio")
     private Long temaId;
 
     @NotNull(message = "La dificultad es obligatoria")

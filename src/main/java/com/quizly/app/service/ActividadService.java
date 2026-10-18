@@ -74,8 +74,17 @@ public class ActividadService {
         } else if (IntentoCuestionarioEstadoEnum.IN_PROGRESS.toString().equals(estado)) {
             fechaRelativa = utils.formatFechaRelativa(intento.getFechaInicio());
 
-            titulo = "Comenzaste tema " + intento.getCuestionario().getTema().getNombre();
-            subtitulo = intento.getCuestionario().getTema().getAsignatura().getNombre();
+            if (intento.getCuestionario().getTema() != null) {
+                titulo = "Comenzaste tema " + intento.getCuestionario().getTema().getNombre();
+                subtitulo = intento.getCuestionario().getTema().getAsignatura() != null 
+                        ? intento.getCuestionario().getTema().getAsignatura().getNombre()
+                        : intento.getCuestionario().getTitulo();
+            } else {
+                titulo = "Comenzaste " + intento.getCuestionario().getTitulo();
+                subtitulo = intento.getCuestionario().getDificultad() != null
+                        ? intento.getCuestionario().getDificultad().getNombre()
+                        : "Cuestionario";
+            }
             tipo = "INICIADO";
             bgColorClass = "bg-accent-purple-muted";
             textColorClass = "text-accent-purple";

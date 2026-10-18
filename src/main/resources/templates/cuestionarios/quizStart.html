@@ -29,7 +29,7 @@
                             <i class="fa-solid fa-book-bookmark text-amber-600"></i>
                             <span>Tema:</span>
                         </div>
-                        <span class="quiz-start__info__item__text" th:text="${quiz.tema.nombre}"></span>
+                        <span class="quiz-start__info__item__text" th:text="${quiz.tema != null ? quiz.tema.nombre : 'Sin tema asociado'}"></span>
                     </div>
 
                     <!-- Dificultad del cuestionario -->

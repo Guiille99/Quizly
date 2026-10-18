@@ -43,6 +43,7 @@ public class HomeController {
                 .orElse(0.0);
 
             long nAsignaturasActivas = intentosCuestionarioUsuario.stream()
+                .filter(i -> i.getCuestionario().getTema() != null && i.getCuestionario().getTema().getAsignatura() != null)
                 .map(i -> i.getCuestionario().getTema().getAsignatura().getId())
                 .distinct()
                 .count();

@@ -18,11 +18,14 @@
                 <!-- Nombre del tema -->
                 <span th:if="${cuestionario.tema != null}" th:text="| · Tema ${cuestionario.tema.orden}: ${cuestionario.tema.nombre}|"></span>
 
+                <!-- Sin tema -->
+                <span th:if="${cuestionario.tema == null}">Sin tema asignado</span>
+
                 <!-- Nº de preguntas -->
                 <span th:text="| · ${cuestionario.preguntas != null ? cuestionario.preguntas.size() : 0} preguntas|"></span>
     
                 <!-- Nombre del usuario -->
-                <span th:if="${cuestionario.usuario != null}" th:text="| · ${cuestionario.usuario.username}"></span>
+                <span th:if="${cuestionario.usuario != null}" th:text="| · ${cuestionario.usuario.username}|"></span>
             </div>
 
             
