@@ -56,6 +56,7 @@ public class MisCuestionariosController {
     private int maxFileSizeMb;
 
     private final CuestionarioService cuestionarioService;
+    private final com.quizly.app.service.CuestionarioCompartidoService cuestionarioCompartidoService;
     private final FavoritoService favoritoService;
     private final QuizFormService quizFormService;
     private final PdfExtractorService pdfExtractorService;
@@ -376,6 +377,33 @@ public class MisCuestionariosController {
         }
 
         return "redirect:/mis-cuestionarios";
+    }
+
+    // -------------------------------------------------------------------------
+    // Compartir cuestionario personal
+    // -------------------------------------------------------------------------
+
+    @PostMapping("/{id}/compartir")
+    public String compartirPersonalQuiz(
+            @PathVariable Long id,
+            @RequestParam("destinatario") String destinatario,
+            @AuthenticationPrincipal QuizlyUserDetails authUser,
+            HttpServletResponse response,
+            @RequestHeader(value = "HX-Request", required = false) String hxRequest) {
+
+        try {
+            cuestionarioCompartidoService.compartirCuestionario(id, destinatario, authUser.getId());
+            toastService.success(response, "Solicitud enviada correctamente a " + destinatario);
+        } catch (QuizlyException e) {
+            log.warn("Error al compartir cuestionario {}: {}", id, e.getMessage());
+            toastService.error(response, e.getMessage());
+        } catch (Exception e) {
+            log.error("Error inesperado al compartir cuestionario {}", id, e);
+            toastService.error(response, "Ocurrió un error inesperado al compartir el cuestionario.");
+        }
+
+        response.setStatus(HttpServletResponse.SC_OK);
+        return "cuestionarios/mis-cuestionarios :: #empty-response";
     }
 
     // -------------------------------------------------------------------------

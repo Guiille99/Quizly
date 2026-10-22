@@ -36,6 +36,7 @@ class MisCuestionariosControllerTest {
     @Test
     void generarQuizIaSolicitaSoloPreguntasVerdaderoFalso() {
         CuestionarioService cuestionarioService = mock(CuestionarioService.class);
+        com.quizly.app.service.CuestionarioCompartidoService cuestionarioCompartidoService = mock(com.quizly.app.service.CuestionarioCompartidoService.class);
         FavoritoService favoritoService = mock(FavoritoService.class);
         QuizFormService quizFormService = mock(QuizFormService.class);
         PdfExtractorService pdfExtractorService = mock(PdfExtractorService.class);
@@ -48,6 +49,7 @@ class MisCuestionariosControllerTest {
 
         MisCuestionariosController controller = new MisCuestionariosController(
                 cuestionarioService,
+                cuestionarioCompartidoService,
                 favoritoService,
                 quizFormService,
                 pdfExtractorService,

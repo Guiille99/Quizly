@@ -57,6 +57,14 @@
                 role="button">Empezar</a>
 
             <th:block th:if="${showActions}">
+                <!-- Compartir cuestionario -->
+                <button type="button" class="btn btn-outline btn-sm text-primary"
+                        title="Compartir cuestionario"
+                        th:attr="data-quiz-id=${cuestionario.id},data-quiz-title=${cuestionario.titulo}"
+                        onclick="abrirModalCompartir(this.getAttribute('data-quiz-id'), this.getAttribute('data-quiz-title'))">
+                    <i class="fa-solid fa-share-nodes"></i>
+                </button>
+
                 <!-- Editar cuestionario -->
                 <a class="btn btn-outline btn-sm"
                     th:href="@{/mis-cuestionarios/{id}/editar(id=${cuestionario.id})}"

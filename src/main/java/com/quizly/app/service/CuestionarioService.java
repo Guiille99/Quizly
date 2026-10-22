@@ -647,6 +647,59 @@ public class CuestionarioService {
     }
 
     /**
+     * Clona de forma independiente un cuestionario para un usuario destinatario.
+     * Crea una nueva serie y versión 1 con las mismas preguntas y opciones.
+     *
+     * @param origen       cuestionario original
+     * @param destinatario usuario que recibe la copia
+     * @return cuestionario clonado
+     */
+    @Transactional
+    public Cuestionario clonarCuestionarioParaUsuario(Cuestionario origen, Usuario destinatario) {
+        Cuestionario clon = new Cuestionario();
+        clon.setTitulo(origen.getTitulo());
+        clon.setDescripcion(origen.getDescripcion());
+        clon.setTema(origen.getTema());
+        clon.setDificultad(origen.getDificultad());
+        clon.setUsuario(destinatario);
+        clon.setVersion(1);
+        clon.setTiempoLimite(origen.getTiempoLimite());
+        clon.setPreguntasAleatorias(origen.isPreguntasAleatorias());
+
+        CuestionarioSerie serie = new CuestionarioSerie();
+        serie.setSlug(resolveUniqueSlug(origen.getTitulo()));
+        clon.setSerie(cuestionarioSerieRepository.save(serie));
+
+        Cuestionario cuestionarioGuardado = cuestionarioRepository.save(clon);
+
+        if (!CollectionUtils.isEmpty(origen.getPreguntas())) {
+            for (Pregunta preguntaOrigen : origen.getPreguntas()) {
+                Pregunta preguntaClon = new Pregunta();
+                preguntaClon.setCuestionario(cuestionarioGuardado);
+                preguntaClon.setEnunciado(preguntaOrigen.getEnunciado());
+                preguntaClon.setTipoPregunta(preguntaOrigen.getTipoPregunta());
+
+                Pregunta preguntaPersistida = preguntaRepository.save(preguntaClon);
+
+                if (!CollectionUtils.isEmpty(preguntaOrigen.getOpcionesRespuesta())) {
+                    List<OpcionRespuesta> opcionesClon = new ArrayList<>();
+                    for (OpcionRespuesta opcionOrigen : preguntaOrigen.getOpcionesRespuesta()) {
+                        OpcionRespuesta opcionClon = new OpcionRespuesta();
+                        opcionClon.setPregunta(preguntaPersistida);
+                        opcionClon.setTexto(opcionOrigen.getTexto());
+                        opcionClon.setCorrecta(opcionOrigen.getCorrecta());
+                        opcionClon.setRetroalimentacion(opcionOrigen.getRetroalimentacion());
+                        opcionesClon.add(opcionClon);
+                    }
+                    opcionRespuestaRepository.saveAll(opcionesClon);
+                }
+            }
+        }
+
+        return cuestionarioGuardado;
+    }
+
+    /**
      * Determina si la instancia del cuestionario pasada por parámetro
      * es la última versión
      * 

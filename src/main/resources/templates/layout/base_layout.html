@@ -24,6 +24,33 @@
                       
                     </label>
     
+                    
+                    <!-- NOTIFICACIONES DROPDOWN -->
+                    <div class="dropdown dropdown-end">
+                        <button type="button" class="btn btn-ghost btn-circle size-9 min-h-0 relative" hx-get="/notificaciones/dropdown"
+                            hx-target="#notificaciones-dropdown-container" aria-label="Notificaciones">
+
+                            <i class="fa-regular fa-bell text-lg"></i>
+
+                            <span id="notificaciones-badge-container">
+                                <span th:if="${numNotificacionesPendientes != null and numNotificacionesPendientes > 0}"
+                                    class="badge badge-primary badge-xs absolute -top-0.5 -right-0.5 font-bold px-1 min-w-4 h-4 text-[10px]"
+                                    th:text="${numNotificacionesPendientes}">
+                                </span>
+                            </span>
+                        </button>
+
+                        <div tabindex="0" class="dropdown-content z-50 p-0 shadow-lg bg-base-100 rounded-box border border-base-300 w-80! sm:w-96! mt-2">
+                            <div id="notificaciones-dropdown-container">
+                                <div class="p-4 text-center text-xs text-base-content/60">
+                                    <span class="loading loading-spinner loading-xs mr-2"></span>
+                                    Cargando...
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
                     <!-- AVATAR USUARIO -->
                     <div class="flex-none gap-3">
                         <div class="dropdown dropdown-end">
