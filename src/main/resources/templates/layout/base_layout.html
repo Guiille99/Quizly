@@ -27,8 +27,8 @@
                     
                     <!-- NOTIFICACIONES DROPDOWN -->
                     <div class="dropdown dropdown-end">
-                        <button type="button" class="btn btn-ghost btn-circle size-9 min-h-0 relative" hx-get="/notificaciones/dropdown"
-                            hx-target="#notificaciones-dropdown-container" aria-label="Notificaciones">
+                        <button type="button" tabindex="0" class="btn btn-ghost btn-circle size-9 min-h-0 relative" hx-get="/notificaciones/dropdown"
+                            hx-target="#notificaciones-dropdown-container" hx-trigger="mouseenter once" aria-label="Notificaciones">
 
                             <i class="fa-regular fa-bell text-lg"></i>
 
@@ -40,7 +40,8 @@
                             </span>
                         </button>
 
-                        <div tabindex="0" class="dropdown-content z-50 p-0 shadow-lg bg-base-100 rounded-box border border-base-300 w-80! sm:w-96! mt-2">
+                        <div tabindex="0" class="dropdown-content z-50 p-0 shadow-lg bg-base-100 rounded-box border border-base-300 w-80! sm:w-96! mt-2"
+                        hx-trigger="intersect once">
                             <div id="notificaciones-dropdown-container">
                                 <div class="p-4 text-center text-xs text-base-content/60">
                                     <span class="loading loading-spinner loading-xs mr-2"></span>
