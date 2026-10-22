@@ -2,6 +2,7 @@ package com.quizly.app.service;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -16,8 +17,6 @@ import com.quizly.app.model.enums.IntentoCuestionarioEstadoEnum;
 import com.quizly.app.model.session.UserQuizSession;
 import com.quizly.app.repository.IntentoCuestionarioEstadoRepository;
 import com.quizly.app.repository.IntentoCuestionarioRepository;
-import com.quizly.app.util.Constantes;
-
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -146,5 +145,44 @@ public class IntentoCuestionarioService {
         }
 
         return intento;
+    }
+
+    /**
+     * Recorre todos los intentos en progreso que han superado el tiempo de inactividad
+     * máximo (cuestionarios sin tiempo límite) o cuyo tiempo límite ha expirado
+     * (cuestionarios con tiempo límite) y los marca como abandonados.
+     * <p>
+     * Este método está pensado para ser invocado periódicamente por un job programado,
+     * de modo que los intentos queden cerrados aunque el usuario nunca vuelva a
+     * interactuar con la aplicación.
+     *
+     * @return Número total de intentos cerrados
+     */
+    @Transactional
+    public int cerrarIntentosExpirados() {
+        LocalDateTime ahora = LocalDateTime.now();
+
+        // Intentos sin tiempo límite cuya inactividad ha caducado
+        LocalDateTime umbralInactividad = ahora.minus(quizProperties.getInactivityMaxDuration());
+        List<IntentoCuestionario> intentosPorInactividad =
+            intentoCuestionarioRepository.findIntentosEnProgresoConInactividadCaducada(umbralInactividad);
+
+        // Intentos con tiempo límite que ya han expirado
+        List<IntentoCuestionario> intentosPorTiempoLimite =
+            intentoCuestionarioRepository.findIntentosEnProgresoConTiempoAgotado(ahora);
+
+        int cerrados = 0;
+
+        for (IntentoCuestionario intento : intentosPorInactividad) {
+            abandonarIntento(intento);
+            cerrados++;
+        }
+
+        for (IntentoCuestionario intento : intentosPorTiempoLimite) {
+            abandonarIntento(intento);
+            cerrados++;
+        }
+
+        return cerrados;
     }
 }

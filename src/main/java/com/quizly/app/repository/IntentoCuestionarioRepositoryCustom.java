@@ -63,5 +63,27 @@ public interface IntentoCuestionarioRepositoryCustom {
      * @return
      */
     int actualizarFechaUltimaActividad(Long intentoId, LocalDateTime fecha);
-   
+
+    /**
+     * Obtiene todos los intentos que están en progreso y cuya inactividad
+     * ha superado el umbral indicado, es decir, aquellos en los que
+     * {@code fechaUltimaActividad} es anterior a {@code umbralInactividad}.
+     * Solo se incluyen intentos cuyo cuestionario no tiene tiempo límite,
+     * ya que los que sí lo tienen se controlan mediante {@code fechaInicio + tiempoLimite}.
+     *
+     * @param umbralInactividad Instante a partir del cual se considera que la inactividad ha caducado
+     * @return Lista de intentos en progreso con inactividad caducada
+     */
+    List<IntentoCuestionario> findIntentosEnProgresoConInactividadCaducada(LocalDateTime umbralInactividad);
+
+    /**
+     * Obtiene todos los intentos que están en progreso y cuyo tiempo límite
+     * ha expirado, es decir, aquellos cuyo cuestionario tiene tiempo límite y
+     * {@code fechaInicio + tiempoLimite} es anterior al instante actual.
+     *
+     * @param ahora Instante actual para calcular la expiración
+     * @return Lista de intentos en progreso con tiempo límite expirado
+     */
+    List<IntentoCuestionario> findIntentosEnProgresoConTiempoAgotado(LocalDateTime ahora);
+
 }

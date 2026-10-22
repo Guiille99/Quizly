@@ -43,6 +43,7 @@ ai:
 quiz:
   inactivity-max-duration: 1h
   activity-update-interval: 1m
+  inactivity-check-cron: 0 0 8 * * *
 logging:
   level:
     root: INFO

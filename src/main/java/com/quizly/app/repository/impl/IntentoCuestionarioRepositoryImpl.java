@@ -170,4 +170,38 @@ public class IntentoCuestionarioRepositoryImpl implements IntentoCuestionarioRep
         .setParameter("intentoId", intentoId)
         .executeUpdate();
     }
+
+    @Override
+    public List<IntentoCuestionario> findIntentosEnProgresoConInactividadCaducada(LocalDateTime umbralInactividad) {
+        TypedQuery<IntentoCuestionario> query = entityManager.createQuery("""
+            SELECT i FROM IntentoCuestionario i
+            JOIN FETCH i.cuestionario c
+            JOIN FETCH i.estado e
+            WHERE e.codigo = :estadoEnProgreso
+                AND c.tiempoLimite IS NULL
+                AND i.fechaUltimaActividad < :umbralInactividad
+        """, IntentoCuestionario.class);
+
+        query.setParameter("estadoEnProgreso", IntentoCuestionarioEstadoEnum.IN_PROGRESS.name());
+        query.setParameter("umbralInactividad", umbralInactividad);
+
+        return query.getResultList();
+    }
+
+    @Override
+    public List<IntentoCuestionario> findIntentosEnProgresoConTiempoAgotado(LocalDateTime ahora) {
+        TypedQuery<IntentoCuestionario> query = entityManager.createQuery("""
+            SELECT i FROM IntentoCuestionario i
+            JOIN FETCH i.cuestionario c
+            JOIN FETCH i.estado e
+            WHERE e.codigo = :estadoEnProgreso
+                AND c.tiempoLimite IS NOT NULL
+                AND FUNCTION('TIMESTAMPADD', SECOND, c.tiempoLimite, i.fechaInicio) < :ahora
+        """, IntentoCuestionario.class);
+
+        query.setParameter("estadoEnProgreso", IntentoCuestionarioEstadoEnum.IN_PROGRESS.name());
+        query.setParameter("ahora", ahora);
+
+        return query.getResultList();
+    }
 }
