@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="es" th:fragment="layout(main)">
 <head th:replace="~{fragments/head :: head('Quizly')}"></head>
 <body>   
@@ -28,7 +28,7 @@
                     <!-- NOTIFICACIONES DROPDOWN -->
                     <div class="dropdown dropdown-end">
                         <button type="button" tabindex="0" class="btn btn-ghost btn-circle size-9 min-h-0 relative" hx-get="/notificaciones/dropdown"
-                            hx-target="#notificaciones-dropdown-container" hx-trigger="mouseenter once" aria-label="Notificaciones">
+                            hx-target="#notificaciones-dropdown-container" hx-trigger="mouseenter once, touchstart once" aria-label="Notificaciones">
 
                             <i class="fa-regular fa-bell text-lg"></i>
 
@@ -40,8 +40,7 @@
                             </span>
                         </button>
 
-                        <div tabindex="0" class="dropdown-content z-50 p-0 shadow-lg bg-base-100 rounded-box border border-base-300 w-80! sm:w-96! mt-2"
-                        hx-trigger="intersect once">
+                        <div tabindex="0" class="dropdown-content z-50 p-0 shadow-lg bg-base-100 rounded-box border border-base-300 mt-2 w-[calc(100vw-6rem)]! max-w-96 sm:w-96! right-0 left-auto">
                             <div id="notificaciones-dropdown-container">
                                 <div class="p-4 text-center text-xs text-base-content/60">
                                     <span class="loading loading-spinner loading-xs mr-2"></span>
