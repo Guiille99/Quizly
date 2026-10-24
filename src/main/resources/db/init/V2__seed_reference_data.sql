@@ -15,7 +15,7 @@ INSERT INTO intentos_cuestionario_estados (codigo, nombre) VALUES
 INSERT INTO generos (codigo, nombre) VALUES
     ('M', 'Hombre'),
     ('F', 'Mujer'),
-    ('PND', 'Prefiero no decirlo')
+    ('PND', 'Prefiero no decirlo');
 
 -- Dificultades
 INSERT INTO dificultades (codigo, nombre) VALUES('EASY', 'Fácil');

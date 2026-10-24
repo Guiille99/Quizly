@@ -9,6 +9,8 @@ import com.quizly.app.model.entity.Usuario;
 
 @Repository
 public interface UsuarioRepository extends JpaRepository<Usuario, Long>, UsuarioRepositoryCustom {
+    java.util.Optional<Usuario> findByGoogleSub(String googleSub);
+
     long countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
 
     boolean existsByUsernameIgnoreCase(String username);

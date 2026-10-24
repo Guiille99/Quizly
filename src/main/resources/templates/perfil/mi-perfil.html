@@ -74,7 +74,7 @@
                     <p class="mt-1 text-sm text-text-muted">Administra tu contraseña y el acceso a tu cuenta.</p>
                 </div>
 
-                <div class="border-y border-base-300 py-5">
+                <div th:if="${profileUser.password != null}" class="border-y border-base-300 py-5">
                     <h3 class="font-semibold text-text">Cambiar contraseña</h3>
                     <form th:action="@{/mi-perfil/contrasena}" th:object="${passwordForm}" method="post"
                           class="form-stack mt-4">

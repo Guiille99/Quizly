@@ -36,6 +36,16 @@ public class EmailService {
         sendHtmlEmail(userEmail, "Recuperación de contraseña - Quizly", htmlContent);
     }
 
+    @LogExecution
+    public void sendGoogleAccountEmail(String userEmail, String appUrl) throws QuizlyException{
+        Context context = new Context();
+        context.setVariable("loginUrl", appUrl + "/login");
+
+        String htmlContent = templateEngine.process("emails/email_google-account", context);
+
+        sendHtmlEmail(userEmail, "Accede a Quizly con Google", htmlContent);
+    }
+
     private void sendHtmlEmail(String userEmail, String subject, String html) throws QuizlyException{
         try {
             MimeMessage message = mailSender.createMimeMessage();

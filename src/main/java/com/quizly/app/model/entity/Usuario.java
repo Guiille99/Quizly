@@ -46,8 +46,12 @@ public class Usuario extends AuditableEntity {
     @Column(name = "email", nullable = false, unique = true, length = 100)
     private String email;
 
-    @Column(name = "password", nullable = false)
+    // Nula en cuentas creadas solo con Google
+    @Column(name = "password")
     private String password;
+
+    @Column(name = "google_sub", unique = true)
+    private String googleSub;
 
     @Enumerated(EnumType.STRING)
     private Rol rol;

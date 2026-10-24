@@ -75,6 +75,49 @@ public class AuthService {
         return userPersist;
     }
 
+    /** Devuelve el usuario ligado a la cuenta de Google, enlazándolo por email o creándolo si no existe. */
+    @LogExecution
+    @Transactional
+    public Usuario findOrCreateGoogleUser(String sub, String email, String nombre, String apellidos) {
+        String emailNorm = email.trim().toLowerCase();
+
+        Optional<Usuario> existente = usuarioRepository.findByGoogleSub(sub)
+                .or(() -> usuarioRepository.findByEmail(emailNorm));
+        if (existente.isPresent()) {
+            Usuario usuario = existente.get();
+            if (usuario.getGoogleSub() == null) {
+                usuario.setGoogleSub(sub);
+                usuario.setUpdatedAt(LocalDateTime.now());
+                log.info("Cuenta de Google enlazada al usuario '{}'", usuario.getUsername());
+                return usuarioRepository.save(usuario);
+            }
+            return usuario;
+        }
+
+        String base = emailNorm.substring(0, emailNorm.indexOf('@')).replaceAll("\s", "");
+        base = base.length() > 40 ? base.substring(0, 40) : base;
+        String username = base.length() < 3 ? base + "user" : base;
+        for (int i = 1; usuarioRepository.existsByUsernameIgnoreCase(username); i++) {
+            username = base + i;
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+        Usuario usuario = new Usuario();
+        usuario.setNombre(nombre != null && !nombre.isBlank() ? nombre : username);
+        usuario.setApellidos(apellidos != null && !apellidos.isBlank() ? apellidos : "-");
+        usuario.setUsername(username);
+        usuario.setEmail(emailNorm);
+        usuario.setGoogleSub(sub);
+        usuario.setGenero(generoRepository.findByCodigo("PND").orElseThrow());
+        usuario.setRol(Rol.ESTUDIANTE);
+        usuario.setCreatedAt(now);
+        usuario.setUpdatedAt(now);
+
+        Usuario persisted = usuarioRepository.save(usuario);
+        log.info("Nuevo usuario registrado con Google. username='{}', id='{}'", persisted.getUsername(), persisted.getId());
+        return persisted;
+    }
+
     @LogExecution
     @Transactional
     public String createPasswordResetToken(Usuario usuario){

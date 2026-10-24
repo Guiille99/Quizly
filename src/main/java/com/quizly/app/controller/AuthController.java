@@ -114,12 +114,16 @@ public class AuthController {
 
         if (usuarioOpt.isPresent()) {
             Usuario usuario = usuarioOpt.get();
-            String token = authService.createPasswordResetToken(usuario);
             String appUrl = ServletUriComponentsBuilder.fromContextPath(request).toUriString();
 
             try {
                 log.info("Solicitud de recuperación de contraseña enviada por el usuario '{}'", usuario.getUsername());
-                emailService.sendPasswordResetEmail(usuario.getEmail(), token, appUrl);
+                if (usuario.getPassword() == null) {
+                    // Cuenta solo-Google: no hay contraseña que restablecer, solo se le indica cómo acceder
+                    emailService.sendGoogleAccountEmail(usuario.getEmail(), appUrl);
+                } else {
+                    emailService.sendPasswordResetEmail(usuario.getEmail(), authService.createPasswordResetToken(usuario), appUrl);
+                }
             } catch (QuizlyException e) {
                 log.error("Se ha producido un error al enviar el email de recuperación de contraseña", e);
                 toastService.error(model, e.getMessage());

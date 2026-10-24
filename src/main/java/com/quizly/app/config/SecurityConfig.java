@@ -8,6 +8,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+import com.quizly.app.security.QuizlyOidcUserService;
 import com.quizly.app.security.QuizlyUserDetailsService;
 
 @Configuration
@@ -20,8 +21,9 @@ public class SecurityConfig {
         this.userDetailsService = userDetailsService;
     }
 
+    // oidcUserService va como parámetro (no en el constructor): AuthService necesita el PasswordEncoder de esta clase
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, QuizlyOidcUserService oidcUserService) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
@@ -39,6 +41,12 @@ public class SecurityConfig {
                         .permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
+                .oauth2Login(oauth -> oauth
+                    .loginPage("/login")
+                    .userInfoEndpoint(u -> u.oidcUserService(oidcUserService))
+                    .defaultSuccessUrl("/", true)
+                    .failureUrl("/login?oauthError")
+                )
                 .userDetailsService(userDetailsService)
                 .formLogin(form -> form
                         .loginPage("/login")

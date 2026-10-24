@@ -76,13 +76,15 @@ CREATE TABLE usuarios (
     apellidos   VARCHAR(255) NOT NULL,
     username    VARCHAR(50)  NOT NULL,
     email       VARCHAR(100) NOT NULL,
-    password    TEXT         NOT NULL,
+    password    TEXT,
+    google_sub  VARCHAR(255),
     rol         VARCHAR(20)  NOT NULL,
     genero_id   BIGINT       NOT NULL,     
     created_at  TIMESTAMP    NOT NULL,
     updated_at  TIMESTAMP    NOT NULL,
     CONSTRAINT uk_usuarios_username UNIQUE (username),
     CONSTRAINT uk_usuarios_email UNIQUE (email),
+    CONSTRAINT uk_usuarios_google_sub UNIQUE (google_sub),
     CONSTRAINT ck_usuarios_rol CHECK (rol IN ('ESTUDIANTE', 'ADMIN')),
     CONSTRAINT fk_usuarios_genero
         FOREIGN KEY (genero_id) REFERENCES generos (id)
@@ -94,6 +96,7 @@ COMMENT ON COLUMN usuarios.apellidos IS 'Apellidos completos del usuario';
 COMMENT ON COLUMN usuarios.username IS 'Nombre de usuario único para acceso al sistema';
 COMMENT ON COLUMN usuarios.email IS 'Dirección de correo electrónico única del usuario';
 COMMENT ON COLUMN usuarios.password IS 'Contraseña cifrada del usuario';
+COMMENT ON COLUMN usuarios.google_sub IS 'Identificador (sub) de la cuenta de Google vinculada; NULL si el usuario no ha enlazado Google';
 COMMENT ON COLUMN usuarios.rol IS 'Rol asignado al usuario (ESTUDIANTE o ADMIN)';
 COMMENT ON COLUMN usuarios.genero_id IS 'Referencia al género del usuario';
 COMMENT ON COLUMN usuarios.created_at IS 'Fecha y hora de registro del usuario';

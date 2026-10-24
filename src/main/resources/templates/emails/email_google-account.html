@@ -1,0 +1,25 @@
+<div th:replace="~{layout/email_layout :: layout(~{::content})}">
+    <div th:fragment="content">
+        <h1 style="font-size: 20px; font-weight: 700; margin-top: 0; margin-bottom: 16px;">¡Hola!</h1>
+
+        <p style="margin-bottom: 24px; line-height: 1.5;">
+            Se solicitó restablecer la contraseña de tu cuenta en Quizly, pero esta cuenta accede con Google y no tiene contraseña.
+            Para entrar, pulsa «Continuar con Google» en la pantalla de inicio de sesión.
+        </p>
+
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin: 32px 0;">
+            <tr>
+                <td align="center">
+                    <a th:href="${loginUrl}"
+                       style="display: inline-block; padding: 14px 32px; background-color: #2071f3; color: #ffffff; border-radius: 12px; text-decoration: none; font-weight: 700; font-size: 16px; box-shadow: 0 4px 6px rgba(32, 113, 243, 0.2);">
+                        Ir a iniciar sesión
+                    </a>
+                </td>
+            </tr>
+        </table>
+
+        <p style="margin-bottom: 16px; font-size: 14px; color: #4e5969;">
+            Si no has sido tú, puedes ignorar este correo.
+        </p>
+    </div>
+</div>
