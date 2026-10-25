@@ -87,6 +87,10 @@ public class AuthService {
             Usuario usuario = existente.get();
             if (usuario.getGoogleSub() == null) {
                 usuario.setGoogleSub(sub);
+                // El email de una cuenta local nunca se verificó: Google acaba de demostrar que es del usuario,
+                // así que se descarta cualquier contraseña/token previo (podrían ser de quien registró ese email antes)
+                usuario.setPassword(null);
+                passwordResetTokenRepository.deleteAllByUsuarioId(usuario.getId());
                 usuario.setUpdatedAt(LocalDateTime.now());
                 log.info("Cuenta de Google enlazada al usuario '{}'", usuario.getUsername());
                 return usuarioRepository.save(usuario);
