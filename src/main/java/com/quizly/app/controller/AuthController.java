@@ -3,6 +3,7 @@ package com.quizly.app.controller;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -10,7 +11,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.quizly.app.repository.GeneroRepository;
 import com.quizly.app.repository.UsuarioRepository;
@@ -26,7 +26,6 @@ import com.quizly.app.service.AuthService;
 import com.quizly.app.service.EmailService;
 import com.quizly.app.web.notification.ToastService;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 
@@ -41,13 +40,16 @@ public class AuthController {
     private final UsuarioRepository usuarioRepository; // Inyección del nuevo repositorio
     private final ToastService toastService;
     private final EmailService emailService;
+    private final String baseUrl;
 
-    public AuthController(AuthService authService, GeneroRepository generoRepository, ToastService toastService, UsuarioRepository usuarioRepository, EmailService emailService) {
+    public AuthController(AuthService authService, GeneroRepository generoRepository, ToastService toastService, UsuarioRepository usuarioRepository, EmailService emailService,
+                          @Value("${app.base-url}") String baseUrl) {
         this.authService = authService;
         this.generoRepository = generoRepository;
         this.usuarioRepository = usuarioRepository;
         this.toastService = toastService;
         this.emailService = emailService;
+        this.baseUrl = baseUrl;
     }
 
     @ModelAttribute("generos")
@@ -103,18 +105,17 @@ public class AuthController {
     
     @PostMapping("/forgot-password")
     public String processForgotPassword(@Valid @ModelAttribute("forgotPasswordForm") ForgotPasswordDto form, 
-                     BindingResult bindingResult, RedirectAttributes ra, Model model,
-                     HttpServletRequest request) {
+                     BindingResult bindingResult, RedirectAttributes ra, Model model) {
 
         if (bindingResult.hasErrors()) {
             return "auth/forgot-password";
         }
-        
+
         Optional<Usuario> usuarioOpt = usuarioRepository.findByEmail(form.getEmail()); // Usando el nuevo repositorio
 
         if (usuarioOpt.isPresent()) {
             Usuario usuario = usuarioOpt.get();
-            String appUrl = ServletUriComponentsBuilder.fromContextPath(request).toUriString();
+            String appUrl = baseUrl;
 
             try {
                 log.info("Solicitud de recuperación de contraseña enviada por el usuario '{}'", usuario.getUsername());
