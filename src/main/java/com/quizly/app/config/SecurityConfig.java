@@ -7,9 +7,12 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.quizly.app.security.LoginThrottleFilter;
 import com.quizly.app.security.QuizlyOidcUserService;
 import com.quizly.app.security.QuizlyUserDetailsService;
+import com.quizly.app.security.RateLimiter;
 
 @Configuration
 @EnableWebSecurity
@@ -23,8 +26,10 @@ public class SecurityConfig {
 
     // oidcUserService va como parámetro (no en el constructor): AuthService necesita el PasswordEncoder de esta clase
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, QuizlyOidcUserService oidcUserService) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, QuizlyOidcUserService oidcUserService,
+            RateLimiter rateLimiter) throws Exception {
         http
+                .addFilterBefore(new LoginThrottleFilter(rateLimiter), UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/login",

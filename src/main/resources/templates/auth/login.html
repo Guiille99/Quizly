@@ -10,6 +10,9 @@
   <div th:if="${param.error}" class="alert alert-error" role="alert">
     <span>Usuario o contraseña incorrectos. Inténtalo de nuevo.</span>
   </div>
+  <div th:if="${param.locked}" class="alert alert-error" role="alert">
+    <span>Demasiados intentos fallidos. Inténtalo de nuevo en unos minutos.</span>
+  </div>
   <div th:if="${param.oauthError}" class="alert alert-error" role="alert">
     <span>No se pudo iniciar sesión con Google. Comprueba que tu correo esté verificado.</span>
   </div>

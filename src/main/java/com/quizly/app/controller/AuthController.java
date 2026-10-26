@@ -1,5 +1,6 @@
 package com.quizly.app.controller;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,6 +23,7 @@ import com.quizly.app.exception.DuplicateUsernameException;
 import com.quizly.app.exception.QuizlyException;
 import com.quizly.app.model.entity.Genero;
 import com.quizly.app.model.entity.Usuario;
+import com.quizly.app.security.RateLimiter;
 import com.quizly.app.service.AuthService;
 import com.quizly.app.service.EmailService;
 import com.quizly.app.web.notification.ToastService;
@@ -35,21 +37,26 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 public class AuthController {
 
+    private static final int FORGOT_PASSWORD_MAX_POR_HORA = 3;
+    private static final String FORGOT_PASSWORD_INFO = "Si el email está registrado, recibirás un enlace de recuperación pronto.";
+
     private final AuthService authService;
     private final GeneroRepository generoRepository;
     private final UsuarioRepository usuarioRepository; // Inyección del nuevo repositorio
     private final ToastService toastService;
     private final EmailService emailService;
     private final String baseUrl;
+    private final RateLimiter rateLimiter;
 
     public AuthController(AuthService authService, GeneroRepository generoRepository, ToastService toastService, UsuarioRepository usuarioRepository, EmailService emailService,
-                          @Value("${app.base-url}") String baseUrl) {
+                          @Value("${app.base-url}") String baseUrl, RateLimiter rateLimiter) {
         this.authService = authService;
         this.generoRepository = generoRepository;
         this.usuarioRepository = usuarioRepository;
         this.toastService = toastService;
         this.emailService = emailService;
         this.baseUrl = baseUrl;
+        this.rateLimiter = rateLimiter;
     }
 
     @ModelAttribute("generos")
@@ -111,6 +118,13 @@ public class AuthController {
             return "auth/forgot-password";
         }
 
+        // Se limita por email, exista o no, y se responde igual para no revelar qué emails están registrados
+        String limiteKey = "forgot:" + form.getEmail().trim().toLowerCase();
+        if (!rateLimiter.tryAcquire(limiteKey, FORGOT_PASSWORD_MAX_POR_HORA, Duration.ofHours(1))) {
+            toastService.info(ra, FORGOT_PASSWORD_INFO);
+            return "redirect:/login";
+        }
+
         Optional<Usuario> usuarioOpt = usuarioRepository.findByEmail(form.getEmail()); // Usando el nuevo repositorio
 
         if (usuarioOpt.isPresent()) {
@@ -132,7 +146,7 @@ public class AuthController {
             }
         }
 
-        toastService.info(ra, "Si el email está registrado, recibirás un enlace de recuperación pronto.");
+        toastService.info(ra, FORGOT_PASSWORD_INFO);
         return "redirect:/login";
     }
 

@@ -13,6 +13,7 @@ import com.quizly.app.model.entity.Tema;
 import com.quizly.app.repository.DificultadRepository;
 import com.quizly.app.repository.TemaRepository;
 import com.quizly.app.security.QuizlyUserDetails;
+import com.quizly.app.security.RateLimiter;
 import com.quizly.app.service.AiQuizGeneratorService;
 import com.quizly.app.service.CuestionarioService;
 import com.quizly.app.service.FavoritoService;
@@ -44,7 +45,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.Duration;
 import java.util.List;
+import java.util.concurrent.Semaphore;
 
 @Slf4j
 @Controller
@@ -66,6 +69,13 @@ public class MisCuestionariosController {
     private final ToastService toastService;
     private final com.quizly.app.web.model.BreadcrumbContext breadcrumbContext;
     private final com.quizly.app.service.BreadcrumbService breadcrumbService;
+    private final RateLimiter rateLimiter;
+
+    // Cada generación con IA consume cuota del proveedor y memoria (el PDF se lee completo)
+    private static final int IA_MAX_POR_HORA = 10;
+    private static final int IA_MAX_POR_DIA = 40;
+    private static final int IA_MAX_SIMULTANEAS = 2;
+    private final Semaphore iaSlots = new Semaphore(IA_MAX_SIMULTANEAS);
 
     @ModelAttribute("maxFileSizeMb")
     public int getMaxFileSizeMb() {
@@ -126,8 +136,31 @@ public class MisCuestionariosController {
             @RequestParam(value = "numPreguntas", defaultValue = "10") Integer numPreguntas,
             @RequestParam(value = "dificultad", defaultValue = "MEDIUM") String dificultadParam,
             @RequestParam(value = "tipoPreguntas", defaultValue = "VARIADAS") String tipoPreguntas,
+            @AuthenticationPrincipal QuizlyUserDetails authUser,
             Model model,
             RedirectAttributes ra) {
+
+        String userKey = "ia:" + authUser.getId();
+        if (!rateLimiter.tryAcquire(userKey + ":h", IA_MAX_POR_HORA, Duration.ofHours(1))
+                || !rateLimiter.tryAcquire(userKey + ":d", IA_MAX_POR_DIA, Duration.ofDays(1))) {
+            toastService.error(ra, "Has alcanzado el límite de generaciones con IA. Inténtalo de nuevo más tarde.");
+            return "redirect:/mis-cuestionarios";
+        }
+
+        if (!iaSlots.tryAcquire()) {
+            toastService.error(ra, "Hay demasiadas generaciones en curso. Inténtalo de nuevo en unos minutos.");
+            return "redirect:/mis-cuestionarios";
+        }
+
+        try {
+            return procesarGeneracionIa(file, numPreguntas, dificultadParam, tipoPreguntas, model, ra);
+        } finally {
+            iaSlots.release();
+        }
+    }
+
+    private String procesarGeneracionIa(MultipartFile file, Integer numPreguntas, String dificultadParam,
+            String tipoPreguntas, Model model, RedirectAttributes ra) {
 
         try {
             // 1. Extraer texto del documento PDF
