@@ -65,9 +65,9 @@
                                 <!-- <li><a class="py-2">Ajustes</a></li> -->
                                 <hr class="border-base-300/60 my-1" />
                                 <li>                                
-                                    <form th:action="@{/logout}" method="post" class="w-full">
+                                    <form th:action="@{/logout}" method="post" class="w-full p-0 block">
                                         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                                        <button type="submit" class="w-full text-left text-error py-2 cursor-pointer">Cerrar sesión</button>
+                                        <button type="submit" class="w-full text-left text-error py-2 px-3 cursor-pointer">Cerrar sesión</button>
                                     </form>
                                 </li>
                             </ul>
