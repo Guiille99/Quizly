@@ -204,10 +204,11 @@
                             th:classappend="${currentUser.rol.name() == 'ADMIN' ? 'badge-admin' : 'badge-user'}"
                             th:text="${currentUser.rol.name() == 'ADMIN' ? 'Administrador' : 'Estudiante'}"
                         ></span>
+                        <span th:if="${appVersion}" class="font-mono text-[11px] text-base-content/40 pt-2 border-t border-base-300/40"
+                            th:text="|Quizly v${appVersion}|"></span>
                     </div>
                 </div>
             </aside>
-            </header>
         </div>
     </div>
 

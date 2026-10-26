@@ -1,5 +1,7 @@
 package com.quizly.app.advice;
 
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.info.BuildProperties;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -17,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 public class GlobalModelAttributes {
 
     private final CuestionarioCompartidoService cuestionarioCompartidoService;
+    private final ObjectProvider<BuildProperties> buildPropertiesProvider;
 
     @ModelAttribute("currentUser")
     public Usuario currentUser(@AuthenticationPrincipal QuizlyUserDetails user){
@@ -34,5 +37,12 @@ public class GlobalModelAttributes {
             return 0;
         }
         return cuestionarioCompartidoService.contarPendientes(user.getId());
+    }
+
+    // BuildProperties solo existe si Maven generó build-info.properties (no al lanzar desde el IDE ni en tests)
+    @ModelAttribute("appVersion")
+    public String appVersion() {
+        BuildProperties buildProperties = buildPropertiesProvider.getIfAvailable();
+        return buildProperties != null ? buildProperties.getVersion() : null;
     }
 }
