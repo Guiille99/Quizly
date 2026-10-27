@@ -44,7 +44,7 @@ public class SecurityConfig {
                                 "/webjars/**",
                                 "/ping")
                         .permitAll()
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/admin/**", "/mis-cuestionarios/generar-ia").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .oauth2Login(oauth -> oauth
                     .loginPage("/login")

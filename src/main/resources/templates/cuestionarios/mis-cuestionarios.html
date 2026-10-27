@@ -10,10 +10,14 @@
                 <p class="mt-1 text-sm text-text-muted">Crea, organiza y repasa tus cuestionarios en un solo lugar.</p>
             </div>
 
-            <button type="button" class="btn btn-primary" onclick="document.getElementById('modalChoice').showModal()">
+            <button type="button" class="btn btn-primary" sec:authorize="hasRole('ADMIN')" onclick="document.getElementById('modalChoice').showModal()">
                 <i class="fa-solid fa-plus"></i>
                 Crear cuestionario
             </button>
+            <a th:href="@{/mis-cuestionarios/nuevo}" class="btn btn-primary" sec:authorize="!hasRole('ADMIN')">
+                <i class="fa-solid fa-plus"></i>
+                Crear cuestionario
+            </a>
         </div>
 
         <!-- Filtros combinados: Búsqueda y Dificultad -->
@@ -29,11 +33,20 @@
                     <i class="fa-solid fa-book-open text-2xl text-text-muted"></i>
                 </div>
                 <h3 class="font-semibold text-text">No se encontraron cuestionarios</h3>
-                <p class="text-sm text-text-muted mt-1 max-w-xs">Crea tu primer cuestionario manualmente o genera uno a partir de un PDF con IA.</p>
-                <button type="button" class="btn btn-primary mt-4" onclick="document.getElementById('modalChoice').showModal()">
-                    <i class="fa-solid fa-plus"></i>
-                    Crear cuestionario
-                </button>
+                <th:block sec:authorize="hasRole('ADMIN')">
+                    <p class="text-sm text-text-muted mt-1 max-w-xs">Crea tu primer cuestionario manualmente o genera uno a partir de un PDF con IA.</p>
+                    <button type="button" class="btn btn-primary mt-4" onclick="document.getElementById('modalChoice').showModal()">
+                        <i class="fa-solid fa-plus"></i>
+                        Crear cuestionario
+                    </button>
+                </th:block>
+                <th:block sec:authorize="!hasRole('ADMIN')">
+                    <p class="text-sm text-text-muted mt-1 max-w-xs">Crea tu primer cuestionario y empieza a repasar.</p>
+                    <a th:href="@{/mis-cuestionarios/nuevo}" class="btn btn-primary mt-4">
+                        <i class="fa-solid fa-plus"></i>
+                        Crear cuestionario
+                    </a>
+                </th:block>
             </div>
 
             <!-- Tarjetas -->
@@ -57,6 +70,8 @@
             </div>
         </div>
 
+        <!-- Modales de creación: la generación con IA es exclusiva de administradores -->
+        <th:block sec:authorize="hasRole('ADMIN')">
         <!-- Modal de selección de tipo de creación -->
         <dialog id="modalChoice" class="modal modal-middle">
             <div class="modal-box">
@@ -173,6 +188,7 @@
                 </form>
             </div>
         </dialog>
+        </th:block>
 
         <!-- Modal de compartir cuestionario -->
         <dialog id="modalCompartir" class="modal modal-middle">

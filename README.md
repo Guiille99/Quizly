@@ -1,6 +1,6 @@
 # Quizly
 
-Aplicación web de cuestionarios organizada por asignaturas y temas. Permite a los usuarios realizar cuestionarios, seguir su progreso y crear los suyos propios (manualmente o generados con IA a partir de un PDF). Incluye un panel de administración.
+Aplicación web de cuestionarios organizada por asignaturas y temas. Permite a los usuarios realizar cuestionarios, seguir su progreso y crear los suyos propios. Los administradores pueden además generarlos con IA a partir de un PDF. Incluye un panel de administración.
 
 ## Funcionalidades
 
@@ -9,7 +9,7 @@ Aplicación web de cuestionarios organizada por asignaturas y temas. Permite a l
 - Navegación por asignaturas → temas → cuestionarios, y listados de cuestionarios recientes y favoritos.
 - Realización de cuestionarios con estado de intento persistido, reanudación, navegación entre preguntas y cierre por tiempo o por inactividad.
 - Página de progreso con historial de intentos.
-- Creación, edición y borrado de cuestionarios propios, y generación con IA a partir de un PDF.
+- Creación, edición y borrado de cuestionarios propios.
 - Compartición de cuestionarios entre usuarios, con solicitudes aceptables/rechazables desde las notificaciones.
 - Edición del perfil, cambio de contraseña y eliminación de cuenta.
 
@@ -17,6 +17,7 @@ Aplicación web de cuestionarios organizada por asignaturas y temas. Permite a l
 - Panel con estadísticas.
 - CRUD de asignaturas, temas, cuestionarios y usuarios.
 - Importación de cuestionarios desde JSON.
+- Generación de cuestionarios con IA a partir de un PDF (desde "Mis cuestionarios"). Está limitada a administradores porque la clave de Gemini es del plan gratuito, que no permite ofrecerla a otros usuarios en el EEE, Suiza o Reino Unido.
 
 **Seguridad**
 - Limitación de frecuencia en login, recuperación de contraseña y generación con IA.
