@@ -13,11 +13,11 @@ Aplicación web de cuestionarios organizada por asignaturas y temas. Permite a l
 - Compartición de cuestionarios entre usuarios, con solicitudes aceptables/rechazables desde las notificaciones.
 - Edición del perfil, cambio de contraseña y eliminación de cuenta.
 
-**Administración** (`/admin`, rol `ADMIN`)
+**Administración** (rol `ADMIN`)
 - Panel con estadísticas.
 - CRUD de asignaturas, temas, cuestionarios y usuarios.
 - Importación de cuestionarios desde JSON.
-- Generación de cuestionarios con IA a partir de un PDF (desde "Mis cuestionarios"). Está limitada a administradores porque la clave de Gemini es del plan gratuito, que no permite ofrecerla a otros usuarios en el EEE, Suiza o Reino Unido.
+- Generación de cuestionarios con IA a partir de un PDF (desde "Mis cuestionarios").
 
 **Seguridad**
 - Limitación de frecuencia en login, recuperación de contraseña y generación con IA.
@@ -74,7 +74,7 @@ Se define en [src/main/resources/application.yaml](src/main/resources/applicatio
 | `AI_API_KEY`, `AI_BASE_URL`, `AI_MODELS` | Sí | Clave, URL base y lista de modelos para la generación con IA |
 | `EMAIL_USERNAME`, `EMAIL_PASSWORD` | Sí | Credenciales SMTP |
 | `EMAIL_HOST`, `EMAIL_PORT` | Solo en `prod` | Servidor SMTP (en `dev` tienen valor por defecto) |
-| `APP_BASE_URL` | Solo en `prod` | URL pública, usada para los enlaces de recuperación de contraseña (en `dev` por defecto `http://localhost:8080`) |
+| `APP_BASE_URL` | Solo en `prod` | URL pública, (en `dev` por defecto `http://localhost:8080`) |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Para login con Google | Por defecto `disabled` |
 | `PORT` | No | Puerto del servidor (por defecto 8080) |
 | `AI_MODEL_COOLDOWN_SECONDS`, `AI_TIMEOUT_SECONDS`, `AI_CONTEXT_WINDOW_TOKENS`, `AI_OUTPUT_TOKEN_RESERVE`, `AI_CONTEXT_SAFETY_MARGIN`, `AI_RETRY_MAX_ATTEMPTS`, `AI_RETRY_INITIAL_BACKOFF_MS` | No | Ajustes del cliente de IA, con valores por defecto |
