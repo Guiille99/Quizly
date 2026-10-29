@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es"
+      th:replace="~{layout/auth_layout :: layout('Privacidad · Quizly', 'wide', 'Política de privacidad', 'Última actualización: 29 de octubre de 2026', ~{::content}, ~{::footer})}">
+<body>
+
+<div th:fragment="content" class="mt-6 flex flex-col gap-3 text-sm [&_h2]:mt-4 [&_h2]:text-base [&_h2]:font-semibold [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:space-y-1 [&_a]:underline">
+
+  <h2>1. Quién es el responsable</h2>
+  <p>Quizly es un proyecto personal, gratuito y sin actividad económica: no tiene publicidad, patrocinios ni ingresos de ningún tipo. Su titular y responsable del tratamiento de tus datos es <strong>Guillermo Jarana</strong>, particular.</p>
+  <p>Contacto para cualquier cuestión sobre tus datos: <a href="mailto:quizly.mail@gmail.com">quizly.mail@gmail.com</a>.</p>
+
+  <h2>2. Qué datos tratamos y para qué</h2>
+  <ul>
+    <li><strong>Tu cuenta.</strong> Nombre, apellidos, nombre de usuario, correo electrónico, contraseña y género. Sirven para crear tu cuenta, identificarte y que puedas usar Quizly.</li>
+    <li><strong>Si entras con Google.</strong> Google nos facilita tu identificador de cuenta de Google, tu correo verificado, tu nombre y tus apellidos. Como en este caso no te preguntamos el género, se guarda como «Prefiero no decirlo».</li>
+    <li><strong>El género.</strong> Es obligatorio, pero puedes elegir «Prefiero no decirlo». Solo lo usamos para saludarte («Bienvenido» o «Bienvenida»). No se usa para nada más ni se comunica a nadie.</li>
+    <li><strong>Lo que haces en Quizly.</strong> Tus intentos de cuestionarios, respuestas, resultados, progreso, la hora de tu última actividad en un intento, favoritos, los cuestionarios que creas y los que compartes o recibes. Sirven para que funcionen el servicio, tu historial y tu progreso.</li>
+    <li><strong>Correos del servicio.</strong> Usamos tu correo para enviarte lo necesario, como el enlace para recuperar la contraseña o avisos sobre tu cuenta. No enviamos publicidad.</li>
+    <li><strong>Seguridad.</strong> Para evitar ataques, contamos durante 15 minutos los intentos fallidos de inicio de sesión de cada nombre de usuario. El servidor guarda además registros técnicos (por ejemplo, la dirección IP y la fecha de cada petición, o el nombre de usuario en algunas acciones como el registro o el cambio de contraseña).</li>
+  </ul>
+
+  <h2>3. Por qué podemos tratar tus datos (base legal)</h2>
+  <ul>
+    <li><strong>Para darte el servicio que pides</strong> al registrarte (artículo 6.1.b del Reglamento General de Protección de Datos, RGPD): cuenta, cuestionarios, progreso, compartición y correos del servicio. Estos datos son necesarios: sin ellos no podemos crear tu cuenta.</li>
+    <li><strong>Interés legítimo</strong> (artículo 6.1.f RGPD): mantener la seguridad de Quizly (registros y control de intentos de acceso), personalizar el saludo con tu género y cargar tipografías y librerías externas para que la web se vea y funcione bien (ver apartado 5). Puedes oponerte escribiéndonos.</li>
+  </ul>
+
+  <h2>4. Cuánto tiempo guardamos tus datos</h2>
+  <ul>
+    <li>Mientras tengas cuenta en Quizly.</li>
+    <li>Puedes borrar tu cuenta cuando quieras desde tu perfil. Al hacerlo se eliminan tus datos de cuenta, tus intentos y respuestas, tus favoritos y tus cuestionarios. <strong>Excepción:</strong> si otras personas ya han hecho alguno de tus cuestionarios, ese cuestionario se conserva sin tu nombre para no romper su historial. Las copias de cuestionarios que otras personas aceptaron cuando los compartiste siguen en sus cuentas.</li>
+    <li>El enlace de recuperación de contraseña caduca a los 50 minutos y se borra cuando lo usas.</li>
+    <li>Tras borrar tu cuenta, tus datos pueden permanecer durante un tiempo limitado en copias de seguridad cifradas de nuestro proveedor de base de datos, protegidas frente a cualquier otro uso, hasta que se eliminan conforme a sus procedimientos.</li>
+    <li>Los registros técnicos del servidor (por ejemplo, la dirección IP) se eliminan automáticamente a los 7 días.</li>
+  </ul>
+
+  <h2>5. Quién más recibe o puede ver datos</h2>
+  <p>No vendemos ni cedemos tus datos. Solo intervienen estos proveedores, necesarios para que Quizly funcione:</p>
+  <ul>
+    <li><strong>Render</strong> (alojamiento de la web, en servidores de Frankfurt, Alemania). Trata los datos por nuestra cuenta como encargado del tratamiento.</li>
+    <li><strong>Neon</strong> (base de datos, en servidores de Amazon Web Services en Londres, Reino Unido). Trata los datos por nuestra cuenta como encargado del tratamiento.</li>
+    <li><strong>Google, inicio de sesión</strong>: si eliges «Continuar con Google», Google nos envía los datos indicados en el apartado 2.</li>
+    <li><strong>Google, Gmail</strong>: los correos del servicio se envían desde una cuenta de Gmail. Google trata tu dirección de correo y el contenido del mensaje para entregarlo.</li>
+    <li><strong>Google Fonts</strong> (tipografías), <strong>jsDelivr</strong> (librería de gráficos) y <strong>unpkg</strong> (librería htmx): al abrir Quizly, tu navegador descarga archivos de estos servicios, que reciben tu dirección IP y datos técnicos de tu navegador.</li>
+    <li><strong>Google Gemini</strong>: solo los administradores lo usan para generar cuestionarios a partir de documentos PDF. No se le envían datos de los usuarios.</li>
+  </ul>
+  <p>Google, jsDelivr y unpkg tratan esos datos según sus propias políticas de privacidad.</p>
+  <p><strong>Dónde se guardan tus datos y transferencias fuera de la Unión Europea.</strong> La web se aloja en servidores de Frankfurt (Alemania) y la base de datos, en Londres (Reino Unido). El Reino Unido no pertenece a la Unión Europea, pero la Comisión Europea ha decidido que ofrece un nivel de protección adecuado, por lo que enviar allí datos personales está permitido sin garantías adicionales. Además, algunos de nuestros proveedores (o las empresas que trabajan para ellos) están en Estados Unidos, por lo que pueden acceder a ciertos datos desde allí. Esas transferencias se amparan en el Marco de Privacidad de Datos UE-EE. UU. (decisión de la Comisión Europea de 10 de julio de 2023) o en cláusulas contractuales tipo aprobadas por la Comisión Europea. Puedes pedirnos más información sobre estas garantías escribiendo a <a href="mailto:quizly.mail@gmail.com">quizly.mail@gmail.com</a>.</p>
+
+  <h2>6. Qué ven otros usuarios</h2>
+  <ul>
+    <li>Para compartir un cuestionario, otra persona puede buscarte escribiendo tu nombre de usuario o tu correo.</li>
+    <li>Cuando compartes un cuestionario, quien lo recibe ve tu nombre de usuario.</li>
+    <li>Los administradores de Quizly pueden ver y gestionar las cuentas de usuario.</li>
+  </ul>
+
+  <h2>7. Tus derechos</h2>
+  <p>Puedes pedirnos en cualquier momento:</p>
+  <ul>
+    <li><strong>Acceso:</strong> saber qué datos tenemos sobre ti.</li>
+    <li><strong>Rectificación:</strong> corregirlos (muchos puedes cambiarlos tú en tu perfil).</li>
+    <li><strong>Supresión:</strong> borrarlos (también puedes borrar tu cuenta desde tu perfil).</li>
+    <li><strong>Oposición</strong> a los tratamientos basados en interés legítimo.</li>
+    <li><strong>Limitación</strong> del tratamiento.</li>
+    <li><strong>Portabilidad:</strong> recibir tus datos en un formato que puedas llevar a otro servicio.</li>
+  </ul>
+  <p>Escríbenos a <a href="mailto:quizly.mail@gmail.com">quizly.mail@gmail.com</a>. Te responderemos en un plazo máximo de un mes.</p>
+  <p>Si crees que no hemos tratado bien tus datos, puedes reclamar ante la Agencia Española de Protección de Datos: <a href="https://www.aepd.es" target="_blank" rel="noopener">www.aepd.es</a>.</p>
+
+  <h2>8. Cookies y almacenamiento en tu navegador</h2>
+  <p>Quizly no usa cookies de publicidad ni de analítica. Solo usa:</p>
+  <ul>
+    <li><strong>JSESSIONID</strong>: cookie técnica que mantiene tu sesión iniciada. Caduca tras una hora de inactividad o al cerrar sesión.</li>
+    <li><strong>theme</strong> (almacenamiento local del navegador): recuerda si prefieres el tema claro u oscuro. Puedes borrarlo desde la configuración de tu navegador.</li>
+  </ul>
+  <p>Ninguno de los dos sirve para seguirte ni para mostrarte publicidad.</p>
+
+  <h2>9. Edad</h2>
+  <p>Quizly está pensada para personas de 14 años o más. Si tienes menos de 14 años, no te registres sin el permiso de tu padre, madre o tutor.</p>
+</div>
+
+<div th:fragment="footer" class="mt-4 text-xs">
+  <a th:href="@{/}" class="link-accent">Volver a Quizly</a>
+</div>
+
+</body>
+</html>

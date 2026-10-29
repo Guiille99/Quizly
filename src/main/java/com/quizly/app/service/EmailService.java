@@ -51,7 +51,7 @@ public class EmailService {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-            helper.setFrom(fromEmail);
+            helper.setFrom(fromEmail, "Quizly");
             helper.setTo(userEmail);
             helper.setSubject(subject);
             helper.setText(html, true);
