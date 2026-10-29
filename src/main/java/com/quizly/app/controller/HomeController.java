@@ -30,36 +30,38 @@ public class HomeController {
     @GetMapping("/")
     public String home(Model model, @AuthenticationPrincipal QuizlyUserDetails authUser, 
             HttpServletRequest request) {
-        if (authUser != null) {
-            List<IntentoCuestionario> intentosCuestionarioUsuario = intentoCuestionarioRepository.findByUsuarioId(authUser.getId());
-
-            List<IntentoCuestionario> cuestionariosCompletados = intentosCuestionarioUsuario.stream()
-                .filter(i -> IntentoCuestionarioEstadoEnum.FINISHED.toString().equals(i.getEstado().getCodigo()))
-                .toList();
-
-            double puntuacionMedia = cuestionariosCompletados.stream()
-                .mapToDouble(IntentoCuestionario::getPorcentajeAciertos)
-                .average()
-                .orElse(0.0);
-
-            long nAsignaturasActivas = intentosCuestionarioUsuario.stream()
-                .filter(i -> i.getCuestionario().getTema() != null && i.getCuestionario().getTema().getAsignatura() != null)
-                .map(i -> i.getCuestionario().getTema().getAsignatura().getId())
-                .distinct()
-                .count();
-
-            long totalSegundos = intentosCuestionarioUsuario.stream()
-                .mapToLong(i -> i.getTiempoEmpleado() != null ? i.getTiempoEmpleado() : 0L)
-                .sum();
-
-            model.addAttribute("nCuestionariosCompletados", cuestionariosCompletados.size());
-            model.addAttribute("puntuacionMedia", Math.round(puntuacionMedia));
-            model.addAttribute("nAsignaturasActivas", nAsignaturasActivas);
-            model.addAttribute("tiempoEstudio", Utils.formatDuration(totalSegundos));
-            model.addAttribute("actividades", actividadService.getActividadesRecientes(authUser.getUsuario(), 5));
-            model.addAttribute("temasMayorRendimiento", temaService.getTemasMayorRendimientoUsuario(authUser.getId()));
-            model.addAttribute("temasPeorRendimiento", temaService.getTemasPeorRendimientoUsuario(authUser.getId()));
+        if (authUser == null) {
+            return "landing";
         }
+
+        List<IntentoCuestionario> intentosCuestionarioUsuario = intentoCuestionarioRepository.findByUsuarioId(authUser.getId());
+
+        List<IntentoCuestionario> cuestionariosCompletados = intentosCuestionarioUsuario.stream()
+            .filter(i -> IntentoCuestionarioEstadoEnum.FINISHED.toString().equals(i.getEstado().getCodigo()))
+            .toList();
+
+        double puntuacionMedia = cuestionariosCompletados.stream()
+            .mapToDouble(IntentoCuestionario::getPorcentajeAciertos)
+            .average()
+            .orElse(0.0);
+
+        long nAsignaturasActivas = intentosCuestionarioUsuario.stream()
+            .filter(i -> i.getCuestionario().getTema() != null && i.getCuestionario().getTema().getAsignatura() != null)
+            .map(i -> i.getCuestionario().getTema().getAsignatura().getId())
+            .distinct()
+            .count();
+
+        long totalSegundos = intentosCuestionarioUsuario.stream()
+            .mapToLong(i -> i.getTiempoEmpleado() != null ? i.getTiempoEmpleado() : 0L)
+            .sum();
+
+        model.addAttribute("nCuestionariosCompletados", cuestionariosCompletados.size());
+        model.addAttribute("puntuacionMedia", Math.round(puntuacionMedia));
+        model.addAttribute("nAsignaturasActivas", nAsignaturasActivas);
+        model.addAttribute("tiempoEstudio", Utils.formatDuration(totalSegundos));
+        model.addAttribute("actividades", actividadService.getActividadesRecientes(authUser.getUsuario(), 5));
+        model.addAttribute("temasMayorRendimiento", temaService.getTemasMayorRendimientoUsuario(authUser.getId()));
+        model.addAttribute("temasPeorRendimiento", temaService.getTemasPeorRendimientoUsuario(authUser.getId()));
         
         model.addAttribute(Constantes.ATTR_CURRENT_URI, request.getRequestURI());
         

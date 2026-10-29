@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.quizly.app.security.HtmxAuthenticationEntryPoint;
 import com.quizly.app.security.LoginThrottleFilter;
 import com.quizly.app.security.QuizlyOidcUserService;
 import com.quizly.app.security.QuizlyUserDetailsService;
@@ -32,6 +33,7 @@ public class SecurityConfig {
                 .addFilterBefore(new LoginThrottleFilter(rateLimiter), UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
+                                "/",
                                 "/login",
                                 "/register",
                                 "/forgot-password",
@@ -47,6 +49,8 @@ public class SecurityConfig {
                         .permitAll()
                         .requestMatchers("/admin/**", "/mis-cuestionarios/generar-ia").hasRole("ADMIN")
                         .anyRequest().authenticated())
+                // htmx sin sesión: navegar al login en vez de pintarlo dentro del fragmento
+                .exceptionHandling(ex -> ex.authenticationEntryPoint(new HtmxAuthenticationEntryPoint()))
                 .oauth2Login(oauth -> oauth
                     .loginPage("/login")
                     .userInfoEndpoint(u -> u.oidcUserService(oidcUserService))

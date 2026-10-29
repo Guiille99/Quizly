@@ -93,7 +93,7 @@ public class MiPerfilController {
                 org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication());
             log.info("El usuario {} eliminó su cuenta", authUser.getId());
             toastService.success(redirectAttributes, "Tu cuenta se ha eliminado correctamente.");
-            return "redirect:/login?logout";
+            return "redirect:/";
         } catch (EntityNotFoundException exception) {
             log.warn("No se encontró la cuenta {} durante la solicitud de eliminación", authUser.getId());
             toastService.error(redirectAttributes, "No se ha encontrado la cuenta que quieres eliminar.");

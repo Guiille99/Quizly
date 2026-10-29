@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:replace="~{fragments/head :: head('Quizly: estudia respondiendo preguntas')}"></head>
+<body>
+
+<header class="sticky top-0 z-30 border-b border-border/60 bg-bg/80 backdrop-blur-md">
+  <div class="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3.5 sm:px-6">
+    <a th:href="@{/}" class="flex items-center gap-2.5 no-underline">
+      <img th:src="@{/img/Logo.svg}" alt="" class="size-8">
+      <span class="text-lg font-semibold tracking-tight text-text">Quizly</span>
+    </a>
+    <nav class="flex items-center gap-2 sm:gap-3">
+      <label th:replace="~{fragments/theme-toggle :: toggle}"></label>
+      <a th:href="@{/login}" class="btn btn-ghost btn-sm hidden sm:inline-flex sm:btn-md">Iniciar sesión</a>
+      <a th:href="@{/register}" class="btn btn-primary btn-sm sm:btn-md">Crear cuenta</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!-- Hero: una pregunta de verdad que se puede responder (solo CSS) -->
+  <section class="relative overflow-x-clip">
+    <div class="landing-dots pointer-events-none absolute inset-0" aria-hidden="true"></div>
+
+    <div class="relative mx-auto grid max-w-6xl items-center gap-14 px-4 pb-24 pt-12 sm:px-6 lg:grid-cols-[1.1fr_1fr] lg:pt-20">
+      <div>
+        <h1 class="max-w-[17ch] text-4xl font-semibold leading-[1.06] tracking-tight text-text sm:text-5xl lg:text-[3.5rem]">
+          Estudia respondiendo preguntas, no releyendo apuntes.
+        </h1>
+        <p class="mt-6 max-w-[52ch] text-lg leading-relaxed text-text-secondary">
+          Quizly organiza cuestionarios por asignatura y tema. Los respondes, ves qué has fallado
+          y sigues tu progreso hasta dominar cada tema.
+        </p>
+        <div class="mt-9 flex flex-wrap gap-3">
+          <a th:href="@{/register}" class="btn btn-primary btn-lg shadow-lg shadow-accent/25">Crear cuenta gratis</a>
+          <a th:href="@{/login}" class="btn btn-lg border-border bg-surface hover:border-accent hover:text-accent">Ya tengo cuenta</a>
+        </div>
+        <ul class="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-text-secondary">
+          <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-accent-green"></i>Gratis y sin publicidad</li>
+          <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-accent-green"></i>Entra con tu cuenta de Google</li>
+        </ul>
+      </div>
+
+      <div class="relative mx-auto w-full max-w-xl lg:mr-0">
+        <div class="landing-glow pointer-events-none absolute -inset-10" aria-hidden="true"></div>
+
+        <!-- Las siguientes preguntas del mazo -->
+        <div class="landing-deal absolute inset-0 translate-x-4 translate-y-3 rotate-[4deg] rounded-2xl border border-border bg-card-alt" style="--delay:.1s" aria-hidden="true"></div>
+        <div class="landing-deal absolute inset-0 -translate-x-2 translate-y-1.5 -rotate-[2.5deg] rounded-2xl border border-border bg-surface" aria-hidden="true"></div>
+
+        <fieldset class="group/quiz landing-lift relative min-w-0 rounded-2xl border border-border bg-surface p-5 sm:p-7">
+          <div class="flex items-start justify-between gap-4 text-sm">
+            <div class="space-y-1.5">
+              <p><i class="fa-solid fa-brain mr-1.5 text-accent"></i><span class="font-semibold">Tema:</span> Técnicas de estudio</p>
+              <span class="badge badge-sm border-difficulty-easy-border bg-difficulty-easy-bg text-difficulty-easy-fg">Fácil</span>
+            </div>
+            <div class="text-right">
+              <p class="text-xs text-text-muted">Pregunta</p>
+              <p class="text-2xl font-semibold">1<span class="opacity-40"> / </span>10</p>
+            </div>
+          </div>
+
+          <div class="mt-4 h-2 overflow-hidden rounded-full bg-base-200" aria-hidden="true">
+            <div class="h-full w-[4%] rounded-full bg-accent group-has-[:checked]/quiz:w-[10%] motion-safe:transition-[width] motion-safe:duration-700"></div>
+          </div>
+
+          <legend class="sr-only">Pregunta de ejemplo</legend>
+          <p class="mt-6 text-lg font-semibold leading-relaxed">
+            Una semana después de estudiar un tema, ¿qué recuerdas mejor?
+          </p>
+
+          <div class="mt-5 space-y-3">
+            <label th:each="opcion : ${ {'A|Lo que subrayaste en los apuntes|no', 'B|Lo que releíste varias veces|no', 'C|Lo que intentaste responder de memoria|ok', 'D|Lo que pasaste a limpio|no'} }"
+                   th:with="partes=${#strings.arraySplit(opcion, '|')}, ok=${partes[2] == 'ok'}"
+                   class="group/opt block cursor-pointer">
+              <input type="radio" name="demo" class="peer sr-only" th:classappend="${ok} ? 'demo-ok' : 'demo-ko'">
+              <div class="flex items-center gap-4 rounded-xl border border-border bg-surface p-3.5 transition-colors hover:border-accent hover:bg-accent/5
+                          peer-focus-visible:ring-2 peer-focus-visible:ring-accent"
+                   th:classappend="${ok} ? 'group-has-[:checked]/quiz:border-accent-green group-has-[:checked]/quiz:bg-accent-green-muted'
+                                         : 'peer-checked:border-accent-red peer-checked:bg-accent-red-muted'">
+                <span class="flex size-9 shrink-0 items-center justify-center rounded-full bg-base-200 text-sm font-semibold"
+                      th:classappend="${ok} ? 'group-has-[:checked]/quiz:bg-accent-green group-has-[:checked]/quiz:text-white'
+                                            : 'group-has-[:checked]/opt:bg-accent-red group-has-[:checked]/opt:text-white'"
+                      th:text="${partes[0]}">A</span>
+                <span class="flex-1 leading-snug" th:text="${partes[1]}"></span>
+                <span th:if="${ok}" class="hidden text-accent-green group-has-[:checked]/quiz:inline"><i class="fa-solid fa-check"></i></span>
+                <span th:unless="${ok}" class="hidden text-accent-red group-has-[:checked]/opt:inline"><i class="fa-solid fa-xmark"></i></span>
+              </div>
+            </label>
+          </div>
+
+          <div class="mt-6 flex items-start justify-between gap-4 border-t border-base-200 pt-5 text-sm" role="status">
+            <p class="text-text-secondary group-has-[:checked]/quiz:hidden">Elige una respuesta.</p>
+            <p class="hidden text-text-secondary group-has-[.demo-ok:checked]/quiz:block">
+              <strong class="text-accent-green">Correcto.</strong>
+              Intentar recordar fija lo aprendido mucho más que releer. Quizly está hecho sobre esa idea.
+            </p>
+            <p class="hidden text-text-secondary group-has-[.demo-ko:checked]/quiz:block">
+              <strong class="text-accent-red">No exactamente.</strong>
+              Se recuerda mejor lo que intentaste responder de memoria: recordar fija más que releer. Quizly está hecho sobre esa idea.
+            </p>
+            <span class="badge badge-neutral badge-sm shrink-0 gap-1 group-has-[:checked]/quiz:hidden">
+              <i class="fa-solid fa-pencil text-[10px]"></i> Pendiente
+            </span>
+            <span class="badge badge-success badge-sm hidden shrink-0 gap-1 text-white group-has-[:checked]/quiz:inline-flex">
+              <i class="fa-solid fa-check text-[10px]"></i> Respondida
+            </span>
+          </div>
+        </fieldset>
+
+        <!-- Avisos de la app alrededor de la pregunta -->
+        <div class="landing-pop landing-lift absolute -left-14 -top-11 hidden items-center gap-3 rounded-xl border border-border bg-surface px-3.5 py-2.5 lg:flex" aria-hidden="true">
+          <span class="flex size-9 items-center justify-center rounded-lg bg-accent-green-muted text-accent-green"><i class="fa-solid fa-trophy"></i></span>
+          <span class="text-xs leading-tight"><span class="block text-text-muted">Último resultado</span><span class="font-semibold">9 de 10 aciertos</span></span>
+        </div>
+        <div class="landing-pop landing-lift absolute -bottom-8 -right-6 hidden items-center gap-3 rounded-xl border border-border bg-surface px-3.5 py-2.5 lg:flex" style="--delay:.8s" aria-hidden="true">
+          <span class="flex size-9 items-center justify-center rounded-lg bg-accent-purple-muted text-accent-purple"><i class="fa-solid fa-share-nodes"></i></span>
+          <span class="text-xs leading-tight"><span class="block text-text-muted">laura_m te ha compartido</span><span class="font-semibold">Derivadas, repaso final</span></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Cómo funciona: es una secuencia real, por eso va numerada -->
+  <section class="border-y border-border bg-surface">
+    <div class="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-24">
+      <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">Cómo funciona</h2>
+      <p class="mt-2 max-w-[60ch] text-text-secondary">Cuatro pasos, los mismos cada vez que repasas un tema.</p>
+
+      <ol class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <li class="flex flex-col rounded-2xl border border-border bg-bg p-4">
+          <div class="flex h-36 flex-col justify-center gap-2 rounded-xl border border-border bg-surface p-3" aria-hidden="true">
+            <div th:each="a : ${ {'fa-calculator|purple|Matemáticas|8 temas', 'fa-flask|green|Química|5 temas', 'fa-landmark|orange|Historia|6 temas'} }"
+                 th:with="p=${#strings.arraySplit(a, '|')}" class="flex items-center gap-2.5 text-xs">
+              <span class="flex size-7 items-center justify-center rounded-md"
+                    th:classappend="|bg-accent-${p[1]}-muted text-accent-${p[1]}|"><i class="fa-solid text-[11px]" th:classappend="${p[0]}"></i></span>
+              <span class="flex-1 font-medium" th:text="${p[2]}"></span>
+              <span class="text-text-muted" th:text="${p[3]}"></span>
+            </div>
+          </div>
+          <div class="mt-5 flex items-center gap-3">
+            <span class="flex size-8 items-center justify-center rounded-lg bg-accent text-sm font-semibold text-white">1</span>
+            <h3 class="font-semibold">Elige una asignatura</h3>
+          </div>
+          <p class="mt-2 text-sm leading-relaxed text-text-secondary">Cada asignatura se divide en temas, y cada tema tiene sus cuestionarios.</p>
+        </li>
+
+        <li class="flex flex-col rounded-2xl border border-border bg-bg p-4">
+          <div class="flex h-36 flex-col justify-center gap-2 rounded-xl border border-border bg-surface p-3" aria-hidden="true">
+            <div class="mb-1 h-1.5 w-1/2 rounded-full bg-base-300"></div>
+            <div class="flex items-center gap-2 rounded-lg border border-border p-1.5 text-xs"><span class="flex size-5 items-center justify-center rounded-full bg-base-200 text-[10px] font-semibold">A</span><span class="h-1.5 w-2/3 rounded-full bg-base-300"></span></div>
+            <div class="flex items-center gap-2 rounded-lg border border-accent bg-accent/10 p-1.5 text-xs ring-1 ring-accent"><span class="flex size-5 items-center justify-center rounded-full bg-accent text-[10px] font-semibold text-white">B</span><span class="h-1.5 w-1/2 rounded-full bg-accent/40"></span></div>
+            <div class="flex items-center gap-2 rounded-lg border border-border p-1.5 text-xs"><span class="flex size-5 items-center justify-center rounded-full bg-base-200 text-[10px] font-semibold">C</span><span class="h-1.5 w-3/5 rounded-full bg-base-300"></span></div>
+          </div>
+          <div class="mt-5 flex items-center gap-3">
+            <span class="flex size-8 items-center justify-center rounded-lg bg-accent text-sm font-semibold text-white">2</span>
+            <h3 class="font-semibold">Responde el cuestionario</h3>
+          </div>
+          <p class="mt-2 text-sm leading-relaxed text-text-secondary">Pregunta a pregunta, eligiendo entre las opciones. Puedes volver atrás antes de terminar.</p>
+        </li>
+
+        <li class="flex flex-col rounded-2xl border border-border bg-bg p-4">
+          <div class="flex h-36 items-center justify-center gap-4 rounded-xl border border-border bg-surface p-3" aria-hidden="true">
+            <div class="radial-progress text-accent-green" style="--value:80; --size:4.5rem; --thickness:7px" data-value="80" role="presentation">
+              <span class="text-sm font-semibold text-text">80%</span>
+            </div>
+            <div class="space-y-1.5 text-xs">
+              <p class="flex items-center gap-1.5"><i class="fa-solid fa-circle-check text-accent-green"></i>8 aciertos</p>
+              <p class="flex items-center gap-1.5"><i class="fa-solid fa-circle-xmark text-accent-red"></i>2 fallos</p>
+            </div>
+          </div>
+          <div class="mt-5 flex items-center gap-3">
+            <span class="flex size-8 items-center justify-center rounded-lg bg-accent text-sm font-semibold text-white">3</span>
+            <h3 class="font-semibold">Revisa el resultado</h3>
+          </div>
+          <p class="mt-2 text-sm leading-relaxed text-text-secondary">Al terminar ves tu porcentaje de aciertos y la respuesta correcta de cada pregunta que fallaste.</p>
+        </li>
+
+        <li class="flex flex-col rounded-2xl border border-border bg-bg p-4">
+          <div class="flex h-36 flex-col justify-center gap-3 rounded-xl border border-border bg-surface p-3" aria-hidden="true">
+            <div class="text-xs">
+              <div class="mb-1 flex justify-between"><span class="font-medium text-accent-green">Fortaleza</span><span>92 %</span></div>
+              <progress class="progress progress-success h-1.5" value="92" max="100"></progress>
+            </div>
+            <div class="text-xs">
+              <div class="mb-1 flex justify-between"><span class="font-medium text-accent-orange">Necesita mejorar</span><span>41 %</span></div>
+              <progress class="progress progress-warning h-1.5" value="41" max="100"></progress>
+            </div>
+          </div>
+          <div class="mt-5 flex items-center gap-3">
+            <span class="flex size-8 items-center justify-center rounded-lg bg-accent text-sm font-semibold text-white">4</span>
+            <h3 class="font-semibold">Sigue tu progreso</h3>
+          </div>
+          <p class="mt-2 text-sm leading-relaxed text-text-secondary">Quizly separa los temas que dominas de los que necesitas repasar.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- Qué más puedes hacer -->
+  <section class="mx-auto grid max-w-6xl items-center gap-16 px-4 py-20 sm:px-6 sm:py-28 lg:grid-cols-2">
+    <figure class="relative">
+      <div class="landing-glow pointer-events-none absolute inset-x-0 -inset-y-8 opacity-60 lg:-inset-8" aria-hidden="true"></div>
+      <div class="landing-lift relative rounded-2xl border border-border bg-surface p-5 sm:p-6" aria-hidden="true">
+        <div class="flex items-center justify-between">
+          <p class="font-semibold">Análisis del rendimiento de los temas</p>
+          <i class="fa-solid fa-chart-simple text-text-muted"></i>
+        </div>
+        <div class="mt-5 grid gap-4 sm:grid-cols-2">
+          <div class="rounded-xl border border-border bg-card-alt p-4">
+            <p class="mb-4 text-sm font-semibold text-accent-green">Fortalezas</p>
+            <div th:each="t : ${ {'Derivadas|92', 'Tabla periódica|86', 'Edad Media|81'} }"
+                 th:with="p=${#strings.arraySplit(t, '|')}" class="mb-3 flex gap-3">
+              <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-accent-green-muted text-accent-green"><i class="fa-solid fa-circle-check text-xs"></i></span>
+              <div class="flex-1">
+                <div class="flex justify-between gap-2 text-sm"><span th:text="${p[0]}"></span><span class="shrink-0 whitespace-nowrap" th:text="|${p[1]} %|"></span></div>
+                <progress class="progress progress-success h-1.5" th:value="${p[1]}" max="100"></progress>
+              </div>
+            </div>
+          </div>
+          <div class="rounded-xl border border-border bg-card-alt p-4">
+            <p class="mb-4 text-sm font-semibold text-accent-orange">Necesita mejorar</p>
+            <div th:each="t : ${ {'Subjuntivo|48', 'Integrales|41', 'Enlace químico|35'} }"
+                 th:with="p=${#strings.arraySplit(t, '|')}" class="mb-3 flex gap-3">
+              <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-accent-orange-muted text-accent-orange"><i class="fa-solid fa-triangle-exclamation text-xs"></i></span>
+              <div class="flex-1">
+                <div class="flex justify-between gap-2 text-sm"><span th:text="${p[0]}"></span><span class="shrink-0 whitespace-nowrap" th:text="|${p[1]} %|"></span></div>
+                <progress class="progress progress-warning h-1.5" th:value="${p[1]}" max="100"></progress>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <figcaption class="relative mt-4 text-sm text-text-muted">Ejemplo del resumen que ves al entrar en Quizly.</figcaption>
+    </figure>
+
+    <div>
+      <h2 class="max-w-[18ch] text-2xl font-semibold tracking-tight sm:text-3xl">Repasa a tu ritmo, y con tus compañeros</h2>
+      <ul class="mt-10 space-y-3">
+        <li class="flex gap-4 rounded-2xl border border-transparent p-4 transition-colors hover:border-border hover:bg-surface">
+          <span class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-accent-muted text-accent ring-1 ring-accent-muted-border"><i class="fa-solid fa-pen-to-square"></i></span>
+          <div>
+            <h3 class="font-semibold">Crea tus propios cuestionarios</h3>
+            <p class="mt-1 text-sm leading-relaxed text-text-secondary">Escribe las preguntas de lo que estás estudiando y repásalas cuando quieras.</p>
+          </div>
+        </li>
+        <li class="flex gap-4 rounded-2xl border border-transparent p-4 transition-colors hover:border-border hover:bg-surface">
+          <span class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-accent-purple-muted text-accent-purple ring-1 ring-accent-purple/20"><i class="fa-solid fa-share-nodes"></i></span>
+          <div>
+            <h3 class="font-semibold">Compártelos</h3>
+            <p class="mt-1 text-sm leading-relaxed text-text-secondary">Envía un cuestionario a otro usuario. Si lo acepta, se guarda una copia en su biblioteca.</p>
+          </div>
+        </li>
+        <li class="flex gap-4 rounded-2xl border border-transparent p-4 transition-colors hover:border-border hover:bg-surface">
+          <span class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-accent-orange-muted text-accent-orange ring-1 ring-accent-orange/20"><i class="fa-solid fa-star"></i></span>
+          <div>
+            <h3 class="font-semibold">Guarda tus favoritos</h3>
+            <p class="mt-1 text-sm leading-relaxed text-text-secondary">Ten a mano los cuestionarios que quieres repetir antes del examen.</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-6xl px-4 pb-24 sm:px-6">
+    <div class="relative overflow-hidden rounded-3xl bg-linear-to-br from-[#2071f3] to-[#1350c9] px-6 py-12 text-white shadow-xl shadow-accent/20 sm:px-12 sm:py-14">
+      <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(rgb(255_255_255/0.14)_1px,transparent_1px)] bg-size-[22px_22px] mask-[linear-gradient(to_left,#000,transparent_70%)]" aria-hidden="true"></div>
+      <img th:src="@{/img/Logo.svg}" alt="" class="pointer-events-none absolute -bottom-16 -right-10 size-64 rotate-12 opacity-15 sm:size-72" aria-hidden="true">
+      <div class="relative max-w-xl">
+        <h2 class="text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">Empieza con el tema que tengas pendiente.</h2>
+        <p class="mt-3 text-lg text-white/80">Crear una cuenta lleva un minuto.</p>
+        <div class="mt-8 flex flex-wrap gap-3">
+          <a th:href="@{/register}" class="btn btn-lg border-0 bg-white text-[#2071f3] shadow-lg hover:bg-white/90">Crear cuenta gratis</a>
+          <a th:href="@{/oauth2/authorization/google}" class="btn btn-lg btn-outline border-white/50 text-white hover:border-white hover:bg-white/10">
+            <i class="fa-brands fa-google"></i> Continuar con Google
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="border-t border-border bg-surface">
+  <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-6 text-sm text-text-muted sm:px-6">
+    <a th:href="@{/}" class="flex items-center gap-2 text-text no-underline">
+      <img th:src="@{/img/Logo.svg}" alt="" class="size-6">
+      <span class="font-semibold">Quizly</span>
+      <span class="font-normal text-text-muted">es un proyecto personal y gratuito.</span>
+    </a>
+    <a th:href="@{/legal}" class="link-accent">Política de privacidad</a>
+  </div>
+</footer>
+
+<div th:replace="~{fragments/toast :: toast}"></div>
+</body>
+</html>
