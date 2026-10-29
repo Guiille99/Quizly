@@ -7,6 +7,7 @@ import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 
+import com.quizly.app.exception.DuplicateEmailException;
 import com.quizly.app.model.entity.Usuario;
 import com.quizly.app.service.AuthService;
 
@@ -29,8 +30,12 @@ public class QuizlyOidcUserService extends OidcUserService {
             throw new OAuth2AuthenticationException(new OAuth2Error("email_not_verified"));
         }
 
-        Usuario usuario = authService.findOrCreateGoogleUser(
-                oidcUser.getSubject(), oidcUser.getEmail(), oidcUser.getGivenName(), oidcUser.getFamilyName());
-        return new QuizlyUserDetails(usuario, oidcUser);
+        try {
+            Usuario usuario = authService.findOrCreateGoogleUser(
+                    oidcUser.getSubject(), oidcUser.getEmail(), oidcUser.getGivenName(), oidcUser.getFamilyName());
+            return new QuizlyUserDetails(usuario, oidcUser);
+        } catch (DuplicateEmailException e) {
+            throw new OAuth2AuthenticationException(new OAuth2Error("account_conflict"));
+        }
     }
 }

@@ -95,6 +95,11 @@ public class AuthService {
                 log.info("Cuenta de Google enlazada al usuario '{}'", usuario.getUsername());
                 return usuarioRepository.save(usuario);
             }
+            if (!sub.equals(usuario.getGoogleSub())) {
+                // El email ya está ligado a otra cuenta de Google: el sub manda, no el email
+                log.warn("Login con Google rechazado: el email del usuario '{}' está vinculado a otro sub", usuario.getUsername());
+                throw new DuplicateEmailException();
+            }
             return usuario;
         }
 

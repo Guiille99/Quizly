@@ -14,7 +14,7 @@
     <span>Demasiados intentos fallidos. Inténtalo de nuevo en unos minutos.</span>
   </div>
   <div th:if="${param.oauthError}" class="alert alert-error" role="alert">
-    <span>No se pudo iniciar sesión con Google. Comprueba que tu correo esté verificado.</span>
+    <span>No se pudo iniciar sesión con Google. Comprueba que tu correo esté verificado y que no esté asociado a otra cuenta de Google.</span>
   </div>
   <div th:if="${param.logout}" class="alert alert-success" role="status">
     <span>Has cerrado sesión correctamente.</span>
