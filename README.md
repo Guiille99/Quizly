@@ -74,8 +74,9 @@ Se define en [src/main/resources/application.yaml](src/main/resources/applicatio
 | `AI_API_KEY`, `AI_BASE_URL`, `AI_MODELS` | Sí | Clave, URL base y lista de modelos para la generación con IA |
 | `EMAIL_USERNAME`, `EMAIL_PASSWORD` | Sí | Credenciales SMTP |
 | `EMAIL_HOST`, `EMAIL_PORT` | Solo en `prod` | Servidor SMTP (en `dev` tienen valor por defecto) |
+| `GMAIL_REFRESH_TOKEN` | No (solo `prod`) | Si está definido, los correos se envían por la API de Gmail (usando `GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET` y `EMAIL_USERNAME` como remitente); si está vacío, se usa SMTP |
 | `APP_BASE_URL` | Solo en `prod` | URL pública, (en `dev` por defecto `http://localhost:8080`) |
-| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Para login con Google | Por defecto `disabled` |
+| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Para login con Google y envío por la API de Gmail | Por defecto `disabled` |
 | `PORT` | No | Puerto del servidor (por defecto 8080) |
 | `AI_MODEL_COOLDOWN_SECONDS`, `AI_TIMEOUT_SECONDS`, `AI_CONTEXT_WINDOW_TOKENS`, `AI_OUTPUT_TOKEN_RESERVE`, `AI_CONTEXT_SAFETY_MARGIN`, `AI_RETRY_MAX_ATTEMPTS`, `AI_RETRY_INITIAL_BACKOFF_MS` | No | Ajustes del cliente de IA, con valores por defecto |
 
