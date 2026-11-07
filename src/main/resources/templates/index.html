@@ -47,9 +47,9 @@
                 </div>
 
                 <div class="flex-1">
-                  <div class="flex justify-between text-sm">
+                  <div class="flex justify-between gap-2 text-sm">
                     <span th:text="${temaStat.nombreTema}"></span>
-                    <span th:text="|${temaStat.promedioRedondeado} %|"></span>
+                    <span class="shrink-0 whitespace-nowrap" th:text="|${temaStat.promedioRedondeado} %|"></span>
                   </div>
                   <progress class="progress auto-range" th:value="${temaStat.promedioRedondeado}" max="100"></progress>
                 </div>
@@ -76,9 +76,9 @@
               </div>
 
               <div class="flex-1">
-                <div class="flex justify-between text-sm">
+                <div class="flex justify-between gap-2 text-sm">
                   <span th:text="${temaStat.nombreTema}"></span>
-                  <span th:text="|${temaStat.promedioRedondeado} %|"></span>
+                  <span class="shrink-0 whitespace-nowrap" th:text="|${temaStat.promedioRedondeado} %|"></span>
                 </div>
                 <progress class="progress auto-range" th:value="${temaStat.promedioRedondeado}" max="100"></progress>
               </div>

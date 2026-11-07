@@ -2,14 +2,14 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="es" th:fragment="layout(main)">
 <head th:replace="~{fragments/head :: head('Quizly')}"></head>
 <body>   
-    <div class="drawer md:drawer-open min-h-screen">
+    <div class="drawer lg:drawer-open min-h-screen">
         <input id="sidebar-drawer" class="drawer-toggle" type="checkbox">
     
         <div class="drawer-content flex flex-col min-h-screen bg-base-200">
             <!-- HEADER + SIDEBAR -->
             <header class="navbar bg-base-100 border-b border-base-300/60 px-4 justify-between sticky top-0 z-30 shadow-xs">
                 <div class="flex-one">
-                    <label for="sidebar-drawer" class="btn btn-square btn-ghost md:hidden animate-none"
+                    <label for="sidebar-drawer" class="btn btn-square btn-ghost lg:hidden animate-none"
                         aria-label="Abrir menú">
                         <i class="fa-solid fa-bars text-3xl"></i>
                     </label>

@@ -26,8 +26,8 @@
                         <input type="hidden" name="sinLimiteTiempo" value="true">
     
                         <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-                            <fieldset class="fieldset flex-1 rounded-lg border-2 border-dashed border-primary/40 bg-base-200/50 p-4">
-                                <label class="label flex items-center gap-2 text-base font-semibold" for="jsonFile">
+                            <fieldset class="fieldset flex-1 min-w-0 rounded-lg border-2 border-dashed border-primary/40 bg-base-200/50 p-4">
+                                <label class="label flex items-center gap-2 text-base font-semibold whitespace-normal" for="jsonFile">
                                     <i class="fa-solid fa-file-arrow-up text-primary" aria-hidden="true"></i>
                                     Importar cuestionario desde JSON
                                 </label>
@@ -178,12 +178,12 @@
                             </div>
     
                             <!-- Tiempo límite -->
-                            <fieldset class="fieldset p-0">
+                            <fieldset class="fieldset p-0 min-w-0">
                                 <label class="label">
                                     <span>Tiempo límite</span>
                                 </label>
-    
-                                <div class="flex items-center gap-3">
+
+                                <div class="flex flex-wrap items-center gap-3">
                                     <input id="tiempoLimite" class="input w-3/12 lg:w-1/12" type="number" 
                                         name="tiempoLimite" th:field="*{tiempoLimite}"
                                         min="1"
