@@ -78,22 +78,39 @@
                     <p th:if="${resumen.mazo.descripcion != null}" class="text-sm text-text-muted break-words"
                         th:text="${resumen.mazo.descripcion}"></p>
 
-                    <div class="flex items-center gap-2 text-sm">
-                        <span class="badge" th:classappend="${resumen.pendientes > 0} ? 'badge-primary' : 'badge-ghost'"
-                            th:text="|${resumen.pendientes} pendientes|"></span>
-                        <span class="text-text-muted" th:text="|${resumen.total} tarjetas|"></span>
-                    </div>
+                    <!-- El azul se reserva para los mazos con repaso pendiente: es lo único que pide acción -->
+                    <div class="mt-auto flex items-end justify-between gap-3 pt-2">
+                        <div class="text-sm leading-snug">
+                            <p th:if="${resumen.pendientes > 0}" class="font-semibold text-primary"
+                                th:text="|${resumen.pendientes} para repasar hoy|"></p>
+                            <p th:if="${resumen.pendientes == 0 and resumen.total > 0}" class="font-medium text-success">
+                                <i class="fa-solid fa-check" aria-hidden="true"></i> Al día
+                            </p>
+                            <p th:if="${resumen.total == 0}" class="text-text-muted">Sin tarjetas</p>
+                            <p th:if="${resumen.total > 0}" class="text-text-muted"
+                                th:text="|${resumen.total} ${resumen.total == 1 ? 'tarjeta' : 'tarjetas'}|"></p>
+                        </div>
 
-                    <div class="flex items-center justify-end gap-2 mt-2">
-                        <a th:href="@{/mazos/{id}/editar(id=${resumen.mazo.id})}" class="btn btn-outline btn-sm">
-                            <i class="fa-regular fa-pen-to-square"></i>
-                            Editar
-                        </a>
-                        <a th:href="@{/mazos/{id}/estudiar(id=${resumen.mazo.id})}" class="btn btn-primary btn-sm"
-                            th:classappend="${resumen.total == 0} ? 'btn-disabled'">
-                            <i class="fa-solid fa-play"></i>
-                            Estudiar
-                        </a>
+                        <div class="flex items-center gap-1 shrink-0">
+                            <a th:href="@{/mazos/{id}/editar(id=${resumen.mazo.id})}" class="btn btn-ghost btn-sm btn-square"
+                                th:aria-label="|Editar ${resumen.mazo.titulo}|" title="Editar">
+                                <i class="fa-regular fa-pen-to-square" aria-hidden="true"></i>
+                            </a>
+                            <a th:if="${resumen.pendientes > 0}" th:href="@{/mazos/{id}/estudiar(id=${resumen.mazo.id})}"
+                                class="btn btn-primary btn-sm">
+                                <i class="fa-solid fa-play" aria-hidden="true"></i>
+                                Estudiar
+                            </a>
+                            <a th:if="${resumen.pendientes == 0 and resumen.total > 0}"
+                                th:href="@{/mazos/{id}/estudiar(id=${resumen.mazo.id})}" class="btn btn-outline btn-sm">
+                                Abrir
+                            </a>
+                            <a th:if="${resumen.total == 0}" th:href="@{/mazos/{id}/editar(id=${resumen.mazo.id})}"
+                                class="btn btn-outline btn-sm">
+                                <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                                Añadir tarjetas
+                            </a>
+                        </div>
                     </div>
                 </div>
             </section>
