@@ -14,38 +14,49 @@
         <!-- Este bloque se sustituye completo por htmx tras cada calificación -->
         <div id="tarjeta-contenido" th:fragment="tarjeta_fragment" tabindex="-1" aria-live="polite" class="outline-none">
 
-            <!-- Hay una tarjeta pendiente -->
-            <section th:if="${estado.tarjeta != null}" class="card">
-                <div class="card-body gap-5">
-                    <p class="text-xs text-text-muted" th:text="|Pendientes: ${estado.pendientes} de ${estado.total}|"></p>
+            <!-- Hay una tarjeta pendiente: dos caras en el mismo hueco; al mostrar la respuesta la tarjeta gira -->
+            <section th:if="${estado.tarjeta != null}" class="perspective-[1400px]">
+                <div id="tarjeta-flip" data-volteada="false"
+                    class="grid transform-3d transition-transform duration-1000 ease-out motion-reduce:transition-none data-[volteada=true]:rotate-y-180">
 
-                    <div>
-                        <p class="text-xs uppercase tracking-wide text-text-muted mb-1">Anverso</p>
-                        <p class="text-lg text-text break-words whitespace-pre-line" th:text="${estado.tarjeta.anverso}"></p>
+                    <!-- Cara delantera: anverso -->
+                    <div id="tarjeta-anverso" class="card col-start-1 row-start-1 backface-hidden">
+                        <div class="card-body gap-5">
+                            <p class="text-xs text-text-muted" th:text="|Pendientes: ${estado.pendientes} de ${estado.total}|"></p>
+                            <div>
+                                <p class="text-xs uppercase tracking-wide text-text-muted mb-1">Anverso</p>
+                                <p class="text-lg text-text break-words whitespace-pre-line" th:text="${estado.tarjeta.anverso}"></p>
+                            </div>
+                            <button type="button" id="btn-mostrar" class="btn btn-primary mt-auto">Mostrar respuesta</button>
+                        </div>
                     </div>
 
-                    <div id="tarjeta-reverso" class="hidden border-t border-base-300 pt-4 outline-none" tabindex="-1"
-                        role="region" aria-label="Reverso">
-                        <p class="text-xs uppercase tracking-wide text-text-muted mb-1" aria-hidden="true">Reverso</p>
-                        <p class="text-lg text-text break-words whitespace-pre-line" th:text="${estado.tarjeta.reverso}"></p>
-                    </div>
+                    <!-- Cara trasera: reverso y calificación. Inerte hasta que la tarjeta gira -->
+                    <div id="tarjeta-reverso" inert tabindex="-1" role="region" aria-label="Reverso"
+                        class="card col-start-1 row-start-1 backface-hidden rotate-y-180 outline-none">
+                        <div class="card-body gap-5">
+                            <p class="text-xs text-text-muted" th:text="|Pendientes: ${estado.pendientes} de ${estado.total}|"></p>
+                            <div>
+                                <p class="text-xs uppercase tracking-wide text-text-muted mb-1" aria-hidden="true">Reverso</p>
+                                <p class="text-lg text-text break-words whitespace-pre-line" th:text="${estado.tarjeta.reverso}"></p>
+                            </div>
 
-                    <button type="button" id="btn-mostrar" class="btn btn-primary">Mostrar respuesta</button>
-
-                    <div id="tarjeta-calificar" class="hidden grid grid-cols-2 md:grid-cols-4 gap-2"
-                        th:with="url=@{/mazos/{m}/tarjetas/{t}/calificar(m=${mazo.id}, t=${estado.tarjeta.id})}">
-                        <button type="button" data-key="1" class="btn btn-error btn-outline"
-                            th:attr="hx-post=${url}" hx-vals='{"calificacion":"OTRA_VEZ"}'
-                            hx-target="#tarjeta-contenido" hx-swap="outerHTML">Otra vez</button>
-                        <button type="button" data-key="2" class="btn btn-warning btn-outline"
-                            th:attr="hx-post=${url}" hx-vals='{"calificacion":"DIFICIL"}'
-                            hx-target="#tarjeta-contenido" hx-swap="outerHTML">Difícil</button>
-                        <button type="button" data-key="3" class="btn btn-success btn-outline"
-                            th:attr="hx-post=${url}" hx-vals='{"calificacion":"BIEN"}'
-                            hx-target="#tarjeta-contenido" hx-swap="outerHTML">Bien</button>
-                        <button type="button" data-key="4" class="btn btn-info btn-outline"
-                            th:attr="hx-post=${url}" hx-vals='{"calificacion":"FACIL"}'
-                            hx-target="#tarjeta-contenido" hx-swap="outerHTML">Fácil</button>
+                            <div id="tarjeta-calificar" class="mt-auto grid grid-cols-2 md:grid-cols-4 gap-2"
+                                th:with="url=@{/mazos/{m}/tarjetas/{t}/calificar(m=${mazo.id}, t=${estado.tarjeta.id})}">
+                                <button type="button" data-key="1" class="btn btn-error btn-outline"
+                                    th:attr="hx-post=${url}" hx-vals='{"calificacion":"OTRA_VEZ"}'
+                                    hx-target="#tarjeta-contenido" hx-swap="outerHTML">Otra vez</button>
+                                <button type="button" data-key="2" class="btn btn-warning btn-outline"
+                                    th:attr="hx-post=${url}" hx-vals='{"calificacion":"DIFICIL"}'
+                                    hx-target="#tarjeta-contenido" hx-swap="outerHTML">Difícil</button>
+                                <button type="button" data-key="3" class="btn btn-success btn-outline"
+                                    th:attr="hx-post=${url}" hx-vals='{"calificacion":"BIEN"}'
+                                    hx-target="#tarjeta-contenido" hx-swap="outerHTML">Bien</button>
+                                <button type="button" data-key="4" class="btn btn-info btn-outline"
+                                    th:attr="hx-post=${url}" hx-vals='{"calificacion":"FACIL"}'
+                                    hx-target="#tarjeta-contenido" hx-swap="outerHTML">Fácil</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>

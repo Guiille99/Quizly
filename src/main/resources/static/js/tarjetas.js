@@ -9,18 +9,19 @@
     const CONTENEDOR = '#tarjeta-contenido';
 
     function mostrarRespuesta() {
+        const tarjeta = document.querySelector('#tarjeta-flip');
+        const anverso = document.querySelector('#tarjeta-anverso');
         const reverso = document.querySelector('#tarjeta-reverso');
-        const calificar = document.querySelector('#tarjeta-calificar');
-        const boton = document.querySelector('#btn-mostrar');
-        if (!reverso || !calificar || !boton) {
+        if (!tarjeta || !anverso || !reverso || tarjeta.dataset.volteada === 'true') {
             return;
         }
-        reverso.classList.remove('hidden');
-        calificar.classList.remove('hidden');
-        boton.classList.add('hidden');
+        // La tarjeta gira (CSS) y solo la cara visible queda operable: sin foco ni lectura de la oculta
+        tarjeta.dataset.volteada = 'true';
+        anverso.inert = true;
+        reverso.inert = false;
         // El foco va al reverso, no a un botón de calificar: un segundo Espacio activaría el botón
         // enfocado ("Otra vez") y suspendería la tarjeta sin querer. Además así se anuncia la respuesta.
-        reverso.focus();
+        reverso.focus({ preventScroll: true });
     }
 
     document.addEventListener('click', (e) => {
@@ -37,12 +38,12 @@
         if (e.target.closest('input, textarea, select, [contenteditable="true"]')) {
             return;
         }
-        if (e.key === ' ' && document.querySelector('#btn-mostrar:not(.hidden)')) {
+        if (e.key === ' ' && document.querySelector('#tarjeta-flip[data-volteada="false"]')) {
             e.preventDefault();
             mostrarRespuesta();
             return;
         }
-        const boton = document.querySelector(`#tarjeta-calificar:not(.hidden) [data-key="${e.key}"]`);
+        const boton = document.querySelector(`#tarjeta-flip[data-volteada="true"] [data-key="${e.key}"]`);
         if (boton && !boton.disabled) {
             e.preventDefault();
             boton.click();
