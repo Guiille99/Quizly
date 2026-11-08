@@ -47,7 +47,7 @@ public class SecurityConfig {
                                 "/webjars/**",
                                 "/ping")
                         .permitAll()
-                        .requestMatchers("/admin/**", "/mis-cuestionarios/generar-ia").hasRole("ADMIN")
+                        .requestMatchers("/admin/**", "/mis-cuestionarios/generar-ia", "/mazos/generar-ia").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 // htmx sin sesión: navegar al login en vez de pintarlo dentro del fragmento
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(new HtmxAuthenticationEntryPoint()))

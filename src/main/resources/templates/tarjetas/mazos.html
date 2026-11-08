@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es" th:replace="~{layout/base_layout :: layout(~{::main})}">
+<head th:replace="~{fragments/head :: head('Quizly - Tarjetas')}"></head>
+<body>
+    <main th:fragment="main" class="w-full px-6 py-8">
+        <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
+            <div>
+                <h1 class="text-xl font-semibold tracking-tight text-text">Tarjetas inteligentes</h1>
+                <p class="mt-1 text-sm text-text-muted">Repasa con repetición espaciada: cada tarjeta vuelve justo cuando conviene.</p>
+            </div>
+            <div class="flex flex-wrap gap-2">
+                <button type="button" sec:authorize="hasRole('ADMIN')" class="btn btn-outline"
+                    onclick="document.getElementById('modalIATarjetas').showModal()">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    Generar con IA
+                </button>
+                <a th:href="@{/mazos/nuevo}" class="btn btn-primary">
+                    <i class="fa-solid fa-plus"></i>
+                    Nuevo mazo
+                </a>
+            </div>
+        </div>
+
+        <!-- Generación con IA: solo admin (la cuota de Gemini es gratuita y no se puede servir a otros usuarios) -->
+        <dialog id="modalIATarjetas" class="modal modal-middle" sec:authorize="hasRole('ADMIN')">
+            <div class="modal-box">
+                <button type="button" onclick="document.getElementById('modalIATarjetas').close()"
+                    class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" aria-label="Cerrar">✕</button>
+                <h3 class="text-xl font-bold mb-4">Generar tarjetas desde un PDF</h3>
+
+                <form th:action="@{/mazos/generar-ia}" method="post" enctype="multipart/form-data" class="space-y-4">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+
+                    <fieldset class="fieldset p-0">
+                        <label for="ia-tarjetas-pdf" class="label"
+                            th:text="|PDF (máximo ${maxFileSizeMb} MB)|">PDF</label>
+                        <input id="ia-tarjetas-pdf" type="file" name="file" accept="application/pdf"
+                            class="file-input w-full" required>
+                    </fieldset>
+
+                    <fieldset class="fieldset p-0">
+                        <label for="ia-tarjetas-num" class="label">Número de tarjetas</label>
+                        <select id="ia-tarjetas-num" name="numTarjetas" class="select w-full">
+                            <option value="10">10 tarjetas</option>
+                            <option value="15" selected>15 tarjetas</option>
+                            <option value="25">25 tarjetas</option>
+                            <option value="50">50 tarjetas</option>
+                        </select>
+                    </fieldset>
+
+                    <button type="submit" class="btn btn-primary w-full"
+                        data-loading-text="Generando tarjetas con IA...">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        Generar mazo
+                    </button>
+                    <p class="text-xs text-text-muted">Revisa las tarjetas generadas antes de estudiarlas: la IA puede equivocarse.</p>
+                </form>
+            </div>
+            <form method="dialog" class="modal-backdrop"><button aria-label="Cerrar">cerrar</button></form>
+        </dialog>
+
+        <div th:if="${mazos.empty}" class="flex flex-col items-center justify-center py-16 text-center">
+            <div class="w-16 h-16 rounded-2xl bg-surface-alt flex items-center justify-center mb-4">
+                <i class="fa-regular fa-clone text-2xl text-text-muted"></i>
+            </div>
+            <h3 class="font-semibold text-text">Todavía no tienes mazos</h3>
+            <p class="text-sm text-text-muted mt-1 max-w-xs">Crea un mazo y añade tarjetas para empezar a repasar.</p>
+            <a th:href="@{/mazos/nuevo}" class="btn btn-primary mt-4">Crear mi primer mazo</a>
+        </div>
+
+        <div th:if="${!mazos.empty}" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            <section th:each="resumen : ${mazos}" class="card">
+                <div class="card-body gap-3">
+                    <div class="flex items-start justify-between gap-2">
+                        <h2 class="font-semibold text-text break-words" th:text="${resumen.mazo.titulo}">Título</h2>
+                        <span th:if="${resumen.mazo.deFallos}" class="badge badge-warning badge-sm shrink-0">Automático</span>
+                    </div>
+                    <p th:if="${resumen.mazo.descripcion != null}" class="text-sm text-text-muted break-words"
+                        th:text="${resumen.mazo.descripcion}"></p>
+
+                    <div class="flex items-center gap-2 text-sm">
+                        <span class="badge" th:classappend="${resumen.pendientes > 0} ? 'badge-primary' : 'badge-ghost'"
+                            th:text="|${resumen.pendientes} pendientes|"></span>
+                        <span class="text-text-muted" th:text="|${resumen.total} tarjetas|"></span>
+                    </div>
+
+                    <div class="flex items-center justify-end gap-2 mt-2">
+                        <a th:href="@{/mazos/{id}/editar(id=${resumen.mazo.id})}" class="btn btn-outline btn-sm">
+                            <i class="fa-regular fa-pen-to-square"></i>
+                            Editar
+                        </a>
+                        <a th:href="@{/mazos/{id}/estudiar(id=${resumen.mazo.id})}" class="btn btn-primary btn-sm"
+                            th:classappend="${resumen.total == 0} ? 'btn-disabled'">
+                            <i class="fa-solid fa-play"></i>
+                            Estudiar
+                        </a>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+</body>
+</html>

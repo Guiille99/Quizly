@@ -79,6 +79,13 @@
                         Comenzar
                     </button>
                 </th:block>
+
+                <form th:action="@{/mazos/importar/{slug}(slug=${quiz.slug})}" method="post" class="mt-2">
+                    <button type="submit" class="btn btn-outline w-full" data-loading-text="Creando...">
+                        <i class="fa-regular fa-clone"></i>
+                        Crear tarjetas de este cuestionario
+                    </button>
+                </form>
             </div>
         </div>
 

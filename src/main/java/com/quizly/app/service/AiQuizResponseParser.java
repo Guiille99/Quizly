@@ -7,11 +7,14 @@ import java.util.Locale;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
+import com.quizly.app.dto.ai.MazoGenerado;
 import com.quizly.app.dto.ai.PdfQuizGeneratorRequest;
+import com.quizly.app.dto.ai.TarjetaGenerada;
 import com.quizly.app.dto.form.OpcionRespuestaForm;
 import com.quizly.app.dto.form.PreguntaForm;
 import com.quizly.app.dto.form.QuizForm;
 import com.quizly.app.exception.AiGenerationException;
+import com.quizly.app.util.TextoTarjeta;
 
 import lombok.extern.slf4j.Slf4j;
 import tools.jackson.databind.DeserializationFeature;
@@ -22,6 +25,8 @@ import tools.jackson.databind.json.JsonMapper;
 @Slf4j
 @Component
 public class AiQuizResponseParser {
+
+    static final int MAX_TARJETAS = 50;
 
     private final ObjectMapper objectMapper;
 
@@ -90,6 +95,47 @@ public class AiQuizResponseParser {
             throw e;
         } catch (Exception e) {
             log.error("Error al parsear la respuesta JSON de la IA: {}", rawJsonResponse, e);
+            throw new AiGenerationException("La IA devolvió un formato no válido: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Mazo de tarjetas devuelto por la IA. Las tarjetas con anverso o reverso vacío se descartan
+     * y se recorta a {@link #MAX_TARJETAS}; si no queda ninguna es un error.
+     */
+    MazoGenerado parseFlashcards(String rawJsonResponse, String originalFileName) {
+        try {
+            JsonNode mazoNode = objectMapper.readTree(extractCompletionContent(rawJsonResponse));
+
+            String titulo = mazoNode.path("titulo").asText(null);
+            if (StringUtils.isBlank(titulo)) {
+                titulo = (originalFileName != null && !originalFileName.isBlank())
+                        ? "Tarjetas de " + originalFileName.replaceFirst("(?i)\\.pdf$", "")
+                        : "Tarjetas generadas por IA";
+            }
+
+            List<TarjetaGenerada> tarjetas = new ArrayList<>();
+            JsonNode tarjetasNode = mazoNode.path("tarjetas");
+            if (tarjetasNode.isArray()) {
+                for (JsonNode tarjetaNode : tarjetasNode) {
+                    String anverso = TextoTarjeta.normalizar(tarjetaNode.path("anverso").asText(""), TextoTarjeta.MAX_ANVERSO);
+                    String reverso = TextoTarjeta.normalizar(tarjetaNode.path("reverso").asText(""), TextoTarjeta.MAX_REVERSO);
+                    if (!anverso.isEmpty() && !reverso.isEmpty()) {
+                        tarjetas.add(new TarjetaGenerada(anverso, reverso));
+                    }
+                    if (tarjetas.size() == MAX_TARJETAS) {
+                        break;
+                    }
+                }
+            }
+            if (tarjetas.isEmpty()) {
+                throw new AiGenerationException("La IA no devolvió ninguna tarjeta válida.");
+            }
+            return new MazoGenerado(TextoTarjeta.normalizar(titulo, 150), tarjetas);
+        } catch (AiGenerationException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Error al parsear las tarjetas devueltas por la IA: {}", rawJsonResponse, e);
             throw new AiGenerationException("La IA devolvió un formato no válido: " + e.getMessage(), e);
         }
     }

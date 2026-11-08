@@ -10,10 +10,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -25,6 +27,7 @@ import org.springframework.util.CollectionUtils;
 import com.quizly.app.dto.form.OpcionRespuestaForm;
 import com.quizly.app.dto.form.PreguntaForm;
 import com.quizly.app.dto.form.QuizForm;
+import com.quizly.app.event.IntentoFinalizadoEvent;
 import com.quizly.app.exception.QuizNotResumableException;
 import com.quizly.app.exception.QuizNotFoundException;
 import com.quizly.app.exception.QuizlyException;
@@ -44,6 +47,7 @@ import com.quizly.app.model.session.OptionQuizRecord;
 import com.quizly.app.model.session.QuestionQuizRecord;
 import com.quizly.app.model.session.UserQuizResponse;
 import com.quizly.app.model.session.UserQuizSession;
+import com.quizly.app.model.view.tarjeta.FalloPregunta;
 import com.quizly.app.model.view.quiz.QuestionSummary;
 import com.quizly.app.model.view.quiz.QuizSummary;
 import com.quizly.app.repository.AsignaturaRepository;
@@ -55,6 +59,7 @@ import com.quizly.app.repository.OpcionRespuestaRepository;
 import com.quizly.app.repository.TemaRepository;
 import com.quizly.app.repository.UsuarioRepository;
 import com.quizly.app.security.QuizlyUserDetails;
+import com.quizly.app.util.TextoTarjeta;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityNotFoundException;
@@ -83,6 +88,7 @@ public class CuestionarioService {
     private final TemaRepository temaRepository;
     private final AsignaturaRepository asignaturaRepository;
     private final DificultadRepository dificultadRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     private Map<String, TipoPregunta> tiposPreguntaCache;
 
@@ -475,7 +481,46 @@ public class CuestionarioService {
             intentoCuestionarioPersist.getFallos(),
             intentoCuestionarioPersist.getTiempoEmpleado()
         );
+
+        // Los fallos alimentan las tarjetas tras el commit (ver IntentoFinalizadoListener)
+        List<FalloPregunta> fallosPreguntas = preguntasFalladas(session);
+        if (!fallosPreguntas.isEmpty()) {
+            eventPublisher.publishEvent(
+                new IntentoFinalizadoEvent(intentoCuestionarioPersist.getUsuario().getId(), fallosPreguntas));
+        }
         return intentoCuestionarioPersist;
+    }
+
+    /**
+     * Preguntas no acertadas del intento, incluidas las que se quedaron sin contestar (así las
+     * cuenta también {@code fallos = total - aciertos}). Se omiten las que no tienen opción correcta.
+     */
+    private List<FalloPregunta> preguntasFalladas(UserQuizSession session) {
+        Set<Long> acertadas = session.getResponses().stream()
+            .filter(UserQuizResponse::correcta)
+            .map(UserQuizResponse::preguntaId)
+            .collect(Collectors.toSet());
+
+        List<FalloPregunta> fallos = new ArrayList<>();
+        for (QuestionQuizRecord pregunta : session.getPreguntas()) {
+            if (acertadas.contains(pregunta.id())) {
+                continue;
+            }
+            List<OptionQuizRecord> correctas = pregunta.options().stream().filter(OptionQuizRecord::correct).toList();
+            if (correctas.isEmpty()) {
+                continue;
+            }
+            String retroalimentacion = correctas.stream()
+                .map(OptionQuizRecord::explanation)
+                .filter(StringUtils::isNotBlank)
+                .findFirst()
+                .orElse(null);
+            fallos.add(new FalloPregunta(
+                pregunta.id(),
+                TextoTarjeta.normalizar(pregunta.statement(), TextoTarjeta.MAX_ANVERSO),
+                TextoTarjeta.componerReverso(correctas.stream().map(OptionQuizRecord::text).toList(), retroalimentacion)));
+        }
+        return fallos;
     }
 
     @Transactional

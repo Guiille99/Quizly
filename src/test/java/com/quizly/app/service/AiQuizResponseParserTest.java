@@ -9,6 +9,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockMultipartFile;
 
+import com.quizly.app.dto.ai.MazoGenerado;
 import com.quizly.app.dto.ai.PdfQuizGeneratorRequest;
 import com.quizly.app.dto.form.QuizForm;
 import com.quizly.app.exception.AiGenerationException;
@@ -33,6 +34,69 @@ class AiQuizResponseParserTest {
         assertEquals(4L, form.getDificultadId());
         assertEquals(3, form.getPreguntas().size());
         assertEquals(3, form.getPreguntas().get(0).getOpcionesRespuesta().size());
+    }
+
+    // ---------------------------------------------------------------------
+    // Tarjetas
+    // ---------------------------------------------------------------------
+
+    private String rawCompletion(String content) throws Exception {
+        return objectMapper.writeValueAsString(
+                Map.of("choices", List.of(Map.of("message", Map.of("content", content), "finish_reason", "stop"))));
+    }
+
+    @Test
+    void parseaUnMazoValidoYNormalizaElTexto() throws Exception {
+        String json = """
+                {"titulo": "  Redes  ", "tarjetas": [
+                    {"anverso": "¿Qué es   TCP?", "reverso": "Un protocolo fiable"},
+                    {"anverso": "¿Qué es UDP?", "reverso": "Un protocolo sin conexión"}]}""";
+
+        MazoGenerado mazo = parser.parseFlashcards(rawCompletion(json), "redes.pdf");
+
+        assertEquals("Redes", mazo.titulo());
+        assertEquals(2, mazo.tarjetas().size());
+        assertEquals("¿Qué es TCP?", mazo.tarjetas().get(0).anverso());
+    }
+
+    @Test
+    void aceptaElJsonEnvueltoEnUnBloqueMarkdown() throws Exception {
+        String json = "```json\n{\"titulo\":\"T\",\"tarjetas\":[{\"anverso\":\"a\",\"reverso\":\"b\"}]}\n```";
+
+        assertEquals(1, parser.parseFlashcards(rawCompletion(json), "x.pdf").tarjetas().size());
+    }
+
+    @Test
+    void descartaLasTarjetasIncompletasYUsaElNombreDelFicheroSiNoHayTitulo() throws Exception {
+        String json = """
+                {"tarjetas": [{"anverso": "a", "reverso": ""}, {"anverso": " ", "reverso": "b"},
+                              {"anverso": "ok", "reverso": "ok"}]}""";
+
+        MazoGenerado mazo = parser.parseFlashcards(rawCompletion(json), "apuntes.PDF");
+
+        assertEquals("Tarjetas de apuntes", mazo.titulo());
+        assertEquals(1, mazo.tarjetas().size());
+    }
+
+    @Test
+    void recortaAlMaximoDeTarjetas() throws Exception {
+        StringBuilder tarjetas = new StringBuilder();
+        for (int i = 0; i < AiQuizResponseParser.MAX_TARJETAS + 10; i++) {
+            tarjetas.append(i > 0 ? "," : "").append("{\"anverso\":\"a").append(i).append("\",\"reverso\":\"b\"}");
+        }
+
+        MazoGenerado mazo = parser.parseFlashcards(
+                rawCompletion("{\"titulo\":\"T\",\"tarjetas\":[" + tarjetas + "]}"), "x.pdf");
+
+        assertEquals(AiQuizResponseParser.MAX_TARJETAS, mazo.tarjetas().size());
+    }
+
+    @Test
+    void rechazaUnMazoSinTarjetasValidasOUnJsonInvalido() throws Exception {
+        assertThrows(AiGenerationException.class,
+                () -> parser.parseFlashcards(rawCompletion("{\"titulo\":\"T\",\"tarjetas\":[]}"), "x.pdf"));
+        assertThrows(AiGenerationException.class,
+                () -> parser.parseFlashcards(rawCompletion("esto no es json"), "x.pdf"));
     }
 
     @Test

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es" th:replace="~{layout/base_layout :: layout(~{::main})}">
+<head th:replace="~{fragments/head :: head('Quizly - Mazo')}"></head>
+<body>
+    <main th:fragment="main" class="w-full px-6 pt-8 flex-1 flex flex-col">
+        <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
+            <h1 class="text-xl font-semibold tracking-tight text-text"
+                th:text="${mazoForm.id == null ? 'Nuevo mazo' : 'Editar mazo'}"></h1>
+            <a th:if="${mazoForm.id != null && !tarjetas.empty}" th:href="@{/mazos/{id}/estudiar(id=${mazoForm.id})}"
+                class="btn btn-primary">
+                <i class="fa-solid fa-play"></i>
+                Estudiar
+            </a>
+        </div>
+
+        <!-- Un único formulario: título, descripción, todas las tarjetas y la tarjeta nueva se guardan juntos -->
+        <form id="mazo-form" class="form-stack flex-1"
+            th:action="${mazoForm.id == null ? '/mazos' : '/mazos/' + mazoForm.id}" method="post" th:object="${mazoForm}">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+            <!-- Botón por defecto del Enter: guarda, sin pasar por "Añadir y seguir" ni por los de eliminar -->
+            <button type="submit" class="hidden" tabindex="-1" aria-hidden="true"></button>
+
+            <section class="card">
+                <div class="card-body">
+                    <div class="grid grid-cols-1 gap-4">
+                        <fieldset class="fieldset p-0">
+                            <label for="titulo" class="label">Título <span class="text-error">*</span></label>
+                            <input type="text" class="input w-full" th:field="*{titulo}" maxlength="150" required
+                                placeholder="Ej. Vocabulario de inglés"
+                                th:readonly="${mazo != null && mazo.deFallos}"
+                                th:classappend="${#fields.hasErrors('titulo')} ? 'input-error'">
+                            <p th:if="${#fields.hasErrors('titulo')}" th:errors="*{titulo}" class="text-error"></p>
+                        </fieldset>
+
+                        <fieldset class="fieldset p-0">
+                            <label for="descripcion" class="label">Descripción</label>
+                            <textarea class="textarea w-full" th:field="*{descripcion}" maxlength="500" rows="2"
+                                placeholder="Opcional"
+                                th:classappend="${#fields.hasErrors('descripcion')} ? 'textarea-error'"></textarea>
+                            <p th:if="${#fields.hasErrors('descripcion')}" th:errors="*{descripcion}" class="text-error"></p>
+                        </fieldset>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tarjetas: solo al editar un mazo existente -->
+            <th:block th:if="${mazoForm.id != null}">
+                <h2 class="text-lg font-semibold text-text mt-8 mb-3">
+                    Tarjetas <span class="text-text-muted font-normal" th:text="|(${tarjetas.size()})|"></span>
+                </h2>
+
+                <section class="card mb-4" aria-label="Tarjeta nueva">
+                    <div class="card-body gap-3">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <fieldset class="fieldset p-0">
+                                <label for="nuevo-anverso" class="label">Anverso</label>
+                                <textarea id="nuevo-anverso" name="nuevoAnverso" class="textarea w-full" rows="2"
+                                    maxlength="500" placeholder="Pregunta o concepto"
+                                    th:autofocus="${enfocarNueva}"></textarea>
+                            </fieldset>
+                            <fieldset class="fieldset p-0">
+                                <label for="nuevo-reverso" class="label">Reverso</label>
+                                <textarea id="nuevo-reverso" name="nuevoReverso" class="textarea w-full" rows="2"
+                                    maxlength="1000" placeholder="Respuesta"></textarea>
+                            </fieldset>
+                        </div>
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <span class="text-xs text-text-muted">Se guarda junto al resto de cambios.</span>
+                            <button type="submit" name="seguir" value="true" class="btn btn-outline btn-sm">
+                                <i class="fa-solid fa-plus"></i>
+                                Añadir y seguir
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <p th:if="${tarjetas.empty}" class="text-sm text-text-muted">Este mazo todavía no tiene tarjetas.</p>
+
+                <div class="flex flex-col gap-3">
+                    <article th:each="t, it : ${tarjetas}" class="card">
+                        <input type="hidden" name="tarjetaId" th:value="${t.id}">
+                        <div class="card-body gap-3">
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="text-xs text-text-muted"
+                                    th:text="${t.repeticiones == 0 ? 'Sin aprender' : 'Próximo repaso: ' + #temporals.format(t.proximaRevision, 'dd/MM/yyyy')}"></span>
+                                <button type="submit" formnovalidate
+                                    th:formaction="@{/mazos/{m}/tarjetas/{t}/eliminar(m=${mazoForm.id}, t=${t.id})}"
+                                    class="btn btn-ghost btn-xs text-error" data-confirm="Se eliminará la tarjeta."
+                                    th:attr="aria-label=|Eliminar tarjeta ${it.count}|">
+                                    <i class="fa-regular fa-trash-can"></i>
+                                    Eliminar
+                                </button>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <textarea name="anverso" class="textarea w-full" rows="2" maxlength="500" required
+                                    th:attr="aria-label=|Anverso de la tarjeta ${it.count}|"
+                                    th:text="${t.anverso}"></textarea>
+                                <textarea name="reverso" class="textarea w-full" rows="2" maxlength="1000" required
+                                    th:attr="aria-label=|Reverso de la tarjeta ${it.count}|"
+                                    th:text="${t.reverso}"></textarea>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+
+                <!-- Zona de peligro: lejos del botón de guardar -->
+                <div th:if="${!mazo.deFallos}" class="mt-10 flex flex-wrap items-center justify-between gap-3 rounded-box border border-error/30 p-4">
+                    <div>
+                        <p class="font-semibold text-text">Eliminar este mazo</p>
+                        <p class="text-sm text-text-muted">Se borrarán también todas sus tarjetas. No se puede deshacer.</p>
+                    </div>
+                    <button type="submit" th:formaction="@{/mazos/{id}/eliminar(id=${mazoForm.id})}" formnovalidate
+                        class="btn btn-outline btn-error" data-confirm="Se eliminará el mazo y todas sus tarjetas.">
+                        <i class="fa-regular fa-trash-can"></i>
+                        Eliminar mazo
+                    </button>
+                </div>
+            </th:block>
+
+            <!-- Botones de guardar y volver -->
+            <div class="flex items-center justify-end gap-2"
+                th:classappend="${mazoForm.id == null} ? 'mt-6 pb-8'
+                    : 'sticky bottom-0 z-20 -mx-6 mt-auto border-t border-base-300/60 bg-base-100 px-6 py-3 shadow-xs'">
+                <a th:href="@{/mazos}" class="btn btn-outline">Volver</a>
+                <button type="submit" class="btn btn-primary" data-loading-text="Guardando...">
+                    <i class="fa-regular fa-floppy-disk"></i>
+                    <span th:text="${mazoForm.id == null ? 'Crear mazo' : 'Guardar cambios'}"></span>
+                </button>
+            </div>
+        </form>
+
+        <script src="/js/tarjetas.js"></script>
+    </main>
+</body>
+</html>

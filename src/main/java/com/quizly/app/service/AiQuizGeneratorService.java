@@ -74,7 +74,8 @@ public class AiQuizGeneratorService {
         }
     }
 
-    private boolean isHighDemandOrTimeout(RestClientException e) {
+    // Compartido con AiFlashcardGeneratorService
+    static boolean isHighDemandOrTimeout(RestClientException e) {
         if (e instanceof RestClientResponseException respEx) {
             int statusCode = respEx.getStatusCode().value();
             String responseBody = respEx.getResponseBodyAsString() != null ? respEx.getResponseBodyAsString() : "";

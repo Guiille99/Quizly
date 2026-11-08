@@ -1,19 +1,36 @@
 package com.quizly.app.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 
+import com.quizly.app.event.IntentoFinalizadoEvent;
 import com.quizly.app.exception.QuizNotFoundException;
+import com.quizly.app.model.entity.IntentoCuestionarioEstado;
+import com.quizly.app.model.session.OptionQuizRecord;
+import com.quizly.app.model.session.QuestionQuizRecord;
+import com.quizly.app.model.session.UserQuizResponse;
+import com.quizly.app.model.view.tarjeta.FalloPregunta;
 import com.quizly.app.model.entity.Cuestionario;
 import com.quizly.app.model.entity.CuestionarioSerie;
 import com.quizly.app.model.entity.IntentoCuestionario;
@@ -61,6 +78,8 @@ class CuestionarioServiceTest {
     private AsignaturaRepository asignaturaRepository;
     @Mock
     private DificultadRepository dificultadRepository;
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
 
     @InjectMocks
     private CuestionarioService cuestionarioService;
@@ -283,6 +302,85 @@ class CuestionarioServiceTest {
         org.junit.jupiter.api.Assertions.assertNull(result.getTema());
         org.junit.jupiter.api.Assertions.assertEquals(2, result.getVersion());
         org.junit.jupiter.api.Assertions.assertEquals("Quiz Actualizado", result.getTitulo());
+    }
+
+    // ---------------------------------------------------------------------
+    // finishQuiz -> tarjetas de fallos
+    // ---------------------------------------------------------------------
+
+    private static QuestionQuizRecord pregunta(long id, String enunciado, OptionQuizRecord... opciones) {
+        return new QuestionQuizRecord(id, enunciado, List.of(opciones));
+    }
+
+    private UserQuizSession prepararFinishQuiz(HttpSession httpSession, LocalDateTime fechaFin) {
+        UserQuizSession session = new UserQuizSession();
+        session.setIntentoCuestionarioId(7L);
+
+        Cuestionario cuestionario = createQuiz("quiz", 42L);
+        cuestionario.setPreguntas(List.of());
+        IntentoCuestionario intento = createAttempt(cuestionario, 42L);
+        intento.setFechaInicio(LocalDateTime.now().minusMinutes(5));
+        intento.setFechaFin(fechaFin);
+
+        when(quizSessionService.getRequired(httpSession)).thenReturn(session);
+        when(intentoCuestionarioRepository.findById(7L)).thenReturn(Optional.of(intento));
+        if (fechaFin == null) {
+            when(intentoCuestionarioEstadoRepository.findByCodigo("FINISHED"))
+                    .thenReturn(Optional.of(new IntentoCuestionarioEstado()));
+            when(intentoCuestionarioRepository.save(intento)).thenReturn(intento);
+        }
+        return session;
+    }
+
+    @Test
+    @DisplayName("finishQuiz publica los fallos: incorrectas y sin contestar, no las acertadas ni las sin opción correcta")
+    void finishQuizPublicaFallos() {
+        HttpSession httpSession = mock(HttpSession.class);
+        UserQuizSession session = prepararFinishQuiz(httpSession, null);
+        session.setPreguntas(List.of(
+                pregunta(1L, "Acertada", new OptionQuizRecord(10L, "A", true, null)),
+                pregunta(2L, "Fallada", new OptionQuizRecord(20L, "B", true, "Porque sí"),
+                        new OptionQuizRecord(21L, "C", false, null)),
+                pregunta(3L, "Sin contestar", new OptionQuizRecord(30L, "D", true, null)),
+                pregunta(4L, "Sin correcta", new OptionQuizRecord(40L, "E", false, null))));
+        session.setResponses(new ArrayList<>(List.of(
+                new UserQuizResponse(1L, 10L, "A", true),
+                new UserQuizResponse(2L, 21L, "C", false))));
+
+        cuestionarioService.finishQuiz(httpSession);
+
+        ArgumentCaptor<Object> captor = ArgumentCaptor.forClass(Object.class);
+        verify(eventPublisher).publishEvent(captor.capture());
+        IntentoFinalizadoEvent evento = (IntentoFinalizadoEvent) captor.getValue();
+        assertEquals(42L, evento.usuarioId());
+        assertEquals(List.of(
+                new FalloPregunta(2L, "Fallada", "B — Porque sí"),
+                new FalloPregunta(3L, "Sin contestar", "D")), evento.fallos());
+    }
+
+    @Test
+    @DisplayName("finishQuiz no publica nada si se acertó todo")
+    void finishQuizSinFallosNoPublica() {
+        HttpSession httpSession = mock(HttpSession.class);
+        UserQuizSession session = prepararFinishQuiz(httpSession, null);
+        session.setPreguntas(List.of(pregunta(1L, "Acertada", new OptionQuizRecord(10L, "A", true, null))));
+        session.setResponses(new ArrayList<>(List.of(new UserQuizResponse(1L, 10L, "A", true))));
+
+        cuestionarioService.finishQuiz(httpSession);
+
+        verify(eventPublisher, never()).publishEvent(any(Object.class));
+    }
+
+    @Test
+    @DisplayName("Una segunda llamada a finishQuiz (intento ya terminado) no vuelve a publicar")
+    void finishQuizIdempotente() {
+        HttpSession httpSession = mock(HttpSession.class);
+        UserQuizSession session = prepararFinishQuiz(httpSession, LocalDateTime.now());
+        session.setPreguntas(List.of(pregunta(1L, "Fallada", new OptionQuizRecord(10L, "A", true, null))));
+
+        assertNull(cuestionarioService.finishQuiz(httpSession));
+
+        verify(eventPublisher, never()).publishEvent(any(Object.class));
     }
 
     private static Cuestionario createQuiz(String slug, Long ownerId) {

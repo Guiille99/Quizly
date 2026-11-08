@@ -128,6 +128,12 @@
                             </details>
                         </li>
                         <li>
+                            <a th:href="@{/mazos}" class="btn-link" th:classappend="${currentUri.startsWith('/mazos')} ? 'active'">
+                                <i class="fa-regular fa-clone"></i>
+                                Tarjetas
+                            </a>
+                        </li>
+                        <li>
                             <a th:href="@{/miProgreso}" class="btn-link"
                                 th:classappend="${currentUri == '/miProgreso'} ? 'active'">
                                 <i class="fa-solid fa-arrow-trend-up"></i>

@@ -128,6 +128,42 @@ public class BreadcrumbService {
     }
 
     // =========================================================================
+    // Zona Estudiante: Tarjetas
+    // =========================================================================
+
+    private static final BreadcrumbItem MAZOS = new BreadcrumbItem("Tarjetas", "/mazos");
+
+    /**
+     * Ej: Tarjetas
+     */
+    public List<BreadcrumbItem> mazos() {
+        return List.of(new BreadcrumbItem("Tarjetas", null));
+    }
+
+    /**
+     * Ej: Tarjetas > Nuevo mazo
+     */
+    public List<BreadcrumbItem> mazoNuevo() {
+        return List.of(MAZOS, new BreadcrumbItem("Nuevo mazo", null));
+    }
+
+    /**
+     * Ej: Tarjetas > Editar '[Título]'
+     */
+    public List<BreadcrumbItem> mazoEditar(String titulo) {
+        String label = (titulo != null && !titulo.isBlank()) ? "Editar '" + titulo + "'" : "Editar mazo";
+        return List.of(MAZOS, new BreadcrumbItem(label, null));
+    }
+
+    /**
+     * Ej: Tarjetas > Estudiar '[Título]'
+     */
+    public List<BreadcrumbItem> mazoEstudiar(String titulo) {
+        String label = (titulo != null && !titulo.isBlank()) ? "Estudiar '" + titulo + "'" : "Estudiar";
+        return List.of(MAZOS, new BreadcrumbItem(label, null));
+    }
+
+    // =========================================================================
     // Zona Estudiante: Mi Progreso
     // =========================================================================
 

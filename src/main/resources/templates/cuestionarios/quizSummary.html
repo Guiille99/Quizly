@@ -124,7 +124,13 @@
          </section>
 
          <!-- Acciones -->
-          <section class="mt-10 flex justify-center gap-4">
+          <section class="mt-10 flex flex-wrap justify-center gap-4">
+            <form th:action="@{/mazos/importar/{slug}(slug=${summary.slug})}" method="post">
+                <button type="submit" class="btn btn-outline btn-wide" data-loading-text="Creando...">
+                    <i class="fa-regular fa-clone"></i>
+                    Crear tarjetas para repasar
+                </button>
+            </form>
             <a th:href="@{/}" class="btn btn-primary btn-wide">
                 <i class="fa-regular fa-house"></i>
                 Volver al inicio

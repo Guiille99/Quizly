@@ -28,8 +28,8 @@
           Estudia respondiendo preguntas, no releyendo apuntes.
         </h1>
         <p class="mt-6 max-w-[52ch] text-lg leading-relaxed text-text-secondary">
-          Quizly organiza cuestionarios por asignatura y tema. Los respondes, ves qué has fallado
-          y sigues tu progreso hasta dominar cada tema.
+          Quizly organiza cuestionarios por asignatura y tema. Los respondes, repasas con tarjetas lo que
+          has fallado y sigues tu progreso hasta dominar cada tema.
         </p>
         <div class="mt-9 flex flex-wrap gap-3">
           <a th:href="@{/register}" class="btn btn-primary btn-lg shadow-lg shadow-accent/25">Crear cuenta gratis</a>
@@ -197,8 +197,57 @@
     </div>
   </section>
 
-  <!-- Qué más puedes hacer -->
+  <!-- Tarjetas de repaso: una tarjeta de ejemplo que se gira con un clic (solo CSS) -->
   <section class="mx-auto grid max-w-6xl items-center gap-16 px-4 py-20 sm:px-6 sm:py-28 lg:grid-cols-2">
+    <div>
+      <h2 class="max-w-[20ch] text-2xl font-semibold tracking-tight sm:text-3xl">Lo que fallas vuelve justo cuando toca</h2>
+      <p class="mt-4 max-w-[52ch] text-lg leading-relaxed text-text-secondary">
+        Las preguntas que fallas al terminar un cuestionario pasan solas a un mazo de repaso.
+        Tú calificas cada tarjeta y Quizly decide cuándo volver a enseñártela: lo que ya sabes se espacia, lo que cuesta vuelve antes.
+      </p>
+      <ul class="mt-8 space-y-3 text-text-secondary">
+        <li class="flex items-start gap-3"><i class="fa-solid fa-circle-check mt-1 w-4 shrink-0 text-accent-green"></i>Crea mazos a mano o desde cualquier cuestionario.</li>
+        <li class="flex items-start gap-3"><i class="fa-solid fa-circle-check mt-1 w-4 shrink-0 text-accent-green"></i>Cada día solo ves las tarjetas que tocan.</li>
+      </ul>
+    </div>
+
+    <div class="relative mx-auto w-full max-w-xl lg:ml-auto">
+      <div class="landing-glow pointer-events-none absolute -inset-10" aria-hidden="true"></div>
+      <div class="landing-deal absolute inset-0 translate-x-3 translate-y-3 rotate-[3deg] rounded-2xl border border-border bg-card-alt" style="--delay:.1s" aria-hidden="true"></div>
+
+      <div class="landing-lift relative rounded-2xl border border-border bg-surface p-5 sm:p-7">
+        <div class="flex items-center justify-between gap-4 text-xs text-text-muted">
+          <span class="flex items-center gap-2"><i class="fa-regular fa-clone text-accent"></i>Repaso de fallos</span>
+          <span>Pendientes: 3 de 12</span>
+        </div>
+
+        <p class="mt-6 text-xs text-text-muted">Anverso</p>
+        <p class="mt-1 text-lg font-semibold leading-relaxed">¿Por qué conviene repasar justo antes de olvidar?</p>
+
+        <input type="checkbox" id="demo-tarjeta" class="peer sr-only">
+
+        <div class="mt-5 hidden border-t border-base-200 pt-4 peer-checked:block">
+          <p class="text-xs text-text-muted">Reverso</p>
+          <p class="mt-1 text-lg leading-relaxed">Cada repaso a tiempo alarga el intervalo siguiente, y eso es lo que fija el recuerdo.</p>
+        </div>
+
+        <label for="demo-tarjeta"
+               class="btn btn-primary mt-6 w-full peer-checked:hidden peer-focus-visible:ring-2 peer-focus-visible:ring-accent peer-focus-visible:ring-offset-2">
+          Mostrar respuesta
+        </label>
+
+        <div class="mt-6 hidden grid-cols-2 gap-2 peer-checked:grid sm:grid-cols-4" aria-hidden="true">
+          <span class="btn btn-error btn-outline pointer-events-none">Otra vez</span>
+          <span class="btn btn-warning btn-outline pointer-events-none">Difícil</span>
+          <span class="btn btn-success btn-outline pointer-events-none">Bien</span>
+          <span class="btn btn-info btn-outline pointer-events-none">Fácil</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Qué más puedes hacer -->
+  <section class="mx-auto grid max-w-6xl items-center gap-16 border-t border-border px-4 py-20 sm:px-6 sm:py-28 lg:grid-cols-2">
     <figure class="relative">
       <div class="landing-glow pointer-events-none absolute inset-x-0 -inset-y-8 opacity-60 lg:-inset-8" aria-hidden="true"></div>
       <div class="landing-lift relative rounded-2xl border border-border bg-surface p-5 sm:p-6" aria-hidden="true">
