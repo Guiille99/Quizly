@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<body>
+    <!-- Selector de tema agrupado por asignatura. Los temas son globales, no de un usuario. -->
+    <fieldset th:fragment="tema" class="fieldset p-0">
+        <label for="temaId" class="label">
+            <span>Tema <span class="text-text-muted text-xs font-normal">(opcional)</span></span>
+        </label>
+        <select id="temaId" name="temaId" class="select w-full">
+            <option value="">Sin tema</option>
+            <optgroup th:each="grupo : ${temasPorAsignatura}" th:label="${grupo.key}">
+                <option th:each="tema : ${grupo.value}" th:value="${tema.id}" th:text="${tema.nombre}"
+                    th:selected="${mapaForm.temaId != null and mapaForm.temaId == tema.id}"></option>
+            </optgroup>
+        </select>
+    </fieldset>
+</body>
+</html>

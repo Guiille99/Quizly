@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es" th:replace="~{layout/base_layout :: layout(~{::main})}">
+<head th:replace="~{fragments/head :: head('Quizly - Nuevo mapa')}"></head>
+<body>
+    <main th:fragment="main" class="w-full px-6 py-8">
+        <h1 class="mb-5 text-xl font-semibold tracking-tight text-text">Nuevo mapa mental</h1>
+
+        <form th:action="@{/mapas}" method="post" th:object="${mapaForm}" class="form-stack">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+
+            <section class="card">
+                <div class="card-body">
+                    <div class="grid grid-cols-1 gap-4">
+                        <fieldset class="fieldset p-0">
+                            <label for="titulo" class="label">Título <span class="text-error">*</span></label>
+                            <input type="text" class="input w-full" th:field="*{titulo}" maxlength="150" required
+                                placeholder="Ej. La memoria"
+                                th:classappend="${#fields.hasErrors('titulo')} ? 'input-error'">
+                            <p th:if="${#fields.hasErrors('titulo')}" th:errors="*{titulo}" class="text-error"></p>
+                        </fieldset>
+
+                        <th:block th:replace="~{mapas/tema-select :: tema}"></th:block>
+
+                        <fieldset class="fieldset p-0">
+                            <label for="descripcion" class="label">Descripción</label>
+                            <textarea class="textarea w-full" th:field="*{descripcion}" maxlength="500" rows="2"
+                                placeholder="Opcional"
+                                th:classappend="${#fields.hasErrors('descripcion')} ? 'textarea-error'"></textarea>
+                            <p th:if="${#fields.hasErrors('descripcion')}" th:errors="*{descripcion}" class="text-error"></p>
+                        </fieldset>
+                    </div>
+                </div>
+            </section>
+
+            <div class="mt-6 flex items-center justify-end gap-2 pb-8">
+                <a th:href="@{/mapas}" class="btn btn-outline">Volver</a>
+                <button type="submit" class="btn btn-primary" data-loading-text="Creando...">
+                    <i class="fa-solid fa-diagram-project"></i>
+                    Crear mapa
+                </button>
+            </div>
+        </form>
+    </main>
+</body>
+</html>

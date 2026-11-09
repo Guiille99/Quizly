@@ -134,6 +134,12 @@
                             </a>
                         </li>
                         <li>
+                            <a th:href="@{/mapas}" class="btn-link" th:classappend="${currentUri.startsWith('/mapas')} ? 'active'">
+                                <i class="fa-solid fa-diagram-project"></i>
+                                Mapas mentales
+                            </a>
+                        </li>
+                        <li>
                             <a th:href="@{/miProgreso}" class="btn-link"
                                 th:classappend="${currentUri == '/miProgreso'} ? 'active'">
                                 <i class="fa-solid fa-arrow-trend-up"></i>

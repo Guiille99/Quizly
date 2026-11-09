@@ -7,6 +7,7 @@ import java.util.Locale;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
+import com.quizly.app.dto.ai.MapaGenerado;
 import com.quizly.app.dto.ai.MazoGenerado;
 import com.quizly.app.dto.ai.PdfQuizGeneratorRequest;
 import com.quizly.app.dto.ai.TarjetaGenerada;
@@ -21,12 +22,17 @@ import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 @Slf4j
 @Component
 public class AiQuizResponseParser {
 
     static final int MAX_TARJETAS = 50;
+    // Lo que se le pide a la IA es "4 niveles y ~60 nodos"; esto es el tope duro por si no obedece
+    static final int MAPA_MAX_PROFUNDIDAD = 4;
+    static final int MAPA_MAX_NODOS = 80;
 
     private final ObjectMapper objectMapper;
 
@@ -138,6 +144,70 @@ public class AiQuizResponseParser {
             log.error("Error al parsear las tarjetas devueltas por la IA: {}", rawJsonResponse, e);
             throw new AiGenerationException("La IA devolvió un formato no válido: " + e.getMessage(), e);
         }
+    }
+
+    /**
+     * Mapa mental devuelto por la IA: {@code {"titulo", "raiz": {"texto", "hijos": [...]}}}. Lo que exceda de
+     * {@link #MAPA_MAX_PROFUNDIDAD} niveles o {@link #MAPA_MAX_NODOS} nodos se descarta en vez de rechazar el
+     * mapa entero, y los nodos sin texto se omiten. Sin ninguna rama es un error.
+     */
+    MapaGenerado parseMindMap(String rawJsonResponse, String originalFileName) {
+        try {
+            JsonNode mapaNode = objectMapper.readTree(extractCompletionContent(rawJsonResponse));
+
+            String titulo = mapaNode.path("titulo").asText(null);
+            if (StringUtils.isBlank(titulo)) {
+                titulo = (originalFileName != null && !originalFileName.isBlank())
+                        ? "Mapa de " + originalFileName.replaceFirst("(?i)\\.pdf$", "")
+                        : "Mapa generado por IA";
+            }
+            titulo = TextoTarjeta.normalizar(titulo, 150);
+
+            int[] nodos = { 1 }; // la raíz
+            ObjectNode raiz = objectMapper.createObjectNode();
+            JsonNode raizNode = mapaNode.path("raiz");
+            String textoRaiz = TextoTarjeta.normalizar(raizNode.path("texto").asText(""), MapaMentalService.MAX_TOPIC);
+            raiz.put("topic", textoRaiz.isEmpty() ? titulo : textoRaiz);
+            ArrayNode hijos = hijosMapa(raizNode.path("hijos"), 2, nodos);
+            if (hijos.isEmpty()) {
+                throw new AiGenerationException("La IA no devolvió ninguna rama para el mapa mental.");
+            }
+            raiz.set("children", hijos);
+
+            ObjectNode contenido = objectMapper.createObjectNode();
+            contenido.set("nodeData", raiz);
+            return new MapaGenerado(titulo, objectMapper.writeValueAsString(contenido), nodos[0]);
+        } catch (AiGenerationException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Error al parsear el mapa mental devuelto por la IA: {}", rawJsonResponse, e);
+            throw new AiGenerationException("La IA devolvió un formato no válido: " + e.getMessage(), e);
+        }
+    }
+
+    private ArrayNode hijosMapa(JsonNode hijos, int nivel, int[] nodos) {
+        ArrayNode salida = objectMapper.createArrayNode();
+        if (!hijos.isArray() || nivel > MAPA_MAX_PROFUNDIDAD) {
+            return salida;
+        }
+        for (JsonNode hijo : hijos) {
+            String texto = TextoTarjeta.normalizar(hijo.path("texto").asText(""), MapaMentalService.MAX_TOPIC);
+            if (texto.isEmpty()) {
+                continue;
+            }
+            if (nodos[0] == MAPA_MAX_NODOS) {
+                break;
+            }
+            nodos[0]++;
+            ObjectNode nodo = objectMapper.createObjectNode();
+            nodo.put("topic", texto);
+            ArrayNode nietos = hijosMapa(hijo.path("hijos"), nivel + 1, nodos);
+            if (!nietos.isEmpty()) {
+                nodo.set("children", nietos);
+            }
+            salida.add(nodo);
+        }
+        return salida;
     }
 
     String getRequestedQuestionType(PdfQuizGeneratorRequest request) {

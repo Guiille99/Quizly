@@ -12,6 +12,7 @@ Aplicación web de cuestionarios organizada por asignaturas y temas. Permite a l
 - Creación, edición y borrado de cuestionarios propios.
 - Compartición de cuestionarios entre usuarios, con solicitudes aceptables/rechazables desde las notificaciones.
 - Tarjetas inteligentes (`/mazos`): mazos de tarjetas anverso/reverso, propios y privados, que se estudian con repetición espaciada (algoritmo SM-2 con granularidad de días: cada tarjeta se califica como "Otra vez", "Difícil", "Bien" o "Fácil" y vuelve cuando toca). Se crean a mano o importando un cuestionario ("Crear tarjetas" en su ficha y en el resumen del intento). Las preguntas falladas al terminar un intento alimentan un mazo automático, "Repaso de fallos": reprograman su tarjeta si ya existe o la crean. Los intentos que cierra el job de caducidad no alimentan tarjetas.
+- Mapas mentales (`/mapas`): mapas propios y privados con un editor visual (añadir, mover y plegar ideas; clic derecho para más opciones), que se pueden vincular a un tema, descargar como PNG, imprimir y convertir en un mazo de tarjetas ("Crear mazo de tarjetas": una tarjeta por cada idea con ramas, máximo 50). Se crean a mano o con IA desde un PDF. El contenido se valida siempre en el servidor (máximo 500 nodos, 10 niveles y 200 caracteres por nodo).
 - Edición del perfil, cambio de contraseña y eliminación de cuenta.
 
 **Administración** (rol `ADMIN`)
@@ -20,9 +21,10 @@ Aplicación web de cuestionarios organizada por asignaturas y temas. Permite a l
 - Importación de cuestionarios desde JSON.
 - Generación de cuestionarios con IA a partir de un PDF (desde "Mis cuestionarios").
 - Generación de mazos de tarjetas con IA a partir de un PDF (desde "Tarjetas", hasta 50 tarjetas). Una sola llamada al modelo: si el PDF no cabe en la ventana de contexto se rechaza como demasiado largo. Comparte con la generación de cuestionarios la cuota de uso por usuario (10 por hora y 40 al día).
+- Generación de mapas mentales con IA a partir de un PDF (desde "Mapas mentales", hasta unos 80 nodos y 4 niveles; lo que excede se descarta). Una sola llamada al modelo, con el mismo rechazo por PDF demasiado largo y la misma cuota de uso por usuario que cuestionarios y tarjetas. El mapa generado se edita después como cualquier otro.
 
 **Seguridad**
-- Limitación de frecuencia en login, recuperación de contraseña y generación con IA (cuestionarios y tarjetas).
+- Limitación de frecuencia en login, recuperación de contraseña y generación con IA (cuestionarios, tarjetas y mapas mentales).
 
 ## Tecnologías
 
@@ -49,7 +51,7 @@ Maven no hace falta instalarlo: se usa el wrapper (`mvnw` / `mvnw.cmd`).
    - `V1__create_schema.sql` (esquema)
    - `V2__seed_reference_data.sql` (datos de referencia)
 
-   Si ya tienes una base de datos de una versión anterior, aplica en su lugar los scripts de [src/main/resources/db/update/](src/main/resources/db/update/) (por ejemplo, `1.0.0_to_1.1.0.sql` añade las tablas `mazos` y `tarjetas`).
+   Si ya tienes una base de datos de una versión anterior, aplica en su lugar los scripts de [src/main/resources/db/update/](src/main/resources/db/update/) (por ejemplo, `1.0.0_to_1.1.0.sql` añade las tablas `mazos`, `tarjetas` y `mapas_mentales`).
 
    En producción `ddl-auto` es `validate`, por lo que cualquier cambio de esquema debe aplicarse a mano y reflejarse en estos scripts.
 
@@ -127,7 +129,7 @@ src/main/resources/
 ./mvnw test -Dtest=CuestionarioServiceTest     # una clase
 ```
 
-Hay pruebas unitarias con JUnit/Mockito de servicios (IA, parser, importación JSON, cuestionarios, favoritos, compartición, perfil, tarjetas y algoritmo SM-2, etc.), de seguridad (limitador de frecuencia, filtro de login) y de varios controladores. `AppApplicationTests` es una prueba de contexto que puede requerir la configuración y la base de datos descritas arriba.
+Hay pruebas unitarias con JUnit/Mockito de servicios (IA, parser, importación JSON, cuestionarios, favoritos, compartición, perfil, tarjetas, algoritmo SM-2 y mapas mentales, etc.), de seguridad (limitador de frecuencia, filtro de login) y de varios controladores. `AppApplicationTests` es una prueba de contexto que puede requerir la configuración y la base de datos descritas arriba.
 
 ## Licencia
 

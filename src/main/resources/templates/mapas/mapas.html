@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es" th:replace="~{layout/base_layout :: layout(~{::main})}">
+<head th:replace="~{fragments/head :: head('Quizly - Mapas mentales')}"></head>
+<body>
+    <main th:fragment="main" class="w-full px-6 py-8">
+        <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
+            <div>
+                <h1 class="text-xl font-semibold tracking-tight text-text">Mapas mentales</h1>
+                <p class="mt-1 text-sm text-text-muted">Organiza las ideas de un tema en un esquema visual y ramificado.</p>
+            </div>
+            <div class="flex flex-wrap gap-2">
+                <button type="button" sec:authorize="hasRole('ADMIN')" class="btn btn-outline"
+                    onclick="document.getElementById('modalIAMapas').showModal()">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    Generar con IA
+                </button>
+                <a th:href="@{/mapas/nuevo}" class="btn btn-primary">
+                    <i class="fa-solid fa-plus"></i>
+                    Nuevo mapa
+                </a>
+            </div>
+        </div>
+
+        <!-- Generación con IA: solo admin (la cuota de Gemini es gratuita y no se puede servir a otros usuarios) -->
+        <dialog id="modalIAMapas" class="modal modal-middle" sec:authorize="hasRole('ADMIN')">
+            <div class="modal-box">
+                <button type="button" onclick="document.getElementById('modalIAMapas').close()"
+                    class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" aria-label="Cerrar">✕</button>
+                <h3 class="text-xl font-bold mb-4">Generar un mapa mental desde un PDF</h3>
+
+                <form th:action="@{/mapas/generar-ia}" method="post" enctype="multipart/form-data" class="space-y-4">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+
+                    <fieldset class="fieldset p-0">
+                        <label for="ia-mapas-pdf" class="label"
+                            th:text="|PDF (máximo ${maxFileSizeMb} MB)|">PDF</label>
+                        <input id="ia-mapas-pdf" type="file" name="file" accept="application/pdf"
+                            class="file-input w-full" required>
+                    </fieldset>
+
+                    <button type="submit" class="btn btn-primary w-full"
+                        data-loading-text="Generando mapa con IA...">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        Generar mapa
+                    </button>
+                    <p class="text-xs text-text-muted">Podrás editar el mapa después. Revísalo antes de estudiarlo: la IA puede equivocarse.</p>
+                </form>
+            </div>
+            <form method="dialog" class="modal-backdrop"><button aria-label="Cerrar">cerrar</button></form>
+        </dialog>
+
+        <!-- Filtro por asignatura: solo si algún mapa tiene tema -->
+        <form th:if="${!listado.asignaturas.empty}" th:action="@{/mapas}" method="get" class="mb-4 flex items-center gap-2">
+            <label for="filtro-asignatura" class="text-sm text-text-muted">Asignatura</label>
+            <select id="filtro-asignatura" name="asignatura" class="select select-sm w-auto" onchange="this.form.submit()">
+                <option value="">Todas</option>
+                <option th:each="a : ${listado.asignaturas}" th:value="${a.id}" th:text="${a.nombre}"
+                    th:selected="${listado.asignaturaId != null and listado.asignaturaId == a.id}"></option>
+            </select>
+            <noscript><button type="submit" class="btn btn-sm btn-outline">Filtrar</button></noscript>
+        </form>
+
+        <div th:if="${listado.mapas.empty and listado.asignaturaId == null}" class="flex flex-col items-center justify-center py-16 text-center">
+            <div class="w-16 h-16 rounded-2xl bg-surface-alt flex items-center justify-center mb-4">
+                <i class="fa-solid fa-diagram-project text-2xl text-text-muted"></i>
+            </div>
+            <h3 class="font-semibold text-text">Todavía no tienes mapas mentales</h3>
+            <p class="text-sm text-text-muted mt-1 max-w-xs">Crea un mapa y empieza a ramificar tus ideas.</p>
+            <a th:href="@{/mapas/nuevo}" class="btn btn-primary mt-4">Crear mi primer mapa</a>
+        </div>
+
+        <p th:if="${listado.mapas.empty and listado.asignaturaId != null}" class="py-10 text-center text-sm text-text-muted">
+            No tienes mapas de esta asignatura.
+            <a th:href="@{/mapas}" class="link">Ver todos</a>
+        </p>
+
+        <div th:if="${!listado.mapas.empty}" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            <section th:each="mapa : ${listado.mapas}" class="card">
+                <div class="card-body gap-3">
+                    <h2 class="font-semibold text-text break-words" th:text="${mapa.titulo}">Título</h2>
+                    <p th:if="${mapa.tema != null}" class="text-xs text-text-muted"
+                        th:text="${mapa.tema.asignatura != null ? mapa.tema.asignatura.nombre + ' · ' + mapa.tema.nombre : mapa.tema.nombre}"></p>
+                    <p th:if="${mapa.descripcion != null}" class="text-sm text-text-muted break-words"
+                        th:text="${mapa.descripcion}"></p>
+
+                    <div class="mt-auto flex items-end justify-between gap-3 pt-2">
+                        <p class="text-sm text-text-muted"
+                            th:text="|Editado el ${#temporals.format(mapa.updatedAt, 'dd/MM/yyyy')}|"></p>
+                        <a th:href="@{/mapas/{id}(id=${mapa.id})}" class="btn btn-primary btn-sm">
+                            <i class="fa-regular fa-pen-to-square" aria-hidden="true"></i>
+                            Abrir
+                        </a>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+</body>
+</html>

@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.quizly.app.dto.ai.MazoGenerado;
+import com.quizly.app.dto.ai.TarjetaGenerada;
 import com.quizly.app.exception.MazoNotFoundException;
 import com.quizly.app.model.entity.Cuestionario;
 import com.quizly.app.model.entity.Mazo;
@@ -122,11 +123,19 @@ public class MazoService {
         }
     }
 
-    /** Guarda el mazo y todas sus tarjetas en una sola transacción: si algo falla no queda un mazo a medias. */
-    @Transactional
     public Mazo crearDesdeIa(Long usuarioId, MazoGenerado generado) {
-        Mazo mazo = crear(usuarioId, generado.titulo(), "Generado con IA a partir de un PDF.");
-        tarjetaRepository.saveAll(generado.tarjetas().stream().map(t -> {
+        return crearConTarjetas(usuarioId, generado.titulo(), "Generado con IA a partir de un PDF.",
+                generado.tarjetas());
+    }
+
+    /**
+     * Guarda el mazo y todas sus tarjetas en una sola transacción: si algo falla no queda un mazo a medias.
+     * Las tarjetas deben llegar ya normalizadas a las longitudes de las columnas (ver {@code TextoTarjeta}).
+     */
+    @Transactional
+    public Mazo crearConTarjetas(Long usuarioId, String titulo, String descripcion, List<TarjetaGenerada> tarjetas) {
+        Mazo mazo = crear(usuarioId, titulo, descripcion);
+        tarjetaRepository.saveAll(tarjetas.stream().map(t -> {
             Tarjeta tarjeta = new Tarjeta();
             tarjeta.setMazo(mazo);
             tarjeta.setAnverso(t.anverso());

@@ -164,6 +164,34 @@ public class BreadcrumbService {
     }
 
     // =========================================================================
+    // Zona Estudiante: Mapas mentales
+    // =========================================================================
+
+    private static final BreadcrumbItem MAPAS = new BreadcrumbItem("Mapas mentales", "/mapas");
+
+    /**
+     * Ej: Mapas mentales
+     */
+    public List<BreadcrumbItem> mapas() {
+        return List.of(new BreadcrumbItem("Mapas mentales", null));
+    }
+
+    /**
+     * Ej: Mapas mentales > Nuevo mapa
+     */
+    public List<BreadcrumbItem> mapaNuevo() {
+        return List.of(MAPAS, new BreadcrumbItem("Nuevo mapa", null));
+    }
+
+    /**
+     * Ej: Mapas mentales > Editar '[Título]'
+     */
+    public List<BreadcrumbItem> mapaEditar(String titulo) {
+        String label = (titulo != null && !titulo.isBlank()) ? "Editar '" + titulo + "'" : "Editar mapa";
+        return List.of(MAPAS, new BreadcrumbItem(label, null));
+    }
+
+    // =========================================================================
     // Zona Estudiante: Mi Progreso
     // =========================================================================
 
